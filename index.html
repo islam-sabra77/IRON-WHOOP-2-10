@@ -337,6 +337,28 @@ button.insight:first-of-type{border-top:0}
 .hrow .mini{height:28px;min-width:28px;padding:0 6px}
 .linkbadge{display:inline-block;margin-top:5px;font-size:11.5px;font-weight:800;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);border-radius:99px;padding:2px 9px}
 .hday.auto{position:relative}.hday.auto::after{content:"";position:absolute;right:4px;top:4px;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.55}
+.sdaynav{display:flex;align-items:center;gap:8px;margin:2px 0 10px}
+.sdaynav .mini{height:46px;min-width:46px;font-size:20px}.sdaynav .mini:disabled{opacity:.35}
+.sdate{flex:1;position:relative;background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:6px 12px;text-align:center;cursor:pointer}
+.sdate b{display:block;font-size:16px}.sdate span{font-size:12px;color:var(--mu);font-weight:650}
+.sdate input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.suppw{margin-bottom:8px}.suppw .supp{margin-bottom:0}.suppw .mi{cursor:pointer}
+.suppw.open .supp{border-radius:18px 18px 0 0;border-bottom-color:transparent}
+.sbody{background:var(--sf);border:1px solid var(--ln);border-top:0;border-radius:0 0 18px 18px;padding:4px 12px 12px}
+.dots i.sel{outline:2px solid var(--ink);outline-offset:1px}
+.sih{margin:14px 0 6px;font-size:16px}
+.sinfo{background:color-mix(in srgb,var(--c) 8%,var(--sf));border:1px solid color-mix(in srgb,var(--c) 25%,var(--ln));border-radius:14px;padding:10px 12px;font-size:13.5px}
+.sirow{display:grid;grid-template-columns:110px 1fr;gap:8px;padding:4px 0;border-bottom:1px dashed var(--ln)}
+.sirow span,.sib>span{font-weight:800;color:var(--mu);font-size:12.5px}
+.sib{padding-top:6px}.sib ul{margin:4px 0 0;padding-left:18px}.sib li{margin:2px 0}.sib p{margin:3px 0 0}
+.sib.warn p{color:var(--ink)}
+.sinfohead{font-size:13px;margin:8px 0 6px;color:var(--ok);font-weight:700}
+.gitem{border:1px solid var(--ln);background:var(--sf);border-radius:14px;margin:8px 0;padding:10px 12px}
+.gitem summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.gitem summary::-webkit-details-marker{display:none}
+.gitem summary b{font-size:15.5px}.gitem summary span{font-size:12.5px;color:var(--mu)}
+.gitem summary em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--ok)}
+.gitem[open] summary{margin-bottom:8px}
 .slot{font-size:15px;font-weight:800;margin:14px 2px 6px;color:var(--mu)}
 .supp{display:flex;align-items:center;gap:12px;padding:12px;background:var(--sf);border:1px solid var(--ln);border-radius:18px;margin-bottom:8px}
 .supp .dot{flex:0 0 12px;height:44px;border-radius:6px;background:var(--c)}
@@ -1394,20 +1416,123 @@ function ring(p,c,size,sw,label){const r=(size-sw)/2,C=2*Math.PI*r;return`<svg c
 function spark(pts){const W=110,H=34;if(pts.length<2)return`<span class="pill" style="--c:${COLORS.upper}">${Math.round(pts[0])} e1RM</span>`;const mn=Math.min(...pts),mx=Math.max(...pts),rg=mx-mn||1;const p=pts.map((v,i)=>`${(i/(pts.length-1)*(W-6)+3).toFixed(1)},${(H-3-(v-mn)/rg*(H-6)).toFixed(1)}`).join(' ');const up=pts[pts.length-1]>=pts[0];return`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><polyline points="${p}" fill="none" stroke="${up?'#12B76A':'#EF3B55'}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`}
 
 /* ---------- SUPPLEMENTS ---------- */
+/* ---------- SUPPLEMENT GUIDE (40 common supplements) ----------
+   a: names to recognise (lower case, matched as text inside the name you type)
+   d: typical dose, w: best time, s: slot in the stack, b: benefits, tip: practical tip, c: caution */
+const SUPP_DB=[
+{id:'creatine',n:'Creatine monohydrate',a:['creatine'],d:'3–5 g daily',w:'Any time of day, every day. Consistency matters more than timing.',s:'Morning',b:['More strength and power on short, hard efforts','Helps build lean mass alongside training','May support brain function and memory'],tip:'Mix with water, juice or your shake. A loading phase (20 g a day for 5–7 days) is optional and just fills muscles faster.',c:'Expect 1–2 kg of water weight in muscle. Drink enough water. Talk to your doctor first if you have kidney problems.'},
+{id:'casein',n:'Casein protein',a:['casein','micellar'],d:'30–40 g (about 1 scoop)',w:'Before bed',s:'Evening',b:['Slow-digesting protein that feeds muscle overnight','Helps reach your daily protein target','Keeps you full for longer'],tip:'Mixes thick. Use milk or water and shake well.',c:'Contains dairy, so avoid if you are allergic to milk protein.'},
+{id:'plantprot',n:'Plant protein',a:['plant protein','pea protein','vegan protein','rice protein','soy protein'],d:'25–40 g per serving',w:'Any time; after training or to boost a low-protein meal',s:'Post-workout',b:['Dairy-free way to hit your protein target','Pea and rice blends give a complete amino acid profile','Easy on digestion for many people'],tip:'Choose a blend (pea + rice) or take a slightly larger serving than whey for the same muscle effect.',c:'Check the label for heavy-metal testing (third-party tested brands).'},
+{id:'whey',n:'Whey protein',a:['whey','protein isolate','isolate','protein powder','protein shake','protein'],d:'20–40 g (about 1 scoop)',w:'Within about 2 hours after training, or any time to top up daily protein',s:'Post-workout',b:['Fast-digesting protein that supports muscle repair and growth','Makes your daily target (about 1.6–2.2 g per kg of body weight) easy to reach','Isolate is lower in lactose and fat than concentrate'],tip:'Total daily protein matters most. Spread it over 3–5 meals of 25–40 g each.',c:'Concentrate contains lactose; isolate is usually fine for people with mild lactose intolerance.'},
+{id:'carnitine',n:'L-Carnitine (L-Tartrate)',a:['carnitine','lcar','l-car','alcar'],d:'1–2 g daily',w:'With a meal that contains carbs, which improves uptake into muscle',s:'Morning',b:['May reduce muscle soreness and speed recovery after hard sessions','Plays a role in moving fat into cells to be used for energy','Acetyl-L-carnitine (ALCAR) is the form used for focus'],tip:'Effects build over several weeks of daily use. Evidence for fat loss on its own is weak.',c:'Can cause stomach upset or a fishy body odour at high doses.'},
+{id:'berberine',n:'Berberine',a:['berberine'],d:'500 mg, 2–3 times a day (1–1.5 g total)',w:'Just before or with your main meals',s:'With meals',b:['Supports healthy blood sugar levels','May improve cholesterol and triglycerides','Can support gut health'],tip:'Splitting the dose across meals works better and is easier on the stomach.',c:'Interacts with many medicines, including diabetes and blood-pressure drugs. Check with your doctor first. Not for pregnancy or breastfeeding. Can cause stomach upset.'},
+{id:'magnesium',n:'Magnesium',a:['magnesium','mag glycinate','zma'],d:'200–400 mg (elemental magnesium)',w:'Evening, 30–60 minutes before bed',s:'Evening',b:['Supports sleep quality and relaxation','Needed for muscle contraction and to limit cramps','Commonly low in people who sweat a lot (hot climates, hard training)'],tip:'Glycinate is the gentlest and best for sleep; citrate is well absorbed; oxide is poorly absorbed.',c:'Citrate and oxide can loosen stools. Talk to your doctor if you have kidney disease.'},
+{id:'omega3',n:'Omega-3 (fish oil)',a:['omega','fish oil','epa','dha','krill'],d:'1–3 g of EPA + DHA combined',w:'With a meal that contains fat',s:'With meals',b:['Supports heart health and lowers triglycerides','May reduce joint stiffness and muscle soreness','Supports brain and eye health'],tip:'Read the label for EPA + DHA, not total fish oil. Freezing capsules reduces fishy burps.',c:'Talk to your doctor if you take blood thinners.'},
+{id:'vitd',n:'Vitamin D3',a:['vitamin d','vit d','d3','cholecalciferol'],d:'1,000–4,000 IU daily (test your blood level)',w:'With your fattiest meal of the day',s:'With meals',b:['Supports bones, muscles and the immune system','Deficiency is very common, even in sunny countries where people stay indoors','Low levels are linked to poorer recovery and mood'],tip:'Pairs well with vitamin K2. Get a blood test (25-OH vitamin D) to set your dose.',c:'Don\u2019t take more than 4,000 IU a day long-term unless a doctor advises it.'},
+{id:'vitk2',n:'Vitamin K2 (MK-7)',a:['k2','vitamin k','mk-7','mk7'],d:'90–200 mcg daily',w:'With vitamin D3 and a meal that contains fat',s:'With meals',b:['Helps direct calcium into bones','Supports artery health','Works together with vitamin D3'],tip:'Often sold combined with D3 in one capsule.',c:'Do not take with warfarin or similar blood thinners unless your doctor approves.'},
+{id:'vitc',n:'Vitamin C',a:['vitamin c','vit c','ascorbic'],d:'250–1,000 mg daily',w:'Any time; with food if it upsets your stomach',s:'Morning',b:['Supports the immune system','Needed to build collagen for tendons, ligaments and skin','Improves iron absorption from food'],tip:'Taking it with collagen before rehab or tendon work is a smart pairing.',c:'Very high doses (2 g+) around training may blunt some training adaptations and can cause loose stools.'},
+{id:'b12',n:'Vitamin B12',a:['b12','b-12','methylcobalamin','cyanocobalamin'],d:'250–1,000 mcg daily',w:'Morning',s:'Morning',b:['Supports energy production and red blood cells','Supports nerve health','Important if you eat little meat or take metformin'],tip:'Only helps energy if you are actually low. A blood test can confirm.',c:'Very safe; excess is passed in urine.'},
+{id:'bcomplex',n:'B-complex',a:['b complex','b-complex','b-vitamin','b vitamins','vitamin b complex'],d:'1 capsule daily (per label)',w:'Morning with breakfast',s:'Morning',b:['Covers all eight B vitamins for energy metabolism','Supports nerves and red blood cells','Useful during high stress or a restricted diet'],tip:'Taking it in the evening can feel stimulating for some people.',c:'Bright yellow urine is normal. Avoid very high B6 doses long-term.'},
+{id:'multi',n:'Multivitamin',a:['multivitamin','multi-vitamin','multi vitamin'],d:'1 serving daily (per label)',w:'With breakfast',s:'Morning',b:['Fills small gaps in your diet','Easy insurance during travel or busy periods','Covers many vitamins and minerals at once'],tip:'It supports a good diet; it doesn\u2019t replace one.',c:'Check for overlap with your other supplements (e.g. zinc, iron, vitamin D) to avoid doubling up.'},
+{id:'zinc',n:'Zinc',a:['zinc'],d:'15–30 mg daily',w:'With a meal; not at the same time as iron or calcium',s:'With meals',b:['Supports the immune system','Supports testosterone if you are deficient','Lost in sweat, so needs can be higher with hard training'],tip:'Often taken in the evening as part of ZMA.',c:'Over 40 mg a day long-term can lower copper levels. Can cause nausea on an empty stomach.'},
+{id:'iron',n:'Iron',a:['iron','ferrous','ferritin'],d:'Only if a blood test shows low iron; dose as advised (often 18–65 mg)',w:'Morning with vitamin C, away from coffee, tea, dairy and calcium',s:'Morning',b:['Treats iron deficiency and the tiredness it causes','Supports oxygen delivery to muscles','Supports endurance'],tip:'Get your ferritin tested before starting. Most men don\u2019t need extra iron.',c:'Too much iron is harmful. Can cause constipation and stomach upset. Keep away from children.'},
+{id:'calcium',n:'Calcium',a:['calcium'],d:'500 mg per dose (only if your diet is low)',w:'With meals; split larger amounts',s:'With meals',b:['Supports bone strength','Needed for muscle contraction','Useful if you eat little dairy'],tip:'Food first: dairy, sardines, tahini and leafy greens.',c:'Take apart from iron and zinc. Too much can raise kidney-stone risk.'},
+{id:'electrolytes',n:'Electrolytes',a:['electrolyte','lmnt','hydration','sodium','potassium'],d:'Per label (roughly 300–1,000 mg sodium per serving)',w:'During or after long, hot or sweaty sessions',s:'Pre-workout',b:['Replaces sodium and potassium lost in sweat','Helps prevent cramps and headaches in the heat','Supports performance in long sessions'],tip:'Especially useful in the KSA summer and on long Saturday cardio.',c:'Talk to your doctor if you have high blood pressure or kidney problems.'},
+{id:'caffeine',n:'Caffeine',a:['caffeine','pre-workout','preworkout','pre workout'],d:'100–300 mg (about 1–3 mg per kg)',w:'30–60 minutes before training; not within 8 hours of bedtime',s:'Pre-workout',b:['Boosts focus, energy and performance','Lowers perceived effort','One of the best-studied performance aids'],tip:'Count coffee and pre-workouts together. Pairs well with L-theanine for smoother focus.',c:'Keep total intake under 400 mg a day. Late caffeine lowers sleep quality and HRV.'},
+{id:'betaalanine',n:'Beta-alanine',a:['beta-alanine','beta alanine'],d:'3.2–6.4 g daily, split into smaller doses',w:'Any time, every day (it builds up over 2–4 weeks)',s:'Pre-workout',b:['Buffers acid in muscles during hard efforts of 1–4 minutes','Can add reps to high-rep sets and intervals','Effects build with daily use'],tip:'Split into 2–3 doses of 1.6 g to reduce tingling.',c:'Harmless skin tingling (paresthesia) is common.'},
+{id:'citrulline',n:'L-Citrulline',a:['citrulline'],d:'6–8 g citrulline malate (or 3–5 g pure L-citrulline)',w:'30–60 minutes before training',s:'Pre-workout',b:['Improves blood flow and the muscle pump','May add a few reps and reduce soreness','Supports nitric oxide production'],tip:'Check if it\u2019s citrulline malate or pure citrulline, as the doses differ.',c:'Generally well tolerated; mild stomach upset at high doses.'},
+{id:'bcaa',n:'BCAAs',a:['bcaa','branched'],d:'5–10 g',w:'Around training',s:'Pre-workout',b:['Can reduce soreness slightly','Easy to sip during long sessions','Contain leucine, which signals muscle building'],tip:'If you already eat enough protein, BCAAs add little. EAAs or a protein shake work better.',c:'Not a replacement for full protein.'},
+{id:'eaa',n:'EAAs (essential amino acids)',a:['eaa','essential amino'],d:'10–15 g',w:'Before or during training, especially when training fasted',s:'Pre-workout',b:['All nine essential amino acids for building muscle','Light on the stomach before training','Useful when you can\u2019t eat a meal before an early session'],tip:'A good option for your early-morning workouts if you train before breakfast.',c:'Generally well tolerated.'},
+{id:'glutamine',n:'Glutamine',a:['glutamine'],d:'5 g daily',w:'Any time; often after training or before bed',s:'Post-workout',b:['Supports the gut lining','May support the immune system during heavy training or travel','The body\u2019s most abundant amino acid'],tip:'Benefits for muscle growth in healthy people are small.',c:'Generally safe at normal doses.'},
+{id:'hmb',n:'HMB',a:['hmb','hydroxymethylbutyrate'],d:'3 g daily, split into 2–3 doses',w:'With meals, one dose before training',s:'With meals',b:['May reduce muscle breakdown','Most useful for beginners, older lifters or during a calorie deficit','Supports recovery'],tip:'Less useful if you already eat plenty of protein and are well trained.',c:'Generally safe.'},
+{id:'collagen',n:'Collagen',a:['collagen','gelatin','gelatine'],d:'10–15 g, with about 50 mg vitamin C',w:'30–60 minutes before mobility, rehab or training',s:'Pre-workout',b:['Supports tendons, ligaments and joints','May help joint pain and old injuries (knees, elbows)','Supports skin, hair and nails'],tip:'Taking it before your mobility work suits your ACL knee and tennis elbow rehab.',c:'Not a complete protein, so don\u2019t count it toward your daily protein target.'},
+{id:'ashwagandha',n:'Ashwagandha',a:['ashwagandha','ksm-66','ksm66','withania'],d:'300–600 mg root extract (e.g. KSM-66)',w:'Evening (or morning)',s:'Evening',b:['Lowers stress and cortisol','Supports sleep quality','May support strength and testosterone'],tip:'Effects build over 4–8 weeks. Many people cycle it (8–12 weeks on, a few weeks off).',c:'Avoid with thyroid conditions, in pregnancy, or with sedatives. Rare reports of liver problems. Stop if you notice side effects.'},
+{id:'rhodiola',n:'Rhodiola rosea',a:['rhodiola'],d:'200–600 mg extract',w:'Morning, on an empty stomach',s:'Morning',b:['Reduces fatigue and mental tiredness','Supports stress resilience','May help endurance'],tip:'Useful for heavy travel or work periods.',c:'Can be stimulating, so avoid in the evening. Avoid with bipolar disorder.'},
+{id:'melatonin',n:'Melatonin',a:['melatonin'],d:'0.5–3 mg (low doses often work best)',w:'30–60 minutes before your target bedtime',s:'Evening',b:['Helps you fall asleep','Helps reset your body clock after long flights','Short-term sleep support'],tip:'Great for jet lag: take it at bedtime in the new time zone for a few nights.',c:'Best for short-term use. Can cause grogginess. A prescription is needed in some countries.'},
+{id:'glycine',n:'Glycine',a:['glycine'],d:'3 g',w:'Before bed',s:'Evening',b:['May improve sleep quality and morning alertness','Supports collagen production','Lowers core body temperature slightly for sleep'],tip:'Slightly sweet powder, so it mixes easily in water.',c:'Generally very safe.'},
+{id:'theanine',n:'L-Theanine',a:['theanine'],d:'100–200 mg',w:'With caffeine for focus, or in the evening to relax',s:'Morning',b:['Calm focus without drowsiness','Smooths out caffeine jitters (about a 2:1 ratio of theanine to caffeine)','May support sleep'],tip:'Naturally found in green tea.',c:'Generally safe.'},
+{id:'probiotic',n:'Probiotics',a:['probiotic','lactobacillus','bifido'],d:'Per label (billions of CFU)',w:'With or just before breakfast',s:'Morning',b:['Supports gut health and digestion','May support the immune system','Can help during and after antibiotics or travel'],tip:'Benefits depend on the strain. Fermented foods (yoghurt, kefir) help too.',c:'Mild bloating for the first few days is common.'},
+{id:'fiber',n:'Psyllium fibre',a:['psyllium','fiber','fibre','metamucil'],d:'5–10 g',w:'Before meals, with a large glass of water',s:'With meals',b:['Supports regular digestion','Helps lower LDL cholesterol','Improves fullness and blood-sugar control'],tip:'Start low and build up to avoid bloating.',c:'Take medicines at least 2 hours apart from fibre. Always take with plenty of water.'},
+{id:'curcumin',n:'Curcumin (turmeric)',a:['curcumin','turmeric'],d:'500–1,000 mg extract',w:'With a meal that contains fat',s:'With meals',b:['Supports joints and reduces inflammation','May ease exercise soreness','Antioxidant'],tip:'Choose a form with black pepper (piperine) or a high-absorption formula.',c:'Talk to your doctor if you take blood thinners or have gallbladder problems.'},
+{id:'coq10',n:'CoQ10',a:['coq10','co q10','coenzyme','ubiquinol','ubiquinone'],d:'100–200 mg',w:'With a meal that contains fat',s:'With meals',b:['Supports energy production in cells','Supports heart health','Often recommended for people on statins'],tip:'Ubiquinol is the better-absorbed form.',c:'May interact with blood thinners and blood-pressure medicines.'},
+{id:'nac',n:'NAC (N-acetylcysteine)',a:['nac','acetylcysteine','n-acetyl'],d:'600–1,200 mg',w:'Any time; morning is common',s:'Morning',b:['Raises glutathione, the body\u2019s main antioxidant','Supports lung and respiratory health','Supports liver health'],tip:'Has a sulphur smell; that\u2019s normal.',c:'High-dose antioxidants right after training may blunt some adaptations. Check with your doctor if you have asthma or take nitroglycerin.'},
+{id:'ala',n:'Alpha-lipoic acid',a:['lipoic','alpha lipoic','alpha-lipoic'],d:'300–600 mg',w:'On an empty stomach, 30 minutes before a meal',s:'Morning',b:['Supports healthy blood sugar','Antioxidant','Supports nerve health'],tip:'Pairs with berberine for blood-sugar support, but check with your doctor first.',c:'Can lower blood sugar. Take care with diabetes medicines.'},
+{id:'taurine',n:'Taurine',a:['taurine'],d:'1–3 g',w:'Before training or in the evening',s:'Pre-workout',b:['Supports hydration and muscle function','Supports heart health','May improve sleep and reduce cramps'],tip:'Calming rather than stimulating, despite being in energy drinks.',c:'Generally safe.'},
+{id:'tartcherry',n:'Tart cherry',a:['tart cherry','montmorency','cherry'],d:'30 mL concentrate or about 480 mg extract',w:'Evening, or twice daily during hard training blocks',s:'Evening',b:['Reduces muscle soreness and speeds recovery','Natural source of melatonin for sleep','Antioxidant'],tip:'Useful in the week of a hard training block or after long cardio.',c:'Juice concentrate contains sugar.'},
+{id:'beetroot',n:'Beetroot (nitrate)',a:['beet','beetroot','nitrate'],d:'300–600 mg nitrate (about 70 mL concentrated shot)',w:'2–3 hours before endurance or cardio sessions',s:'Pre-workout',b:['Improves endurance and blood flow','Can lower blood pressure','Makes cardio feel easier'],tip:'Avoid antibacterial mouthwash; mouth bacteria are needed to activate the nitrate.',c:'Pink urine is harmless. Talk to your doctor if you take blood-pressure medicines.'},
+{id:'tongkat',n:'Tongkat Ali',a:['tongkat','longjack','eurycoma'],d:'200–400 mg standardised extract',w:'Morning',s:'Morning',b:['May support testosterone in men with low levels','May reduce stress hormones','May support energy and mood'],tip:'Effects take several weeks; many cycle it.',c:'Quality varies a lot between brands. Avoid with hormone-sensitive conditions; check with your doctor.'},
+{id:'inositol',n:'Myo-inositol',a:['inositol'],d:'2–4 g',w:'Evening or split with meals',s:'Evening',b:['Supports insulin sensitivity','May support calm and sleep','Supports hormone balance'],tip:'Powder dissolves easily in water.',c:'High doses can cause mild stomach upset.'}
+];
+const SUPP_GENERIC=new Set(['protein','isolate','protein powder','protein shake','fiber','fibre','cherry','sodium','potassium','hydration','beet','iron','multi vitamin']);
+function suppInfo(name){const n=(name||'').toLowerCase();if(!n.trim())return null;for(const pass of [0,1]){let best=null,bl=0;for(const e of SUPP_DB)for(const al of e.a){if((pass===0)===SUPP_GENERIC.has(al))continue;if(n.includes(al)&&al.length>bl){best=e;bl=al.length}}if(best)return best}return null}
+function suppInfoHTML(e,c){if(!e)return'';return`<div class="sinfo" style="--c:${c||'var(--cardio)'}">
+  <div class="sirow"><span>💊 Typical dose</span><b>${esc(e.d)}</b></div>
+  <div class="sirow"><span>⏰ Best time</span><b>${esc(e.w)}</b></div>
+  <div class="sib"><span>✅ Benefits</span><ul>${e.b.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+  ${e.tip?`<div class="sib"><span>💡 Tip</span><p>${esc(e.tip)}</p></div>`:''}
+  ${e.c?`<div class="sib warn"><span>⚠️ Good to know</span><p>${esc(e.c)}</p></div>`:''}</div>`}
+
+/* ---------- SUPPLEMENTS TAB ---------- */
 const SLOTS=['Morning','Pre-workout','Post-workout','With meals','Evening'];
+function sTaken(id,d){return!!(S.suppLog[d]&&S.suppLog[d][id])}
+function sStreak(id){let t=todayS(),n=0;if(!sTaken(id,t))t=addD(t,-1);while(sTaken(id,t)&&n<1000){n++;t=addD(t,-1)}return n}
+function sBest(id){let best=0,cur=0;const t=todayS();for(let i=400;i>=0;i--){if(sTaken(id,addD(t,-i))){cur++;best=Math.max(best,cur)}else cur=0}return best}
+function s30(id){let n=0;const t=todayS();for(let i=0;i<30;i++)if(sTaken(id,addD(t,-i)))n++;return n}
 function renderSupps(){
-  const v=document.getElementById('view'),t=todayS(),lg=S.suppLog[t]||{};const taken=S.supps.filter(s=>lg[s.id]).length;
-  let h=`<div class="phead"><h2 class="pagetitle disp">Supplements</h2><button class="addbtn" style="--c:var(--cardio)" data-a="addsupp">${IC.plus}Add</button></div><p class="sub">${nice(t)}. Tick each one as you take it. Tap the pencil to edit or remove.</p>
-  <div class="card"><div class="ringwrap">${ring(S.supps.length?taken/S.supps.length:0,COLORS.cardio,88,10,taken+'/'+S.supps.length)}<div><div class="disp" style="font-size:30px">${taken===S.supps.length&&taken?'All taken today':'Today\u2019s stack'}</div><div class="muted" style="font-size:13.5px">${suppStreak()?suppStreak()+'-day streak with everything taken':'Take all of them to start a streak'}</div></div></div></div>`;
+  UI.sm=UI.sm||{};const v=document.getElementById('view'),t=todayS();if(!UI.sday||UI.sday>t)UI.sday=t;const d=UI.sday,lg=S.suppLog[d]||{};
+  const taken=S.supps.filter(s=>lg[s.id]).length,isT=d===t;
+  let h=`<div class="phead"><h2 class="pagetitle disp">Supplements</h2><button class="addbtn" style="--c:var(--cardio)" data-a="addsupp">${IC.plus}Add</button></div>
+  <div class="sdaynav"><button class="mini" data-a="sday" data-v="-1" aria-label="Previous day">‹</button><label class="sdate"><b>${isT?'Today':nice(d)}</b><span>${isT?nice(d):'Tap to pick another day'}</span><input type="date" data-in="sday" value="${d}" max="${t}" aria-label="Pick a day"></label><button class="mini" data-a="sday" data-v="1" ${isT?'disabled':''} aria-label="Next day">›</button></div>
+  ${isT?'':`<div class="demo-banner"><span>Editing a past day. Tick what you took on ${nice(d)}.</span><button class="mini" data-a="stoday">Today</button></div>`}
+  <div class="card"><div class="ringwrap">${ring(S.supps.length?taken/S.supps.length:0,COLORS.cardio,88,10,taken+'/'+S.supps.length)}<div><div class="disp" style="font-size:30px">${taken===S.supps.length&&taken?(isT?'All taken today':'All taken'):(isT?'Today\u2019s stack':'Stack for '+short(d))}</div><div class="muted" style="font-size:13.5px">${suppStreak()?suppStreak()+'-day streak with everything taken':'Take all of them to start a streak'}</div></div></div></div>
+  <p class="tapnote">Tap a supplement to see its calendar, benefits and best time to take it.</p>`;
   SLOTS.forEach(sl=>{const list=S.supps.filter(s=>s.slot===sl);if(!list.length)return;h+=`<div class="slot">${sl}</div>`;
-    list.forEach(s=>{const on=!!lg[s.id];let dots='';for(let i=13;i>=0;i--){const d=addD(t,-i);dots+=`<i class="${S.suppLog[d]&&S.suppLog[d][s.id]?'on':''}"></i>`}
-      h+=`<div class="supp" style="--c:${s.c}"><span class="dot"></span><div class="mi"><b>${esc(s.n)} <span class="pill" style="--c:${s.c}">${esc(s.d)}</span></b><span>${esc(s.note)}</span><div class="dots" title="Last 14 days">${dots}</div></div><button class="editbtn" data-a="suppopen" data-k="${s.id}" aria-label="Edit or remove ${esc(s.n)}">${IC.pen}</button><button class="tick ${on?'on':''}" data-a="supp" data-k="${s.id}" aria-label="Took ${esc(s.n)}">${IC.check}</button></div>`})});
-  if(!S.supps.length)h+=`<div class="card"><p style="margin:0">No supplements in your list. Tap <b>Add</b> to create one.</p></div>`;
-  h+=`<button class="cta" style="--c:var(--cardio);margin-top:12px" data-a="addsupp">${IC.plus} Add a supplement</button>
-  <p class="muted" style="font-size:12.5px;margin-top:14px">Timing notes are general guidance, not medical advice. Check with your doctor before combining berberine with any medication.</p>`;
+    list.forEach(s=>{const on=!!lg[s.id],open=UI.sx===s.id,info=suppInfo(s.n);let dots='';for(let i=13;i>=0;i--){const dd=addD(t,-i);dots+=`<i class="${sTaken(s.id,dd)?'on':''} ${dd===d?'sel':''}"></i>`}
+      h+=`<div class="suppw ${open?'open':''}" style="--c:${s.c}"><div class="supp"><span class="dot"></span><div class="mi" data-a="sopen" data-k="${s.id}" role="button" aria-expanded="${open}"><b>${esc(s.n)} <span class="pill" style="--c:${s.c}">${esc(s.d)}</span></b><span>${esc(s.note||(info?info.w:''))}</span><div class="dots" title="Last 14 days">${dots}</div></div><button class="editbtn" data-a="suppopen" data-k="${s.id}" aria-label="Edit or remove ${esc(s.n)}">${IC.pen}</button><button class="tick ${on?'on':''}" data-a="supp" data-k="${s.id}" aria-label="Took ${esc(s.n)} on ${short(d)}">${IC.check}</button></div>`;
+      if(open){
+        const mk=UI.sm[s.id]||t.slice(0,7);const[y,mo]=mk.split('-').map(Number);const dim=new Date(y,mo,0).getDate(),first=new Date(y,mo-1,1).getDay();
+        let doneM=0,elig=0,cells=DS.map(x=>`<div class="dh" style="font-size:11px;text-align:center;color:var(--mu);font-weight:700">${x[0]}</div>`).join('');for(let i=0;i<first;i++)cells+='<button class="hday blank" tabindex="-1"></button>';
+        for(let i=1;i<=dim;i++){const dd=ds(new Date(y,mo-1,i));if(dd<=t){elig++;if(sTaken(s.id,dd))doneM++}cells+=`<button class="hday num ${sTaken(s.id,dd)?'on':''} ${dd>t?'fut':''} ${dd===t?'today':''}" data-a="sdaytoggle" data-k="${s.id}" data-d="${dd}">${i}</button>`}
+        h+=`<div class="sbody"><div class="kv" style="grid-template-columns:repeat(3,1fr);margin-top:0"><div><b class="disp num">${sStreak(s.id)}</b><span>Day streak</span></div><div><b class="disp num">${sBest(s.id)}</b><span>Best streak</span></div><div><b class="disp num">${s30(s.id)}/30</b><span>Last 30 days</span></div></div>
+        <div class="mnav"><button class="mini" data-a="sm" data-k="${s.id}" data-v="-1">‹</button><b>${MN[mo-1]} ${y}, ${doneM} of ${elig} days</b><button class="mini" data-a="sm" data-k="${s.id}" data-v="1">›</button></div><div class="hcal">${cells}</div>
+        <div class="pnote">Tap any past day to mark it taken or not taken.</div>
+        ${info?`<h5 class="sih">About ${esc(info.n)}</h5>${suppInfoHTML(info,s.c)}`:`<div class="pnote">No guide entry for this one yet. Name it like a common supplement (e.g. "Magnesium glycinate") to see its benefits and timing.</div>`}</div>`;
+      }
+      h+=`</div>`})});
+  if(!S.supps.length)h+=`<div class="card"><p style="margin:0">No supplements in your list. Tap <b>Add</b> or browse the guide.</p></div>`;
+  h+=`<div class="grid2" style="margin-top:12px"><button class="cta" style="--c:var(--cardio);margin:0" data-a="addsupp">${IC.plus} Add</button><button class="cta ghost" style="margin:0" data-a="sguide">📖 Supplement guide</button></div>
+  <p class="muted" style="font-size:12.5px;margin-top:14px">Doses and timings are general guidance for healthy adults, not medical advice. Check with your doctor before starting anything new, especially if you take medication.</p>`;
   v.innerHTML=h;
 }
-function suppStreak(){let t=todayS(),n=0;const full=d=>S.supps.length&&S.supps.every(s=>S.suppLog[d]&&S.suppLog[d][s.id]);if(!full(t))t=addD(t,-1);while(full(t)){n++;t=addD(t,-1)}return n}
+function suppStreak(){let t=todayS(),n=0;const full=d=>S.supps.length&&S.supps.every(s=>S.suppLog[d]&&S.suppLog[d][s.id]);if(!full(t))t=addD(t,-1);while(full(t)&&n<1000){n++;t=addD(t,-1)}return n}
+function guideSheet(q){
+  q=(q||'').toLowerCase().trim();const list=SUPP_DB.filter(e=>!q||e.n.toLowerCase().includes(q)||e.a.some(a=>a.includes(q))).sort((a,b)=>a.n.localeCompare(b.n));
+  const inStack=e=>S.supps.some(s=>suppInfo(s.n)===e);
+  openSheet(`<h4 class="disp">Supplement guide</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">${SUPP_DB.length} common supplements with benefits, dose and best time. Tap one to read more and add it to your stack.</p>
+  <input type="text" id="gq" data-in="gq" placeholder="Search, e.g. magnesium" value="${esc(q)}" autocomplete="off">
+  <div id="glist">${list.map(e=>`<details class="gitem"><summary><b>${esc(e.n)}</b><span>${esc(e.d)}</span>${inStack(e)?'<em>In your stack</em>':''}</summary>${suppInfoHTML(e)}${inStack(e)?'':`<button class="cta" style="--c:var(--cardio);margin-top:8px" data-a="gadd" data-v="${e.id}">${IC.plus} Add to my stack</button>`}</details>`).join('')||'<p class="muted">No match. Try another name.</p>'}</div>
+  <button class="cta ghost" data-a="close">Close</button>`);
+}
+function suppSheet(id,pre){
+  const x=id?S.supps.find(q=>q.id===id):(pre?{n:pre.n,d:pre.d,slot:pre.s,note:'',c:HAB_COLORS[S.supps.length%HAB_COLORS.length]}:{n:'',d:'',slot:'Morning',note:'',c:HAB_COLORS[S.supps.length%HAB_COLORS.length]});UI.sdraft={c:x.c,isNew:!id};
+  const info=suppInfo(x.n);
+  openSheet(`<h4 class="disp">${id?'Edit supplement':'Add supplement'}</h4>
+  <label class="fl2" for="sn">Name</label><input type="text" id="sn" data-in="sname" list="sdb" placeholder="Start typing, e.g. Magnesium" maxlength="40" value="${esc(x.n)}" autocomplete="off"><datalist id="sdb">${SUPP_DB.map(e=>`<option value="${esc(e.n)}">`).join('')}</datalist>
+  <div id="sinfo">${info?`<div class="sinfohead">ℹ️ Recognised: <b>${esc(info.n)}</b></div>${suppInfoHTML(info)}`:''}</div>
+  <label class="fl2" for="sd">Your dose</label><input type="text" id="sd" placeholder="${info?esc(info.d):'e.g. 2,000 IU'}" maxlength="40" value="${esc(x.d)}">
+  <label class="fl2" for="ss">When</label><select id="ss">${SLOTS.map(sl=>`<option ${sl===x.slot?'selected':''}>${sl}</option>`).join('')}</select>
+  <label class="fl2" for="snote">Note (optional)</label><input type="text" id="snote" placeholder="${info?esc(info.w):'e.g. With breakfast'}" maxlength="90" value="${esc(x.note)}">
+  <span class="fl2">Colour</span><div class="swatches">${HAB_COLORS.map(c=>`<button class="sw ${c===x.c?'on':''}" style="--c:${c}" data-a="scol" data-v="${c}" aria-label="Colour"></button>`).join('')}</div>
+  <button class="cta" style="--c:var(--cardio)" data-a="suppsave" data-k="${id||''}">${id?'Save changes':'Add supplement'}</button>
+  ${id?`<button class="dangerbtn" data-a="delsupp" data-k="${id}">Remove ${esc(x.n)}</button>`:''}`);
+}
+function suppNameInput(el){
+  const info=suppInfo(el.value),box=document.getElementById('sinfo');if(!box)return;
+  box.innerHTML=info?`<div class="sinfohead">ℹ️ Recognised: <b>${esc(info.n)}</b></div>${suppInfoHTML(info)}`:'';
+  const sd=document.getElementById('sd'),ss=document.getElementById('ss'),sn=document.getElementById('snote');
+  sd.placeholder=info?info.d:'e.g. 2,000 IU';sn.placeholder=info?info.w:'e.g. With breakfast';
+  if(info&&UI.sdraft&&UI.sdraft.isNew&&UI.sdraft.lastInfo!==info.id){ss.value=info.s;UI.sdraft.lastInfo=info.id}
+}
 
 /* ---------- HABITS ---------- */
 const LINKS={
@@ -1549,17 +1674,6 @@ function habSheet(id){
   <button class="cta" style="--c:var(--long)" data-a="habsave" data-k="${id||''}">${id?'Save changes':'Add habit'}</button>
   ${id?`<button class="dangerbtn" data-a="habdel" data-k="${id}">Remove ${esc(x.n)}</button>`:''}`);
 }
-function suppSheet(id){
-  const x=id?S.supps.find(q=>q.id===id):{n:'',d:'',slot:'Morning',note:'',c:HAB_COLORS[S.supps.length%HAB_COLORS.length]};UI.sdraft={c:x.c};
-  openSheet(`<h4 class="disp">${id?'Edit supplement':'Add supplement'}</h4>
-  <label class="fl2" for="sn">Name</label><input type="text" id="sn" placeholder="e.g. Vitamin D3" maxlength="40" value="${esc(x.n)}">
-  <label class="fl2" for="sd">Dose</label><input type="text" id="sd" placeholder="e.g. 2,000 IU" maxlength="24" value="${esc(x.d)}">
-  <label class="fl2" for="ss">When</label><select id="ss">${SLOTS.map(sl=>`<option ${sl===x.slot?'selected':''}>${sl}</option>`).join('')}</select>
-  <label class="fl2" for="snote">Note (optional)</label><input type="text" id="snote" placeholder="e.g. With breakfast" maxlength="90" value="${esc(x.note)}">
-  <span class="fl2">Colour</span><div class="swatches">${HAB_COLORS.map(c=>`<button class="sw ${c===x.c?'on':''}" style="--c:${c}" data-a="scol" data-v="${c}" aria-label="Colour"></button>`).join('')}</div>
-  <button class="cta" style="--c:var(--cardio)" data-a="suppsave" data-k="${id||''}">${id?'Save changes':'Add supplement'}</button>
-  ${id?`<button class="dangerbtn" data-a="delsupp" data-k="${id}">Remove ${esc(x.n)}</button>`:''}`);
-}
 function finishSheet(d){
   const u=units(d),l=S.logs[d]||{};let sets=0,vol=0;Object.keys(l).forEach(k=>{if(k[0]==='_')return;(l[k].sets||[]).forEach(s=>{if(s.d){sets++;vol+=(+s.w||0)*(+s.r||0)}})});
   const dur=l._t0?Math.round((Date.now()-l._t0)/60000):null;const pct=Math.round(pctOf(u)*100);
@@ -1664,13 +1778,20 @@ document.addEventListener('click',ev=>{
   case'tstop':TM=null;drawTimer();break;
   case'extend':{const ne=document.getElementById('extEnd').value;if(!ne||ne<=S.end){toast('Pick a date after '+short(S.end));break}const r=analyze().rec;S.ext.push({from:addD(S.end,1),to:ne,vol:r.vol,extra:r.extra,trim:r.trim});S.end=ne;save();rerender();toast('Plan extended to '+short(ne));break}
   case'unextend':{const x=S.ext.pop();if(x){S.end=addD(x.from,-1);save();rerender();toast('Extension removed')}break}
-  case'supp':{const t=todayS();S.suppLog[t]=S.suppLog[t]||{};if(S.suppLog[t][k])delete S.suppLog[t][k];else S.suppLog[t][k]=1;save();rerender();break}
+  case'supp':{const dd=UI.sday||todayS();S.suppLog[dd]=S.suppLog[dd]||{};if(S.suppLog[dd][k])delete S.suppLog[dd][k];else S.suppLog[dd][k]=1;if(!Object.keys(S.suppLog[dd]).length)delete S.suppLog[dd];save();rerender();break}
+  case'sopen':UI.sx=UI.sx===k?null:k;rerender();break;
+  case'sday':{const nd=addD(UI.sday||todayS(),+el.dataset.v);if(nd<=todayS()){UI.sday=nd;rerender()}break}
+  case'stoday':UI.sday=todayS();rerender();break;
+  case'sdaytoggle':{const dd=el.dataset.d;if(dd>todayS())break;S.suppLog[dd]=S.suppLog[dd]||{};if(S.suppLog[dd][k])delete S.suppLog[dd][k];else S.suppLog[dd][k]=1;if(!Object.keys(S.suppLog[dd]).length)delete S.suppLog[dd];save();rerender();break}
+  case'sm':{const cur=UI.sm[k]||todayS().slice(0,7);const[y,m]=cur.split('-').map(Number);const nd=new Date(y,m-1+(+el.dataset.v),1);UI.sm[k]=nd.getFullYear()+'-'+pad(nd.getMonth()+1);rerender();break}
+  case'sguide':guideSheet('');break;
+  case'gadd':{const e=SUPP_DB.find(x=>x.id===el.dataset.v);if(e)suppSheet(null,e);break}
   case'suppedit':UI.suppEdit=!UI.suppEdit;rerender();break;
   case'suppopen':suppSheet(k);break;
   case'scol':UI.sdraft.c=el.dataset.v;el.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===el));break;
   case'delsupp':{const i=S.supps.findIndex(s=>s.id===k);if(i<0)break;const rem=S.supps.splice(i,1)[0];save();closeSheet();rerender();toast('Removed '+rem.n,()=>S.supps.splice(i,0,rem));break}
   case'addsupp':suppSheet();break;
-  case'suppsave':{const n=document.getElementById('sn').value.trim();if(!n){toast('Add a name first');break}const o={n,d:document.getElementById('sd').value.trim()||'1 serving',slot:document.getElementById('ss').value,note:document.getElementById('snote').value.trim()||'',c:UI.sdraft.c};if(k){Object.assign(S.supps.find(q=>q.id===k),o);toast('Saved '+n)}else{S.supps.push(Object.assign({id:'s'+Date.now()},o));toast('Added '+n)}save();closeSheet();rerender();break}
+  case'suppsave':{const n=document.getElementById('sn').value.trim();if(!n){toast('Add a name first');break}const inf=suppInfo(n);const o={n,d:document.getElementById('sd').value.trim()||(inf?inf.d.replace(/ daily$/,''):'1 serving'),slot:document.getElementById('ss').value,note:document.getElementById('snote').value.trim()||'',c:UI.sdraft.c};if(k){Object.assign(S.supps.find(q=>q.id===k),o);toast('Saved '+n)}else{S.supps.push(Object.assign({id:'s'+Date.now()},o));toast(inf?'Added '+n+'. Tap it to see benefits and best time.':'Added '+n)}save();closeSheet();rerender();break}
   case'habtoday':case'habday':{habToggle(k,el.dataset.d||todayS());save();rerender();break}
   case'habopen':UI.hx=UI.hx===k?null:k;rerender();break;
   case'habm':{const cur=UI.hm[k]||todayS().slice(0,7);const[y,m]=cur.split('-').map(Number);const nd=new Date(y,m-1+(+el.dataset.v),1);UI.hm[k]=nd.getFullYear()+'-'+pad(nd.getMonth()+1);rerender();break}
@@ -1690,6 +1811,10 @@ document.addEventListener('click',ev=>{
   case'reset':if(window.confirm('Delete all logs, habits and settings? This cannot be undone.')){S=defaults();save();closeSheet();UI.date=S.start;rerender()}break;
   }
 });
+document.addEventListener('input',ev=>{const el=ev.target;if(!el.dataset)return;
+  if(el.dataset.in==='sname')suppNameInput(el);
+  if(el.dataset.in==='gq'){const q=el.value,pos=el.selectionStart;guideSheet(q);const n=document.getElementById('gq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}
+});
 document.addEventListener('change',ev=>{
   const el=ev.target;if(!el.dataset||!el.dataset.in)return;const t=el.dataset.in,k=el.dataset.k,d=UI.date;
   if(t==='w'||t==='r'){const[slot,i]=k.split('|');const f=findItem(d,slot);if(!f)return;const o=slotLog(d,slot,f.it.ex,f.it.rx.sets);o.sets[+i][t]=el.value.replace(',','.').trim();save();HISTCACHE=null}
@@ -1697,6 +1822,7 @@ document.addEventListener('change',ev=>{
   else if(t==='mvdate'){if(el.value){const mode=(UI.mv&&UI.mv.mode)||'move';if(doSchedule(mode,el.value)){closeSheet();UI.date=mode==='move'?el.value:UI.date;rerender();toast((mode==='move'?'Moved to ':'Copied to ')+short(el.value),()=>{undoSched()})}}}
   else if(t==='start'){if(el.value&&el.value<S.end){S.start=el.value;save();rerender();toast('Plan now starts '+short(el.value))}}
   else if(t==='hlk'){const v2=el.value;document.getElementById('hlrow').classList.toggle('hide',!v2);if(v2){const L=LINKS[v2];document.getElementById('hllab').textContent='Done when '+L.l.toLowerCase()+' '+L.op+(L.u?' ('+L.u+')':'');document.getElementById('hlt').value=L.def}}
+  else if(t==='sday'){if(el.value&&el.value<=todayS()){UI.sday=el.value;rerender()}}
   else if(t==='theme'){applyTheme(el.value);try{localStorage.setItem(KEY+'-theme',el.value)}catch(e){}}
 });
 function applyTheme(v){if(v==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',v)}
