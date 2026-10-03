@@ -64,7 +64,13 @@ export default async (req) => {
       need: (need.baseline_milli || 0) + (need.need_from_sleep_debt_milli || 0) + (need.need_from_recent_strain_milli || 0) - (need.need_from_recent_nap_milli || 0) };
   });
   const cycles = cyc.filter(x => x.score_state === 'SCORED' && x.score).map(x => ({ id: x.id, start: x.start, end: x.end,
-    strain: x.score.strain, kj: x.score.kilojoule, ahr: x.score.average_heart_rate, mhr: x.score.max_heart_rate }));
-  return json({ connected: true, records, sleeps, cycles });
+    strain: x.score.strain, kj: x.score.kilojoule, ahr: x.score.average_heart_rate, mhr: x.score.max_heart_rate,
+    steps: x.score.step_count != null ? x.score.step_count : (x.step_count != null ? x.step_count : null) }));
+  let body = null;
+  try {
+    const br = await fetch(API + '/v2/user/measurement/body', { headers: { Authorization: 'Bearer ' + tok.at } });
+    if (br.ok) { const b = await br.json(); body = { height: b.height_meter, weight: b.weight_kilogram, maxhr: b.max_heart_rate }; }
+  } catch (e) {}
+  return json({ connected: true, records, sleeps, cycles, body });
 };
 export const config = { path: '/api/whoop-data' };

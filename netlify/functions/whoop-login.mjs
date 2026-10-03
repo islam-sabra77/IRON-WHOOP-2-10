@@ -13,7 +13,7 @@ export default async (req) => {
   const state = crypto.randomUUID().replace(/-/g, '');
   await getStore('whoop').setJSON('state:' + state, { k, t: Date.now() });
   const auth = new URL('https://api.prod.whoop.com/oauth/oauth2/auth');
-  auth.search = new URLSearchParams({ client_id: id, redirect_uri: url.origin + '/api/whoop-callback', response_type: 'code', scope: 'offline read:recovery read:cycles read:sleep', state }).toString();
+  auth.search = new URLSearchParams({ client_id: id, redirect_uri: url.origin + '/api/whoop-callback', response_type: 'code', scope: 'offline read:recovery read:cycles read:sleep read:body_measurement read:profile', state }).toString();
   return new Response(null, { status: 302, headers: { Location: auth.toString() } });
 };
 export const config = { path: '/api/whoop-login' };
