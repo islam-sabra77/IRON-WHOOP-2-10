@@ -302,6 +302,39 @@ textarea{height:110px;padding:10px;font-size:12px;font-family:ui-monospace,monos
 .insight b{display:block;font-size:15px}
 .insight span{font-size:13.5px;color:var(--mu)}
 .demo-banner{display:flex;justify-content:space-between;align-items:center;gap:8px;background:color-mix(in srgb,var(--warn) 18%,transparent);border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700;margin:6px 0 0}
+.vital{width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.vital .go,.go{color:var(--mu);font-size:18px;line-height:1}
+.whero .wring{border:0;background:none;padding:0;color:inherit;cursor:pointer}
+.tapnote{font-size:12.5px;color:var(--mu);font-weight:650;margin:-6px 2px 10px}
+.ctop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.linkhead{border:0;background:none;padding:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
+.linkhead.wide{display:flex;justify-content:space-between;align-items:flex-start;width:100%}
+.kv button{border:0;background:var(--sf2);border-radius:12px;padding:8px 6px;text-align:center;font:inherit;color:inherit;cursor:pointer;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--c,var(--ink)) 25%,transparent)}
+.kv button b{display:block;font-size:20px}.kv button span{font-size:11px;color:var(--mu);font-weight:700}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.btile{border:1.5px solid color-mix(in srgb,var(--c) 30%,var(--ln));background:color-mix(in srgb,var(--c) 7%,var(--sf));border-radius:14px;padding:9px;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.btile span{display:block;font-size:12px;font-weight:800;color:var(--c)}
+.btile b{display:block;font-size:24px;margin-top:2px}.btile b small{font-size:11px;color:var(--mu);font-stretch:100%;margin-left:2px}
+.btile em{font-style:normal;font-size:11px;color:var(--mu);font-weight:650}
+.sbars{position:relative;display:flex;gap:5px;align-items:flex-end;height:74px;flex:0 0 150px}
+.sb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.sb i{display:block;width:100%;border-radius:5px 5px 3px 3px}
+.sb span{font-size:10px;font-weight:750;color:var(--mu);margin-top:3px}
+.gline{position:absolute;left:0;right:0;border-top:1.5px dashed var(--c)}
+button.insight{width:100%;border:0;border-top:1px solid var(--ln);background:none;text-align:left;font:inherit;color:inherit;cursor:pointer}
+button.insight:first-of-type{border-top:0}
+.panel .card h4{font-size:24px}
+.mdhead{display:flex;align-items:center;gap:10px}.mdhead h4{margin:0}
+.dotc{width:16px;height:16px;border-radius:5px;background:var(--c)}
+.mdval{display:flex;align-items:center;gap:14px;margin:6px 0 10px}
+.mdval b{font-size:52px;color:var(--c);line-height:1}
+.wkbars{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end}
+.wkbars div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:104px}
+.wkbars i{display:block;width:70%;border-radius:6px}
+.wkbars b{font-size:11px;margin-top:4px}.wkbars span{font-size:10.5px;color:var(--mu);font-weight:700}
+.hrow{display:grid;grid-template-columns:1fr auto 64px auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--ln);font-size:13.5px}
+.hrow:first-of-type{border-top:0}.hrow b{font-size:14.5px}.hrow em{font-style:normal;font-weight:800;text-align:right;font-size:12.5px}
+.hrow .mini{height:28px;min-width:28px;padding:0 6px}
 .slot{font-size:15px;font-weight:800;margin:14px 2px 6px;color:var(--mu)}
 .supp{display:flex;align-items:center;gap:12px;padding:12px;background:var(--sf);border:1px solid var(--ln);border-radius:18px;margin-bottom:8px}
 .supp .dot{flex:0 0 12px;height:44px;border-radius:6px;background:var(--c)}
@@ -443,7 +476,7 @@ function defaults(){return{
     {id:'h2',n:'8,000+ steps',e:'👟',c:'#FF6A13'},
     {id:'h3',n:'Lights out by 10:30',e:'🌙',c:'#7B4DFF'}
   ],
-  habitLog:{},trips:[],col:{},clips:{},whoop:{connected:false,auto:true,last:0},wdata:{}
+  habitLog:{},trips:[],col:{},clips:{},whoop:{connected:false,auto:true,last:0},wdata:{},body:{},wbody:null,stepGoal:8000
 }}
 let S;
 try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
@@ -733,7 +766,8 @@ async function whoopSync(force){
       const asleep=sl&&sl.inBed!=null?sl.inBed-(sl.awake||0):null;
       S.wdata[isoToLocal(x.created_at)]={rec:x.rec,hrv:x.hrv!=null?Math.round(x.hrv*10)/10:null,rhr:x.rhr,spo2:x.spo2!=null?Math.round(x.spo2*10)/10:null,skin:x.skin!=null?Math.round(x.skin*10)/10:null,cal:!!x.calibrating,
         sleep:sl?{perf:sl.perf,eff:sl.eff!=null?Math.round(sl.eff):null,cons:sl.cons,rr:sl.rr!=null?Math.round(sl.rr*10)/10:null,dur:hrs(asleep),light:hrs(sl.light),deep:hrs(sl.deep),rem:hrs(sl.rem),awake:hrs(sl.awake),need:hrs(sl.need),dist:sl.dist,bed:sl.start,wake:sl.end}:null,
-        strain:cy&&cy.strain!=null?Math.round(cy.strain*10)/10:null,kcal:cy&&cy.kj!=null?Math.round(cy.kj/4.184):null,ahr:cy?cy.ahr:null,mhr:cy?cy.mhr:null}});
+        strain:cy&&cy.strain!=null?Math.round(cy.strain*10)/10:null,kcal:cy&&cy.kj!=null?Math.round(cy.kj/4.184):null,ahr:cy?cy.ahr:null,mhr:cy?cy.mhr:null,steps:cy&&cy.steps!=null?cy.steps:null}});
+    whoopAfterSync(j);
     save();rerender();if(force)toast('WHOOP synced');
   }catch(e){if(force)toast('Couldn\u2019t reach WHOOP')}
 }
@@ -1069,124 +1103,198 @@ function renderTravel(){
 }
 
 /* ---------- WHOOP TAB ---------- */
-const WC={rec:'#12B76A',hrv:'#00A3FF',rhr:'#FF2D78',sleep:'#7B4DFF',strain:'#2F5BFF',spo2:'#00B39A',skin:'#F59E0B'};
+const WC={rec:'#12B76A',hrv:'#00A3FF',rhr:'#FF2D78',sleep:'#7B4DFF',strain:'#2F5BFF',spo2:'#00B39A',skin:'#F59E0B',steps:'#E8A900',kcal:'#FF6A13',ahr:'#EF3B55',body:'#00B39A'};
 const recCol=v=>v>=67?'#12B76A':v>=34?'#F5A300':'#EF3B55';
-let DEMO=null;
+let DEMO=null,DEMOB=null;
 function demoData(){if(DEMO)return DEMO;DEMO={};let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};const t=todayS();
   for(let i=119;i>=0;i--){const d=addD(t,-i),wk=dow(d);const base=60+9*Math.sin(i/8)+(wk===5||wk===6?7:0)-(i<20?0:4);const rec=Math.max(9,Math.min(98,Math.round(base+(rnd()-.5)*38)));
     const dur=Math.max(4.8,5.9+rnd()*2.3+(rec-60)/70),deep=dur*(.17+rnd()*.06),rem=dur*(.19+rnd()*.07),awake=.25+rnd()*.5;
     DEMO[d]={rec,hrv:Math.round(44+rec*.3+(rnd()-.5)*10),rhr:Math.round(61-rec*.1+(rnd()-.5)*4),spo2:+(95.2+rnd()*2.6).toFixed(1),skin:+(33.3+rnd()*.8).toFixed(1),
       sleep:{perf:Math.round(Math.min(100,dur/7.9*100)),eff:Math.round(85+rnd()*11),cons:Math.round(58+rnd()*34),rr:+(14.4+rnd()*1.4).toFixed(1),dur:+dur.toFixed(2),light:+(dur-deep-rem).toFixed(2),deep:+deep.toFixed(2),rem:+rem.toFixed(2),awake:+awake.toFixed(2),need:7.9,dist:Math.round(4+rnd()*11)},
-      strain:+(5.5+rnd()*12.5).toFixed(1),kcal:Math.round(2100+rnd()*1300),ahr:Math.round(66+rnd()*12),mhr:Math.round(138+rnd()*48)}}
+      strain:+(5.5+rnd()*12.5).toFixed(1),kcal:Math.round(2100+rnd()*1300),ahr:Math.round(66+rnd()*12),mhr:Math.round(138+rnd()*48),steps:Math.round(3500+rnd()*9500)}}
   return DEMO}
+function demoBody(){if(DEMOB)return DEMOB;DEMOB={};const t=todayS();for(let i=112;i>=0;i-=7){const d=addD(t,-i),k=(112-i)/112;DEMOB[d]={weight:+(84.6-2.8*k+Math.sin(i)*.4).toFixed(1),fat:+(22.5-2.4*k).toFixed(1),waist:+(93-3.5*k).toFixed(1),chest:+(103+1.2*k).toFixed(1),arm:+(36+1*k).toFixed(1),thigh:+(58+.8*k).toFixed(1)}}return DEMOB}
 function W(d){return UI.wdemo?demoData()[d]:(S.wdata||{})[d]}
+function B(d){return UI.wdemo?demoBody()[d]:(S.body||{})[d]}
+function wbody(){return UI.wdemo?{height:1.80,weight:81.8,maxhr:188}:S.wbody}
 const MET={
-  rec:{l:'Recovery',u:'%',c:WC.rec,g:x=>x.rec,dir:1,f:v=>Math.round(v)+'%'},
-  hrv:{l:'HRV',u:'ms',c:WC.hrv,g:x=>x.hrv,dir:1,f:v=>Math.round(v)+' ms'},
-  rhr:{l:'Resting HR',u:'bpm',c:WC.rhr,g:x=>x.rhr,dir:-1,f:v=>Math.round(v)+' bpm'},
-  sleep:{l:'Sleep',u:'h',c:WC.sleep,g:x=>x.sleep&&x.sleep.dur,dir:1,f:v=>hm(v)},
-  strain:{l:'Strain',u:'',c:WC.strain,g:x=>x.strain,dir:0,f:v=>(+v).toFixed(1)}
+  rec:{l:'Recovery',u:'%',c:WC.rec,g:x=>x.rec,dir:1,f:v=>Math.round(v)+'%',about:'How ready your body is to take on strain today. WHOOP builds it mainly from HRV, resting heart rate, respiratory rate and sleep. Green is 67% or more, yellow 34–66%, red 33% or less.'},
+  hrv:{l:'HRV',u:'ms',c:WC.hrv,g:x=>x.hrv,dir:1,about:'Heart rate variability: how much the time between heartbeats varies during deep sleep. Higher than your own normal usually means you have recovered well. Compare it with your own average, not with other people.'},
+  rhr:{l:'Resting heart rate',u:'bpm',c:WC.rhr,g:x=>x.rhr,dir:-1,about:'Your lowest steady heart rate while asleep. A rise of 5 bpm or more above your normal often follows hard training, late meals, alcohol, heat, stress or the start of an illness.'},
+  spo2:{l:'Blood oxygen',u:'%',c:WC.spo2,g:x=>x.spo2,dir:1,dec:1,about:'Average blood oxygen saturation during sleep. Most healthy people sit around 95–100%. One low night is common; a steady drop over several nights is worth paying attention to.'},
+  skin:{l:'Skin temperature',u:'°C',c:WC.skin,g:x=>x.skin,dir:0,dec:1,about:'Skin temperature during sleep. The absolute number matters less than the change from your normal; a clear jump can show up before you feel ill.'},
+  sleep:{l:'Sleep',u:'h',c:WC.sleep,g:x=>x.sleep&&x.sleep.dur,dir:1,f:v=>hm(v),about:'Time actually asleep: time in bed minus time awake. WHOOP sets a sleep need each night from your baseline, sleep debt and the previous day\u2019s strain.'},
+  sleepPerf:{l:'Sleep performance',u:'%',c:WC.sleep,g:x=>x.sleep&&x.sleep.perf,dir:1,f:v=>Math.round(v)+'%',about:'Sleep you got as a share of the sleep WHOOP said you needed. 85% or more is optimal, 70–85% sufficient, under 70% poor.'},
+  strain:{l:'Strain',u:'',c:WC.strain,g:x=>x.strain,dir:0,dec:1,about:'Total cardiovascular load for the day on a 0–21 scale. Under 10 is light, 10–14 moderate, 14–18 strenuous and 18+ all out. Match it to your recovery.'},
+  steps:{l:'Steps',u:'',c:WC.steps,g:x=>x.steps,dir:1,f:v=>Math.round(v).toLocaleString(),about:'Steps WHOOP counted across the day. Your daily goal can be changed on the Steps card.'},
+  kcal:{l:'Calories',u:'kcal',c:WC.kcal,g:x=>x.kcal,dir:0,f:v=>Math.round(v).toLocaleString()+' kcal',about:'Total energy burned during the WHOOP day, converted from the kilojoules WHOOP reports. It includes your resting metabolism, not just exercise.'},
+  ahr:{l:'Average heart rate',u:'bpm',c:WC.ahr,g:x=>x.ahr,dir:0,about:'Your average heart rate across the whole WHOOP day.'},
+  weight:{l:'Weight',u:'kg',c:WC.body,src:'body',g:b=>b.weight,dir:0,dec:1,about:'From your own log, or from your WHOOP profile when it changes. Weigh yourself at the same time of day, ideally in the morning after the bathroom, for a fair comparison.'},
+  fat:{l:'Body fat',u:'%',c:'#7B4DFF',src:'body',g:b=>b.fat,dir:-1,dec:1,about:'Body fat percentage from a scale, calipers or a scan. Use the same method each time; different methods disagree with each other.'},
+  waist:{l:'Waist',u:'cm',c:'#FF6A13',src:'body',g:b=>b.waist,dir:-1,dec:1,about:'Measure around the navel, relaxed, after breathing out, at the same time of day.'},
+  chest:{l:'Chest',u:'cm',c:'#2F5BFF',src:'body',g:b=>b.chest,dir:1,dec:1,about:'Measure around the widest part of the chest, arms relaxed at your sides.'},
+  arm:{l:'Arm',u:'cm',c:'#FF2D78',src:'body',g:b=>b.arm,dir:1,dec:1,about:'Measure around the biggest part of the upper arm, relaxed. Use the same arm every time.'},
+  thigh:{l:'Thigh',u:'cm',c:'#E8A900',src:'body',g:b=>b.thigh,dir:1,dec:1,about:'Measure around the thigh midway between hip and knee. Use the same leg every time; your left may differ after the ACL surgery.'}
 };
+const BODY_KEYS=['weight','fat','waist','chest','arm','thigh'];
 function hm(h){if(h==null||isNaN(h))return'–';const m=Math.round(h*60);return Math.floor(m/60)+'h '+pad(m%60)+'m'}
-function mval(key,d){const x=W(d);if(!x)return null;const v=MET[key]?MET[key].g(x):x[key];return v==null||isNaN(v)?null:+v}
+function fmtM(key,v){const M=MET[key];if(v==null||isNaN(v))return'–';if(M.f)return M.f(v);return(+v).toFixed(M.dec||0)+(M.u?' '+M.u:'')}
+function mval(key,d){const M=MET[key];if(!M)return null;const x=M.src==='body'?B(d):W(d);if(!x)return null;const v=M.g(x);return v==null||isNaN(v)?null:+v}
 function mavg(key,d,n,skip){let a=[];for(let i=skip?1:0;i<(skip?n+1:n);i++){const v=mval(key,addD(d,-i));if(v!=null)a.push(v)}return a.length?a.reduce((p,q)=>p+q,0)/a.length:null}
+function lastVal(key,d,max){for(let i=0;i<(max||400);i++){const dd=addD(d,-i),v=mval(key,dd);if(v!=null)return{d:dd,v}}return null}
 function latestDay(){const t=todayS();for(let i=0;i<14;i++){const d=addD(t,-i);if(W(d)&&W(d).rec!=null)return d}return t}
-function spark(key,d,n,c){const vals=[];for(let i=n-1;i>=0;i--)vals.push(mval(key,addD(d,-i)));const v=vals.filter(x=>x!=null);if(v.length<2)return'<svg></svg>';const mn=Math.min(...v),mx=Math.max(...v),rg=mx-mn||1;let pts='';vals.forEach((x,i)=>{if(x==null)return;pts+=`${(i/(n-1)*96+2).toFixed(1)},${(26-(x-mn)/rg*22).toFixed(1)} `});return`<svg viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`}
-function vital(key,label,unit,d,c,dir,dec){
-  const v=key==='hrv'||key==='rhr'?mval(key,d):(W(d)||{})[key];const a=key==='hrv'||key==='rhr'?mavg(key,d,30,true):(()=>{let s=0,n=0;for(let i=1;i<=30;i++){const x=W(addD(d,-i));if(x&&x[key]!=null){s+=x[key];n++}}return n?s/n:null})();
-  let dl='';if(v!=null&&a!=null){const diff=v-a,pctv=diff/a*100;const cls=dir===0?'neutral':(diff*dir>=0?'good':'bad');dl=`<span class="dl ${cls}">${diff>=0?'▲':'▼'} ${key==='hrv'?Math.abs(Math.round(pctv))+'%':Math.abs(diff).toFixed(dec||0)+(unit==='°C'?'°':'')} vs avg</span>`}
-  const sp=(()=>{const vals=[];for(let i=13;i>=0;i--){const x=W(addD(d,-i));vals.push(x?x[key]:null)}const vv=vals.filter(x=>x!=null);if(vv.length<2)return'';const mn=Math.min(...vv),mx=Math.max(...vv),rg=mx-mn||1;let pts='';vals.forEach((x,i)=>{if(x==null)return;pts+=`${(i/13*96+2).toFixed(1)},${(26-(x-mn)/rg*22).toFixed(1)} `});return`<svg viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`})();
-  return`<div class="vital" style="--c:${c}"><div class="vl"><span>${label}</span></div><b class="disp num">${v!=null?(+v).toFixed(dec||0):'–'}<small>${unit}</small></b>${dl||'<span class="dl neutral">Building average</span>'}${sp}</div>`;
+function whoopAfterSync(j){
+  const t=todayS();
+  if(j.body){S.wbody=j.body;const lw=lastVal('weight',t);if(j.body.weight&&(!lw||Math.abs(lw.v-j.body.weight)>=0.05)){S.body[t]=Object.assign({},S.body[t],{weight:Math.round(j.body.weight*10)/10,src:'whoop'})}}
+  const hab=(S.habits||[]).find(h=>/step/i.test(h.n));
+  if(hab){S.habitLog[hab.id]=S.habitLog[hab.id]||{};Object.keys(S.wdata).forEach(d=>{const x=S.wdata[d];if(x&&x.steps!=null&&x.steps>=(S.stepGoal||8000))S.habitLog[hab.id][d]=1})}
 }
+function sparkSVG(key,d,n,c){const vals=[];for(let i=n-1;i>=0;i--)vals.push(mval(key,addD(d,-i)));const v=vals.filter(x=>x!=null);if(v.length<2)return'';const mn=Math.min(...v),mx=Math.max(...v),rg=mx-mn||1;let pts='';vals.forEach((x,i)=>{if(x==null)return;pts+=`${(i/(n-1)*96+2).toFixed(1)},${(26-(x-mn)/rg*22).toFixed(1)} `});return`<svg viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`}
+function deltaTxt(key,v,a){const M=MET[key];if(v==null||a==null)return'<span class="dl neutral">Building average</span>';const diff=v-a;const cls=M.dir===0?'neutral':(diff*M.dir>=0?'good':'bad');const txt=key==='hrv'||key==='steps'?Math.abs(Math.round(diff/a*100))+'%':Math.abs(diff).toFixed(M.dec||0)+(M.u==='°C'?'°':M.u==='bpm'?'':M.u==='%'?' pts':'');return`<span class="dl ${cls}">${diff>=0?'▲':'▼'} ${txt} vs 30-day avg</span>`}
+function vital(key,d){const M=MET[key],v=mval(key,d),a=mavg(key,d,30,true);const val=v==null?'–':(key==='steps'?Math.round(v).toLocaleString():(+v).toFixed(M.dec||0));
+  return`<button class="vital" style="--c:${M.c}" data-a="metric" data-v="${key}" aria-label="${M.l} details"><div class="vl"><span>${M.l}</span><span class="go">›</span></div><b class="disp num">${val}<small>${M.u}</small></b>${deltaTxt(key,v,a)}${sparkSVG(key,d,14,M.c)}</button>`}
 function insights(){
   const t=todayS(),out=[];const days=[];for(let i=0;i<90;i++)days.push(addD(t,-i));
   const avg=a=>a.length?a.reduce((p,q)=>p+q,0)/a.length:null;
   const h7=mavg('hrv',t,7),hp=(()=>{let a=[];for(let i=7;i<14;i++){const v=mval('hrv',addD(t,-i));if(v!=null)a.push(v)}return avg(a)})();
-  if(h7&&hp){const ch=(h7-hp)/hp*100;out.push({e:Math.abs(ch)<2?'⚖️':ch>=0?'📈':'📉',c:ch>=0?WC.rec:WC.rhr,t:Math.abs(ch)<2?'HRV is steady this week':`HRV is ${ch>=0?'up':'down'} ${Math.abs(Math.round(ch))}% this week`,s:`7-day average ${Math.round(h7)} ms vs ${Math.round(hp)} ms the week before.${ch<-8?' Prioritise sleep and keep intensity moderate.':ch>5?' Your body is adapting well to training.':''}`})}
-  const good=[],short=[];days.forEach(d=>{const x=W(d),n=W(addD(d,1));if(x&&x.sleep&&x.sleep.dur!=null&&x.rec!=null)(x.sleep.dur>=7.5?good:short).push(x.rec)});
-  if(good.length>=3&&short.length>=3)out.push({e:'🌙',c:WC.sleep,t:`7.5h+ sleep = ${Math.round(avg(good)-avg(short))>0?'+':''}${Math.round(avg(good)-avg(short))}% recovery`,s:`Recovery averages ${Math.round(avg(good))}% after 7.5h or more of sleep, vs ${Math.round(avg(short))}% after shorter nights.`});
+  if(h7&&hp){const ch=(h7-hp)/hp*100;out.push({e:Math.abs(ch)<2?'⚖️':ch>=0?'📈':'📉',c:ch>=0?WC.rec:WC.rhr,k:'hrv',t:Math.abs(ch)<2?'HRV is steady this week':`HRV is ${ch>=0?'up':'down'} ${Math.abs(Math.round(ch))}% this week`,s:`7-day average ${Math.round(h7)} ms vs ${Math.round(hp)} ms the week before.${ch<-8?' Prioritise sleep and keep intensity moderate.':ch>5?' Your body is adapting well to training.':''}`})}
+  const good=[],short=[];days.forEach(d=>{const x=W(d);if(x&&x.sleep&&x.sleep.dur!=null&&x.rec!=null)(x.sleep.dur>=7.5?good:short).push(x.rec)});
+  if(good.length>=3&&short.length>=3){const df=Math.round(avg(good)-avg(short));out.push({e:'🌙',c:WC.sleep,k:'sleep',t:`7.5h+ sleep = ${df>=0?'+':''}${df}% recovery`,s:`Recovery averages ${Math.round(avg(good))}% after 7.5 hours or more of sleep, vs ${Math.round(avg(short))}% after shorter nights.`})}
   const byW=[[],[],[],[],[],[],[]];days.forEach(d=>{const v=mval('rec',d);if(v!=null)byW[dow(d)].push(v)});const wa=byW.map(a=>a.length>=2?avg(a):null);
-  if(wa.filter(x=>x!=null).length>=5){const best=wa.indexOf(Math.max(...wa.filter(x=>x!=null))),worst=wa.indexOf(Math.min(...wa.filter(x=>x!=null)));out.push({e:'📅',c:WC.strain,t:`${DN[best]}s are your best recovery days`,s:`${DN[best]} averages ${Math.round(wa[best])}%, ${DN[worst]} only ${Math.round(wa[worst])}%. Plan your heaviest sessions accordingly.`})}
+  if(wa.filter(x=>x!=null).length>=5){const ok=wa.filter(x=>x!=null);const best=wa.indexOf(Math.max(...ok)),worst=wa.indexOf(Math.min(...ok));out.push({e:'📅',c:WC.strain,k:'rec',t:`${DN[best]}s are your best recovery days`,s:`${DN[best]} averages ${Math.round(wa[best])}%, ${DN[worst]} only ${Math.round(wa[worst])}%. Plan your heaviest sessions accordingly.`})}
   const up=[],lo=[];days.forEach(d=>{const k=tplOf(d);if(!k||!S.done[d])return;const v=mval('rec',addD(d,1));if(v==null)return;if(T[k].k==='upper')up.push(v);if(T[k].k==='lower')lo.push(v)});
-  if(up.length>=2&&lo.length>=2)out.push({e:'🏋️',c:COLORS.lower,t:`Leg days cost ${Math.max(0,Math.round(avg(up)-avg(lo)))}% more recovery`,s:`Next-day recovery: ${Math.round(avg(lo))}% after lower body vs ${Math.round(avg(up))}% after upper body.`});
+  if(up.length>=2&&lo.length>=2)out.push({e:'🏋️',c:COLORS.lower,k:'rec',t:`Leg days cost ${Math.max(0,Math.round(avg(up)-avg(lo)))}% more recovery`,s:`Next-day recovery: ${Math.round(avg(lo))}% after lower body vs ${Math.round(avg(up))}% after upper body.`});
   const hs=[],ls=[];days.forEach(d=>{const x=W(d),n=mval('rec',addD(d,1));if(!x||x.strain==null||n==null)return;(x.strain>=14?hs:ls).push(n)});
-  if(hs.length>=3&&ls.length>=3)out.push({e:'⚡',c:WC.strain,t:`High-strain days drop next-day recovery ${Math.max(0,Math.round(avg(ls)-avg(hs)))}%`,s:`After strain 14+ you recover to ${Math.round(avg(hs))}% on average, vs ${Math.round(avg(ls))}% after lighter days.`});
+  if(hs.length>=3&&ls.length>=3)out.push({e:'⚡',c:WC.strain,k:'strain',t:`High-strain days drop next-day recovery ${Math.max(0,Math.round(avg(ls)-avg(hs)))}%`,s:`After strain 14+ you recover to ${Math.round(avg(hs))}% on average, vs ${Math.round(avg(ls))}% after lighter days.`});
+  const st=[],sl=[];days.forEach(d=>{const x=W(d),n=mval('rec',addD(d,1));if(!x||x.steps==null||n==null)return;(x.steps>=(S.stepGoal||8000)?st:sl).push(n)});
+  if(st.length>=3&&sl.length>=3){const df=Math.round(avg(st)-avg(sl));out.push({e:'👟',c:WC.steps,k:'steps',t:`Hitting your step goal: ${df>=0?'+':''}${df}% next-day recovery`,s:`Next-day recovery averages ${Math.round(avg(st))}% after ${(S.stepGoal||8000).toLocaleString()}+ steps vs ${Math.round(avg(sl))}% on quieter days.`})}
+  const w1=lastVal('weight',t),w0=(()=>{for(let i=28;i<60;i++){const v=mval('weight',addD(t,-i));if(v!=null)return v}return null})();
+  if(w1&&w0!=null){const df=w1.v-w0;out.push({e:'⚖️',c:WC.body,k:'weight',t:`Weight ${df>=0?'up':'down'} ${Math.abs(df).toFixed(1)} kg in about a month`,s:`Now ${w1.v.toFixed(1)} kg. Pair it with waist and body fat to see whether it's fat or muscle that moved.`})}
   return out;
+}
+function bodyCard(){
+  const t=todayS(),wb=wbody();const lw=lastVal('weight',t);const h=wb&&wb.height?wb.height:null;const bmi=lw&&h?lw.v/(h*h):null;
+  const tile=k=>{const lv=lastVal(k,t);const M=MET[k];return`<button class="btile" style="--c:${M.c}" data-a="metric" data-v="${k}"><span>${M.l}</span><b class="disp num">${lv?(+lv.v).toFixed(M.dec||0):'–'}<small>${M.u}</small></b><em>${lv?(lv.d===t?'today':short(lv.d)):'not logged'}</em></button>`};
+  return`<div class="card" style="--c:${WC.body}"><div class="ctop"><h4 class="disp" style="margin:0">Body</h4><button class="mini" data-a="bodylog">＋ Log</button></div>
+  <div class="bgrid">${BODY_KEYS.map(tile).join('')}</div>
+  <div class="kv" style="grid-template-columns:repeat(3,1fr)"><div><b class="disp num">${h?(h*100).toFixed(0):'–'}</b><span>Height cm</span></div><div><b class="disp num">${bmi?bmi.toFixed(1):'–'}</b><span>BMI</span></div><div><b class="disp num">${wb&&wb.maxhr?wb.maxhr:'–'}</b><span>Max HR</span></div></div>
+  <div class="pnote">Height, max heart rate and weight come from your WHOOP profile. Log the rest weekly, same day and time, for clean trends.</div></div>`;
+}
+function stepsCard(d){
+  const x=W(d)||{},goal=S.stepGoal||8000,v=x.steps;const p=v!=null?Math.min(1,v/goal):0;
+  let bars='';const vals=[];for(let i=6;i>=0;i--){const dd=addD(d,-i);vals.push([dd,mval('steps',dd)])}const mx=Math.max(goal,...vals.map(q=>q[1]||0));
+  vals.forEach(([dd,vv])=>{const hh=vv!=null?Math.max(4,vv/mx*56):4;bars+=`<div class="sb"><i style="height:${hh}px;background:${vv!=null&&vv>=goal?WC.steps:'color-mix(in srgb,'+WC.steps+' 40%,var(--sf2))'}"></i><span>${DS[dow(dd)][0]}</span></div>`});
+  const gy=56-goal/mx*56;
+  return`<div class="card" style="--c:${WC.steps}"><div class="ctop"><button class="linkhead" data-a="metric" data-v="steps"><h4 class="disp" style="margin:0">Steps ›</h4></button><button class="mini" data-a="stepgoal">Goal ${goal.toLocaleString()}</button></div>
+  <div style="display:flex;gap:14px;align-items:flex-end;margin-top:6px"><div style="flex:1"><b class="disp num" style="font-size:44px;color:${WC.steps}">${v!=null?Math.round(v).toLocaleString():'–'}</b><div class="muted" style="font-size:13px">${v==null?(x.rec!=null?'Steps not reported for this day':'No data yet'):v>=goal?'Goal reached 🎉':(goal-v).toLocaleString()+' to go'}</div>
+  <div class="bar2" style="margin-top:8px"><span style="width:${p*100}%;background:${WC.steps}"></span></div></div>
+  <div class="sbars"><div class="gline" style="top:${gy.toFixed(0)}px"></div>${bars}</div></div></div>`;
 }
 function renderWhoop(){
   const v=document.getElementById('view'),t=todayS();
   if(!S.whoop.connected&&!UI.wdemo){
-    v.innerHTML=`<h2 class="pagetitle disp">WHOOP</h2><p class="sub">Recovery, sleep, strain and trends in one place, linked to your training.</p>
-    <div class="whero" style="--c:#191A4A;grid-template-columns:1fr"><div style="position:relative;z-index:1"><div class="wd">Not connected</div><h3 class="disp">Your body's daily report</h3><p>Connect WHOOP to see recovery, HRV, resting heart rate, sleep stages and strain, plus insights on how your training affects recovery.</p>
-    <div class="hero-actions">${WH_ON?'<button class="hbtn solid" style="--c:#191A4A" data-a="wconnect">Connect WHOOP</button>':'<button class="hbtn solid" style="--c:#191A4A" data-a="settings">Open Settings</button>'}<button class="hbtn" data-a="wdemo">Preview with sample data</button></div></div></div>`;return}
+    v.innerHTML=`<h2 class="pagetitle disp">WHOOP</h2><p class="sub">Recovery, sleep, strain, steps and body in one place, linked to your training.</p>
+    <div class="whero" style="--c:#191A4A;grid-template-columns:1fr"><div style="position:relative;z-index:1"><div class="wd">Not connected</div><h3 class="disp">Your body's daily report</h3><p>Connect WHOOP to see recovery, HRV, resting heart rate, sleep stages, strain and steps, plus insights on how your training affects recovery.</p>
+    <div class="hero-actions">${WH_ON?'<button class="hbtn solid" style="--c:#191A4A" data-a="wconnect">Connect WHOOP</button>':'<button class="hbtn solid" style="--c:#191A4A" data-a="settings">Open Settings</button>'}<button class="hbtn" data-a="wdemo">Preview with sample data</button></div></div></div>${bodyCard()}`;return}
   const d=UI.wday&&W(UI.wday)?UI.wday:latestDay();UI.wday=d;const x=W(d)||{};
   let h=`<div class="phead"><h2 class="pagetitle disp">WHOOP</h2>${UI.wdemo?'':`<button class="addbtn" style="--c:var(--ink);color:var(--bg)" data-a="wsync">↻ Sync</button>`}</div>`;
   if(UI.wdemo)h+=`<div class="demo-banner"><span>Sample data preview. Nothing here is yours yet.</span><button class="mini" data-a="wdemo">Exit</button></div>`;
-  // hero
   const rc=x.rec!=null?recCol(x.rec):'#8E97BF',R=60,C=2*Math.PI*R,L=C*.75,val=x.rec!=null?L*x.rec/100:0;
   const lvl=x.rec==null?null:(UI.wdemo?(x.rec>=67?'g':x.rec>=34?'y':'r'):(whoopDay(d)||{}).lvl);
   const head={g:'Primed to push',y:'Steady. Train smart.',r:'Recover today'}[lvl]||'Waiting for data';
   const k=tplOf(d);const plan=k?T[k]:null;
   const impact=!plan?'':plan.blocks?({g:`${plan.n} runs in full.`,y:`${plan.n} becomes a lighter day.`,r:`${plan.n} switches to recovery only.`}[lvl]||''):`${plan.n} today.`;
-  h+=`<section class="whero" style="--c:${rc}"><div class="wring"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="${R}" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="13" stroke-linecap="round" stroke-dasharray="${L} ${C}" transform="rotate(135 75 75)"/><circle class="arc" cx="75" cy="75" r="${R}" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-dasharray="${val} ${C}" transform="rotate(135 75 75)"/></svg><div class="v"><b class="disp num">${x.rec!=null?Math.round(x.rec):'–'}</b><span>Recovery %</span></div></div>
+  h+=`<section class="whero" style="--c:${rc}"><button class="wring" data-a="metric" data-v="rec" aria-label="Recovery details"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="${R}" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="13" stroke-linecap="round" stroke-dasharray="${L} ${C}" transform="rotate(135 75 75)"/><circle class="arc" cx="75" cy="75" r="${R}" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-dasharray="${val} ${C}" transform="rotate(135 75 75)"/></svg><div class="v"><b class="disp num">${x.rec!=null?Math.round(x.rec):'–'}</b><span>Recovery % ›</span></div></button>
     <div style="position:relative;z-index:1"><div class="wd">${d===t?'Today':nice(d)}</div><h3 class="disp">${head}</h3><p>${impact}${x.cal?' WHOOP is still calibrating.':''}</p>${plan&&plan.blocks?`<button class="hbtn solid" style="--c:${rc}" data-a="openday" data-d="${d}">Open workout</button>`:''}</div></section>`;
-  // 14-day selector bars
   let bars='',lab='';for(let i=13;i>=0;i--){const dd=addD(t,-i),xx=W(dd),r=xx&&xx.rec!=null?xx.rec:null;bars+=`<button class="wbar ${dd===d?'on':''} ${r==null?'none':''}" style="--c:${r!=null?recCol(r):'transparent'};height:${r!=null?Math.max(8,r*.7):8}px" data-a="wday" data-d="${dd}" aria-label="${nice(dd)}${r!=null?', recovery '+Math.round(r)+'%':''}"></button>`;lab+=`<span>${i%2?'':DS[dow(dd)][0]+pd(dd).getDate()}</span>`}
-  h+=`<div class="wbars">${bars}</div><div class="wdays">${lab}</div>`;
-  // vitals
-  h+=`<div class="vgrid">${vital('hrv','HRV','ms',d,WC.hrv,1)}${vital('rhr','Resting HR','bpm',d,WC.rhr,-1)}${vital('spo2','Blood oxygen','%',d,WC.spo2,1,1)}${vital('skin','Skin temp','°C',d,WC.skin,0,1)}</div>`;
-  // sleep
+  h+=`<div class="wbars">${bars}</div><div class="wdays">${lab}</div><p class="tapnote">Tap any card to see its full history and details.</p>`;
+  h+=`<div class="vgrid">${vital('hrv',d)}${vital('rhr',d)}${vital('spo2',d)}${vital('skin',d)}</div>`;
+  h+=stepsCard(d);
   const sl=x.sleep;
   if(sl){const tot=(sl.light||0)+(sl.deep||0)+(sl.rem||0)+(sl.awake||0)||1;const pctNeed=sl.need?Math.min(100,sl.dur/sl.need*100):null;
-    h+=`<div class="card" style="--c:${WC.sleep}"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><h4 class="disp" style="margin:0">Sleep</h4><div class="muted" style="font-size:13px">${sl.bed?new Date(sl.bed).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' to '+new Date(sl.wake).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''}</div></div><div style="text-align:right"><b class="disp num" style="font-size:38px;color:${WC.sleep}">${hm(sl.dur)}</b><div class="muted" style="font-size:12.5px">${sl.need?'needed '+hm(sl.need):''}</div></div></div>
+    h+=`<div class="card" style="--c:${WC.sleep}"><button class="linkhead wide" data-a="metric" data-v="sleep"><div><h4 class="disp" style="margin:0">Sleep ›</h4><div class="muted" style="font-size:13px">${sl.bed?new Date(sl.bed).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' to '+new Date(sl.wake).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''}</div></div><div style="text-align:right"><b class="disp num" style="font-size:38px;color:${WC.sleep}">${hm(sl.dur)}</b><div class="muted" style="font-size:12.5px">${sl.need?'needed '+hm(sl.need):''}</div></div></button>
     ${pctNeed!=null?`<div class="bar2" style="margin-top:8px"><span style="width:${pctNeed}%;background:${WC.sleep}"></span></div>`:''}
     <div class="sbar">${[['awake','#C8CDEA'],['light','#9DB8FF'],['deep','#2F5BFF'],['rem','#7B4DFF']].map(([kk,cc])=>`<i style="width:${(sl[kk]||0)/tot*100}%;background:${cc}"></i>`).join('')}</div>
     <div class="slegend">${[['Awake','awake','#C8CDEA'],['Light','light','#9DB8FF'],['Deep','deep','#2F5BFF'],['REM','rem','#7B4DFF']].map(([n,kk,cc])=>`<span style="--c:${cc}">${n}<em>${hm(sl[kk])}</em></span>`).join('')}</div>
-    <div class="kv"><div><b class="disp num">${sl.perf!=null?Math.round(sl.perf)+'%':'–'}</b><span>Performance</span></div><div><b class="disp num">${sl.eff!=null?sl.eff+'%':'–'}</b><span>Efficiency</span></div><div><b class="disp num">${sl.cons!=null?Math.round(sl.cons)+'%':'–'}</b><span>Consistency</span></div><div><b class="disp num">${sl.rr!=null?sl.rr:'–'}</b><span>Resp. rate</span></div></div></div>`}
-  // strain
-  const yd=addD(d,-1),ys=W(yd)||{};const sv=d===t&&x.strain==null?null:x.strain;const band=lvl==='g'?[14,18]:lvl==='y'?[10,14]:[0,10];
+    <div class="kv"><button data-a="metric" data-v="sleepPerf"><b class="disp num">${sl.perf!=null?Math.round(sl.perf)+'%':'–'}</b><span>Performance ›</span></button><div><b class="disp num">${sl.eff!=null?sl.eff+'%':'–'}</b><span>Efficiency</span></div><div><b class="disp num">${sl.cons!=null?Math.round(sl.cons)+'%':'–'}</b><span>Consistency</span></div><div><b class="disp num">${sl.rr!=null?sl.rr:'–'}</b><span>Resp. rate</span></div></div></div>`}
+  const sv=x.strain!=null?x.strain:null;const band=lvl==='g'?[14,18]:lvl==='y'?[10,14]:[0,10];
   {const R2=62,arc=(a0,a1)=>{const p=a=>[80+R2*Math.cos(Math.PI*(1-a/21)),82-R2*Math.sin(Math.PI*(1-a/21))];const[x0,y0]=p(a0),[x1,y1]=p(a1);return`M${x0.toFixed(1)} ${y0.toFixed(1)} A${R2} ${R2} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`};
-    const sw=sv!=null?sv:0;const needle=(()=>{const a=Math.PI*(1-Math.min(21,sw)/21);return[80+R2*Math.cos(a),82-R2*Math.sin(a)]})();
-    h+=`<div class="card" style="--c:${WC.strain}"><div style="display:flex;gap:12px;align-items:center"><svg viewBox="0 0 160 92" style="width:150px;flex:0 0 150px"><path d="${arc(0,21)}" fill="none" stroke="var(--sf2)" stroke-width="14" stroke-linecap="round"/>${lvl?`<path d="${arc(band[0]+.01,band[1])}" fill="none" stroke="${rc}" stroke-opacity=".35" stroke-width="14"/>`:''}${sv!=null?`<path class="arc" d="${arc(0,Math.max(.2,Math.min(21,sw)))}" fill="none" stroke="${WC.strain}" stroke-width="14" stroke-linecap="round"/><circle cx="${needle[0].toFixed(1)}" cy="${needle[1].toFixed(1)}" r="6" fill="#fff" stroke="${WC.strain}" stroke-width="3"/>`:''}<text x="80" y="78" text-anchor="middle" font-size="30" font-weight="850" fill="var(--ink)" style="font-stretch:68%">${sv!=null?sv.toFixed(1):'–'}</text></svg>
-    <div><h4 class="disp" style="margin:0">Strain</h4><div style="font-size:13.5px">${lvl?`Target for a ${{g:'green',y:'yellow',r:'red'}[lvl]} day: <b>${band[0]}–${band[1]}</b>.`:''} ${sv!=null&&lvl?(sv>band[1]?'You went over, so prioritise sleep tonight.':sv>=band[0]?'Right in the zone.':d===t?'Room to build as the day goes on.':'Lighter than the target.'):''}</div></div></div>
-    <div class="kv" style="grid-template-columns:repeat(3,1fr)"><div><b class="disp num">${x.kcal!=null?x.kcal.toLocaleString():'–'}</b><span>Calories</span></div><div><b class="disp num">${x.ahr||'–'}</b><span>Avg HR</span></div><div><b class="disp num">${x.mhr||'–'}</b><span>Max HR</span></div></div></div>`}
-  // trends
+    const sw=sv!=null?sv:0;const nd=(()=>{const a=Math.PI*(1-Math.min(21,sw)/21);return[80+R2*Math.cos(a),82-R2*Math.sin(a)]})();
+    h+=`<div class="card" style="--c:${WC.strain}"><button class="linkhead wide" data-a="metric" data-v="strain" style="justify-content:flex-start;gap:12px"><svg viewBox="0 0 160 92" style="width:150px;flex:0 0 150px"><path d="${arc(0,21)}" fill="none" stroke="var(--sf2)" stroke-width="14" stroke-linecap="round"/>${lvl?`<path d="${arc(band[0]+.01,band[1])}" fill="none" stroke="${rc}" stroke-opacity=".35" stroke-width="14"/>`:''}${sv!=null?`<path class="arc" d="${arc(0,Math.max(.2,Math.min(21,sw)))}" fill="none" stroke="${WC.strain}" stroke-width="14" stroke-linecap="round"/><circle cx="${nd[0].toFixed(1)}" cy="${nd[1].toFixed(1)}" r="6" fill="#fff" stroke="${WC.strain}" stroke-width="3"/>`:''}<text x="80" y="78" text-anchor="middle" font-size="30" font-weight="850" fill="var(--ink)" style="font-stretch:68%">${sv!=null?sv.toFixed(1):'–'}</text></svg>
+    <div><h4 class="disp" style="margin:0">Strain ›</h4><div style="font-size:13.5px">${lvl?`Target for a ${{g:'green',y:'yellow',r:'red'}[lvl]} day: <b>${band[0]}–${band[1]}</b>.`:''} ${sv!=null&&lvl?(sv>band[1]?'You went over, so prioritise sleep tonight.':sv>=band[0]?'Right in the zone.':d===t?'Room to build as the day goes on.':'Lighter than the target.'):''}</div></div></button>
+    <div class="kv" style="grid-template-columns:repeat(3,1fr)"><button data-a="metric" data-v="kcal"><b class="disp num">${x.kcal!=null?x.kcal.toLocaleString():'–'}</b><span>Calories ›</span></button><button data-a="metric" data-v="ahr"><b class="disp num">${x.ahr||'–'}</b><span>Avg HR ›</span></button><div><b class="disp num">${x.mhr||'–'}</b><span>Max HR</span></div></div></div>`}
+  h+=bodyCard();
   const mk=UI.wmet||'rec',rg=UI.wrange||30,M=MET[mk];
-  h+=`<div class="card" style="--c:${M.c}"><h4 class="disp" style="margin:0">Trends</h4><div class="chipsrow">${Object.keys(MET).map(kk=>`<button class="mchip ${kk===mk?'on':''}" style="--c:${MET[kk].c}" data-a="wmet" data-v="${kk}">${MET[kk].l}</button>`).join('')}</div>
+  h+=`<div class="card" style="--c:${M.c}"><h4 class="disp" style="margin:0">Trends</h4><div class="chipsrow">${['rec','hrv','rhr','sleep','strain','steps','weight'].map(kk=>`<button class="mchip ${kk===mk?'on':''}" style="--c:${MET[kk].c}" data-a="wmet" data-v="${kk}">${MET[kk].l}</button>`).join('')}</div>
   <div class="chipsrow">${[7,30,90].map(n=>`<button class="mchip ${n===rg?'on':''}" style="--c:var(--ink)" data-a="wrange" data-v="${n}">${n} days</button>`).join('')}</div>
-  <div class="wchart" id="wchartWrap"><div class="wtip" id="wtip"></div><svg id="wchart" viewBox="0 0 340 170"></svg></div><div class="kv" id="wsum" style="grid-template-columns:repeat(4,1fr)"></div></div>`;
-  // insights
+  <div class="wchart" id="wwrap"><div class="wtip" id="wtip"></div><svg id="wchart" viewBox="0 0 340 170"></svg></div><div class="kv" id="wsum" style="grid-template-columns:repeat(4,1fr)"></div></div>`;
   const ins=insights();
-  h+=`<div class="card"><h4 class="disp">Insights</h4>${ins.length?ins.map(i=>`<div class="insight" style="--c:${i.c}"><span class="ic">${i.e}</span><div><b>${esc(i.t)}</b><span>${esc(i.s)}</span></div></div>`).join(''):'<p class="muted" style="margin:0;font-size:14px">Insights appear after about two weeks of data: sleep vs recovery, your best days, and how leg days and high strain affect you.</p>'}</div>`;
-  v.innerHTML=h;drawWChart();
+  h+=`<div class="card"><h4 class="disp">Insights</h4>${ins.length?ins.map(i=>`<button class="insight" style="--c:${i.c}" data-a="metric" data-v="${i.k}"><span class="ic">${i.e}</span><div><b>${esc(i.t)}</b><span>${esc(i.s)}</span></div></button>`).join(''):'<p class="muted" style="margin:0;font-size:14px">Insights appear after about two weeks of data: sleep vs recovery, your best days, steps, and how leg days and high strain affect you.</p>'}</div>`;
+  v.innerHTML=h;drawChart('w',mk,rg,true);
 }
-function drawWChart(){
-  const svg=document.getElementById('wchart');if(!svg)return;const t=todayS(),mk=UI.wmet||'rec',M=MET[mk],n=UI.wrange||30;
-  const X0=30,X1=332,Y0=12,Y1=142;const pts=[];for(let i=n-1;i>=0;i--){const d=addD(t,-i);pts.push({d,v:mval(mk,d)})}
-  const vals=pts.filter(p=>p.v!=null).map(p=>p.v);if(!vals.length){svg.innerHTML=`<text x="170" y="85" text-anchor="middle" fill="var(--mu)" font-size="13" font-weight="700">No data in this range yet</text>`;document.getElementById('wsum').innerHTML='';return}
-  let mn=Math.min(...vals),mx=Math.max(...vals);if(mk==='rec'){mn=0;mx=100}else{const pd2=(mx-mn)*.15||1;mn-=pd2;mx+=pd2}
+function drawChart(px,mk,n,clickable){
+  const svg=document.getElementById(px+'chart');if(!svg)return;const t=todayS(),M=MET[mk];
+  const X0=34,X1=332,Y0=12,Y1=142;const pts=[];for(let i=n-1;i>=0;i--){const d=addD(t,-i);pts.push({d,v:mval(mk,d)})}
+  const vals=pts.filter(p=>p.v!=null).map(p=>p.v);const sum=document.getElementById(px+'sum');
+  if(!vals.length){svg.innerHTML=`<text x="170" y="85" text-anchor="middle" fill="var(--mu)" font-size="13" font-weight="700">No data in this range yet</text>`;if(sum)sum.innerHTML='';return}
+  let mn=Math.min(...vals),mx=Math.max(...vals);if(mk==='rec'){mn=0;mx=100}else{const pd2=(mx-mn)*.15||1;mn-=pd2;mx+=pd2;if(mk==='steps')mn=Math.max(0,mn)}
   const sx=i=>X0+(n===1?0:i/(n-1))*(X1-X0),sy=v=>Y1-(v-mn)/(mx-mn)*(Y1-Y0);pts.forEach((p,i)=>{p.x=sx(i);p.y=p.v!=null?sy(p.v):null});
   const avgv=vals.reduce((a,b)=>a+b,0)/vals.length;let g='';
-  for(let i=0;i<=3;i++){const v=mn+(mx-mn)*i/3,y=sy(v);g+=`<line x1="${X0}" x2="${X1}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--ln)" stroke-width="1"/><text x="${X0-5}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--mu)" font-weight="700">${mk==='sleep'?v.toFixed(1):Math.round(v)}</text>`}
-  let body='';
-  if(mk==='rec'){const bw=Math.max(2,(X1-X0)/n-2);pts.forEach(p=>{if(p.v==null)return;body+=`<rect x="${(p.x-bw/2).toFixed(1)}" y="${p.y.toFixed(1)}" width="${bw.toFixed(1)}" height="${(Y1-p.y).toFixed(1)}" rx="${Math.min(4,bw/2)}" fill="${recCol(p.v)}" opacity=".8"/>`})}
+  const yl=v=>mk==='sleep'?v.toFixed(1):mk==='steps'||mk==='kcal'?(v>=1000?(v/1000).toFixed(1)+'k':Math.round(v)):(M.dec?v.toFixed(1):Math.round(v));
+  for(let i=0;i<=3;i++){const v=mn+(mx-mn)*i/3,y=sy(v);g+=`<line x1="${X0}" x2="${X1}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--ln)" stroke-width="1"/><text x="${X0-5}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--mu)" font-weight="700">${yl(v)}</text>`}
+  let body='';const bars=mk==='rec'||mk==='steps'||mk==='strain'||mk==='kcal';
+  if(bars){const bw=Math.max(2,(X1-X0)/n-2);pts.forEach(p=>{if(p.v==null)return;const col=mk==='rec'?recCol(p.v):(mk==='steps'&&p.v>=(S.stepGoal||8000)?M.c:M.c);body+=`<rect x="${(p.x-bw/2).toFixed(1)}" y="${p.y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0,Y1-p.y).toFixed(1)}" rx="${Math.min(4,bw/2)}" fill="${col}" opacity="${mk==='steps'&&p.v<(S.stepGoal||8000)?.45:.85}"/>`});
+    if(mk==='steps'){const gy=sy(S.stepGoal||8000);if(gy>Y0&&gy<Y1)body+=`<line x1="${X0}" x2="${X1}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}" stroke="${M.c}" stroke-width="1.5"/><text x="${X0+4}" y="${(gy-4).toFixed(1)}" font-size="10" font-weight="800" fill="${M.c}">goal</text>`}}
   else{const seg=pts.filter(p=>p.v!=null);const line=seg.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-    body+=`<defs><linearGradient id="wg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${M.c}" stop-opacity=".35"/><stop offset="1" stop-color="${M.c}" stop-opacity="0"/></linearGradient></defs><polygon points="${seg[0].x.toFixed(1)},${Y1} ${line} ${seg[seg.length-1].x.toFixed(1)},${Y1}" fill="url(#wg)"/><polyline points="${line}" fill="none" stroke="${M.c}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
-    if(n<=30)seg.forEach(p=>body+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.6" fill="${M.c}"/>`)}
-  const ay=sy(avgv);body+=`<line x1="${X0}" x2="${X1}" y1="${ay.toFixed(1)}" y2="${ay.toFixed(1)}" stroke="var(--ink)" stroke-dasharray="4 4" stroke-width="1.3" opacity=".55"/><text x="${X1}" y="${(ay-4).toFixed(1)}" text-anchor="end" font-size="10" font-weight="800" fill="var(--ink)" opacity=".7">avg ${M.f(avgv)}</text>`;
+    body+=`<defs><linearGradient id="${px}g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${M.c}" stop-opacity=".35"/><stop offset="1" stop-color="${M.c}" stop-opacity="0"/></linearGradient></defs><polygon points="${seg[0].x.toFixed(1)},${Y1} ${line} ${seg[seg.length-1].x.toFixed(1)},${Y1}" fill="url(#${px}g)"/><polyline points="${line}" fill="none" stroke="${M.c}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if(n<=30||seg.length<=30)seg.forEach(p=>body+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.8" fill="${M.c}"/>`)}
+  const ay=sy(avgv);body+=`<line x1="${X0}" x2="${X1}" y1="${ay.toFixed(1)}" y2="${ay.toFixed(1)}" stroke="var(--ink)" stroke-dasharray="4 4" stroke-width="1.3" opacity=".55"/><text x="${X1}" y="${(ay-4).toFixed(1)}" text-anchor="end" font-size="10" font-weight="800" fill="var(--ink)" opacity=".7">avg ${fmtM(mk,avgv)}</text>`;
   const xl=[0,Math.floor((n-1)/2),n-1].map(i=>`<text x="${pts[i].x.toFixed(1)}" y="160" text-anchor="${i===0?'start':i===n-1?'end':'middle'}" font-size="10" fill="var(--mu)" font-weight="700">${short(pts[i].d)}</text>`).join('');
-  svg.innerHTML=g+body+xl+`<line id="wguide" x1="0" x2="0" y1="${Y0}" y2="${Y1}" stroke="var(--ink)" stroke-width="1.2" opacity="0"/><circle id="wdot" r="5" fill="#fff" stroke="${M.c}" stroke-width="3" opacity="0"/>`;
-  // summary
-  const half=Math.floor(n/2),prev=[];for(let i=n;i<2*n;i++){const v=mval(mk,addD(t,-i));if(v!=null)prev.push(v)}const pa=prev.length?prev.reduce((a,b)=>a+b,0)/prev.length:null;
-  const ch=pa?avgv-pa:null;const good=ch==null||M.dir===0?'neutral':(ch*M.dir>=0?'good':'bad');
-  document.getElementById('wsum').innerHTML=`<div><b class="disp num">${M.f(avgv)}</b><span>Average</span></div><div><b class="disp num">${M.f(Math.min(...vals))}</b><span>Low</span></div><div><b class="disp num">${M.f(Math.max(...vals))}</b><span>High</span></div><div><b class="disp num ${good}">${ch==null?'–':(ch>=0?'+':'')+(mk==='sleep'?Math.round(ch*60)+'m':mk==='strain'?ch.toFixed(1):Math.round(ch))}</b><span>vs prior ${n}d</span></div>`;
-  const wrap=document.getElementById('wchartWrap'),tip=document.getElementById('wtip'),gl=document.getElementById('wguide'),dot=document.getElementById('wdot');
-  const pick=e=>{const r=svg.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*340;let best=null;pts.forEach(p=>{if(p.v==null)return;if(!best||Math.abs(p.x-x)<Math.abs(best.x-x))best=p});return best};
+  svg.innerHTML=g+body+xl+`<line id="${px}guide" x1="0" x2="0" y1="${Y0}" y2="${Y1}" stroke="var(--ink)" stroke-width="1.2" opacity="0"/><circle id="${px}dot" r="5" fill="#fff" stroke="${M.c}" stroke-width="3" opacity="0"/>`;
+  const prev=[];for(let i=n;i<2*n;i++){const v=mval(mk,addD(t,-i));if(v!=null)prev.push(v)}const pa=prev.length?prev.reduce((a,b)=>a+b,0)/prev.length:null;
+  const ch=pa!=null?avgv-pa:null;const good=ch==null||M.dir===0?'neutral':(ch*M.dir>=0?'good':'bad');
+  const chTxt=ch==null?'–':(ch>=0?'+':'')+(mk==='sleep'?Math.round(ch*60)+'m':mk==='steps'||mk==='kcal'?Math.round(ch).toLocaleString():(M.dec?ch.toFixed(1):Math.round(ch)));
+  if(sum)sum.innerHTML=`<div><b class="disp num">${fmtM(mk,avgv)}</b><span>Average</span></div><div><b class="disp num">${fmtM(mk,Math.min(...vals))}</b><span>Low</span></div><div><b class="disp num">${fmtM(mk,Math.max(...vals))}</b><span>High</span></div><div><b class="disp num ${good}">${chTxt}</b><span>vs prior ${n}d</span></div>`;
+  const wrap=document.getElementById(px+'wrap'),tip=document.getElementById(px+'tip'),gl=document.getElementById(px+'guide'),dot=document.getElementById(px+'dot');
+  const pick=e=>{const r=svg.getBoundingClientRect();const xx=(e.clientX-r.left)/r.width*340;let best=null;pts.forEach(p=>{if(p.v==null)return;if(!best||Math.abs(p.x-xx)<Math.abs(best.x-xx))best=p});return best};
   const show=e=>{const p=pick(e);if(!p)return;gl.setAttribute('x1',p.x);gl.setAttribute('x2',p.x);gl.setAttribute('opacity','.4');dot.setAttribute('cx',p.x);dot.setAttribute('cy',p.y);dot.setAttribute('opacity','1');
-    tip.textContent=`${short(p.d)} · ${M.f(p.v)}`;tip.style.left=(p.x/340*100)+'%';tip.style.top=Math.max(0,p.y/170*wrap.clientWidth*170/340-34)+'px';tip.style.opacity='1'};
+    tip.textContent=`${short(p.d)} · ${fmtM(mk,p.v)}`;tip.style.left=Math.min(85,Math.max(15,p.x/340*100))+'%';tip.style.top=Math.max(0,p.y/170*wrap.clientWidth*170/340-34)+'px';tip.style.opacity='1'};
   svg.onpointermove=show;svg.onpointerdown=show;svg.onpointerleave=()=>{tip.style.opacity='0';gl.setAttribute('opacity','0');dot.setAttribute('opacity','0')};
-  svg.onclick=e=>{const p=pick(e);if(p&&W(p.d)){UI.wday=p.d;renderWhoop();window.scrollTo({top:0,behavior:'smooth'})}};
+  if(clickable)svg.onclick=e=>{const p=pick(e);if(p&&W(p.d)){UI.wday=p.d;renderWhoop();window.scrollTo({top:0,behavior:'smooth'})}};
 }
+/* ---------- metric detail sheet ---------- */
+function openMetric(key){UI.md={key,n:UI.md&&UI.md.key===key?UI.md.n:(MET[key].src==='body'?120:30)};drawMetric()}
+function drawMetric(){
+  const{key,n}=UI.md,M=MET[key],t=todayS(),isBody=M.src==='body';
+  const cur=isBody?lastVal(key,t):(()=>{const d=UI.wday||latestDay();const v=mval(key,d);return v!=null?{d,v}:lastVal(key,t,30)})();
+  const a=cur?mavg(key,cur.d,30,true):null;
+  const all=[];for(let i=0;i<400;i++){const d=addD(t,-i),v=mval(key,d);if(v!=null)all.push({d,v})}
+  const best=all.length?all.reduce((p,q)=>M.dir===-1?(q.v<p.v?q:p):(q.v>p.v?q:p)):null;
+  const byW=[[],[],[],[],[],[],[]];all.filter(x=>diffD(x.d,t)<=90).forEach(x=>byW[dow(x.d)].push(x.v));const wa=byW.map(q=>q.length?q.reduce((p,r)=>p+r,0)/q.length:null);
+  let wk='';if(!isBody&&wa.filter(x=>x!=null).length>=5){const ok=wa.filter(x=>x!=null),mn=Math.min(...ok),mx=Math.max(...ok),rg=mx-mn||1;
+    wk=`<div class="card" style="--c:${M.c}"><h4 class="disp" style="margin:0 0 8px">By day of week</h4><div class="wkbars">${wa.map((q,i)=>`<div><i style="height:${q==null?4:Math.round(14+(M.dir===-1?(mx-q):(q-mn))/rg*52)}px;background:${M.c};opacity:${q==null?.2:.85}"></i><b class="num">${q==null?'–':key==='sleep'?q.toFixed(1):key==='steps'?(q/1000).toFixed(1)+'k':(M.dec?q.toFixed(1):Math.round(q))}</b><span>${DS[i]}</span></div>`).join('')}</div><div class="pnote">Last 90 days. Taller is better${M.dir===0?' (higher)':''}.</div></div>`}
+  const rows=all.slice(0,isBody?60:45).map(x=>{const av=mavg(key,x.d,30,true);const df=av!=null?x.v-av:null;const cls=df==null||M.dir===0?'neutral':(df*M.dir>=0?'good':'bad');
+    return`<div class="hrow"><span>${nice(x.d)}</span><b class="num">${fmtM(key,x.v)}</b><em class="${cls}">${df==null?'':(df>=0?'+':'')+(key==='sleep'?Math.round(df*60)+'m':key==='steps'||key==='kcal'?Math.round(df).toLocaleString():(M.dec?df.toFixed(1):Math.round(df)))}</em>${isBody&&!UI.wdemo?`<button class="mini" data-a="bodydel" data-d="${x.d}" data-v="${key}" aria-label="Delete">✕</button>`:''}</div>`}).join('');
+  openSheet(`<div class="mdhead" style="--c:${M.c}"><span class="dotc"></span><h4 class="disp">${M.l}</h4></div>
+  <div class="mdval" style="--c:${M.c}"><b class="disp num">${cur?fmtM(key,cur.v):'–'}</b><div><span class="muted">${cur?(cur.d===t?'Today':nice(cur.d)):'No data yet'}</span><br>${cur?deltaTxt(key,cur.v,a):''}</div></div>
+  ${isBody?`<button class="cta" style="--c:${M.c};margin:4px 0 6px" data-a="bodylog">＋ Log a measurement</button>`:''}
+  <div class="card" style="--c:${M.c}"><div class="chipsrow" style="margin-top:0">${(isBody?[[30,'1 month'],[90,'3 months'],[180,'6 months'],[365,'1 year']]:[[7,'7 days'],[30,'30 days'],[90,'90 days']]).map(([q,l])=>`<button class="mchip ${q===n?'on':''}" style="--c:var(--ink)" data-a="mrange" data-v="${q}">${l}</button>`).join('')}</div>
+  <div class="wchart" id="mwrap"><div class="wtip" id="mtip"></div><svg id="mchart" viewBox="0 0 340 170"></svg></div><div class="kv" id="msum" style="grid-template-columns:repeat(4,1fr)"></div></div>
+  <div class="kv" style="grid-template-columns:repeat(3,1fr);margin:0 0 12px"><div><b class="disp num">${a!=null?fmtM(key,a):'–'}</b><span>30-day average</span></div><div><b class="disp num">${best?fmtM(key,best.v):'–'}</b><span>${M.dir===-1?'Lowest':'Best'}${best?' · '+short(best.d):''}</span></div><div><b class="disp num">${all.length}</b><span>${isBody?'Entries':'Days of data'}</span></div></div>
+  ${wk}
+  <div class="card"><h4 class="disp" style="margin:0 0 4px">What it means</h4><p style="margin:0;font-size:14px">${M.about}</p></div>
+  <div class="card"><h4 class="disp" style="margin:0 0 6px">History</h4>${rows||'<p class="muted" style="margin:0">Nothing logged yet.</p>'}${all.length>(isBody?60:45)?'<div class="pnote">Showing the most recent entries.</div>':''}<div class="pnote">± shows the difference from the 30-day average before that day.</div></div>
+  <button class="cta ghost" data-a="close">Close</button>`);
+  requestAnimationFrame(()=>drawChart('m',key,n,false));
+}
+function bodySheet(){
+  const t=todayS(),f=k=>{const lv=lastVal(k,t);return lv?(+lv.v).toFixed(1):''};
+  openSheet(`<h4 class="disp">Log body measurements</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Fill in what you measured; leave the rest empty. Grey numbers are your last entries.</p>
+  <label class="fl2" for="bdate">Date</label><input type="date" id="bdate" value="${t}" max="${t}">
+  <div class="grid2">${BODY_KEYS.map(k=>`<div><label class="fl2" for="b_${k}">${MET[k].l} (${MET[k].u})</label><input type="text" inputmode="decimal" id="b_${k}" placeholder="${f(k)}"></div>`).join('')}</div>
+  <button class="cta" style="--c:${WC.body}" data-a="bodysave">Save</button>`);
+}
+
 
 /* ---------- PROGRESS ---------- */
 function planDays(){const a=[];for(let d=S.start;d<=S.end;d=addD(d,1))a.push(d);return a}
@@ -1427,6 +1535,12 @@ document.addEventListener('click',ev=>{
   case'useWhoop':delete S.ready[d];save();rerender();break;
   case'wsync':whoopSync(true);break;
   case'wday':UI.wday=el.dataset.d;renderWhoop();break;
+  case'metric':openMetric(el.dataset.v);break;
+  case'mrange':UI.md.n=+el.dataset.v;drawMetric();break;
+  case'bodylog':bodySheet();break;
+  case'bodysave':{const d2=document.getElementById('bdate').value||todayS();const o={};let any=false;BODY_KEYS.forEach(k=>{const v=parseFloat((document.getElementById('b_'+k).value||'').replace(',','.'));if(!isNaN(v)&&v>0){o[k]=v;any=true}});if(!any){toast('Enter at least one measurement');break}S.body[d2]=Object.assign({},S.body[d2],o);save();closeSheet();rerender();toast('Measurements saved');break}
+  case'bodydel':{const d2=el.dataset.d,k2=el.dataset.v;if(S.body[d2]){delete S.body[d2][k2];if(!Object.keys(S.body[d2]).filter(q=>q!=='src').length)delete S.body[d2]}save();drawMetric();toast('Entry removed');break}
+  case'stepgoal':{const v2=parseInt(window.prompt('Daily step goal:',S.stepGoal||8000),10);if(v2>0){S.stepGoal=v2;save();renderWhoop()}break}
   case'wmet':UI.wmet=el.dataset.v;renderWhoop();break;
   case'wrange':UI.wrange=+el.dataset.v;renderWhoop();break;
   case'wdemo':UI.wdemo=!UI.wdemo;UI.wday=null;rerender();break;
