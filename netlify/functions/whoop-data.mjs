@@ -1,56 +1,32 @@
 // Returns your recent WHOOP recovery records (score, HRV, resting HR).
-import { getStore } from '@netlify/blobs';
-// WHOOP app keys. The secret must live in Netlify environment variables.
-const CLIENT_ID = process.env.WHOOP_CLIENT_ID || '7cd8e320-a15a-42d9-a4e8-c913b1eff798';
-const CLIENT_SECRET = process.env.WHOOP_CLIENT_SECRET; // set in Netlify → Environment variables (never in code)
+// Token handling lives in _whoop-token.mjs, shared with /api/whoop-mcp.
+import { openSession, dropSession, authedFetch, pull, API, WhoopAuthError } from './_whoop-token.mjs';
 
-const TOKEN = 'https://api.prod.whoop.com/oauth/oauth2/token';
-const API = 'https://api.prod.whoop.com/developer';
-const hash = async (s) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, '0')).join('');
 export default async (req) => {
   const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
   const k = req.headers.get('x-iron-key') || '';
   if (k.length < 32) return json({ connected: false }, 401);
-  const store = getStore('whoop'), id = 'tok:' + (await hash(k));
-  const tok = await store.get(id, { type: 'json' });
-  if (!tok) return json({ connected: false }, 401);
-  let refreshed = false;
-  const doRefresh = async () => {
-    if (refreshed) return false; refreshed = true;
-    const r = await fetch(TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: tok.rt, client_id: CLIENT_ID, client_secret: CLIENT_SECRET, scope: 'offline' }) });
-    if (!r.ok) return false;
-    const t = await r.json(); if (!t.access_token) return false;
-    tok.at = t.access_token; if (t.refresh_token) tok.rt = t.refresh_token;
-    tok.exp = Date.now() + ((t.expires_in || 3600) - 120) * 1000;
-    await store.setJSON(id, tok); return true;
-  };
-  if (!tok.at || Date.now() > tok.exp) { if (!(await doRefresh())) { await store.delete(id); return json({ connected: false }, 401); } }
+  const session = await openSession(k);
+  if (!session) return json({ connected: false }, 401);
   const days = Math.min(120, Math.max(1, parseInt(new URL(req.url).searchParams.get('days') || '45', 10)));
   const start = new Date(Date.now() - days * 864e5).toISOString();
-  const pull = async (path, maxPages) => {
-    const out = []; let next = null, pages = 0;
-    do {
-      const u = new URL(API + path);
-      u.searchParams.set('limit', '25'); u.searchParams.set('start', start);
-      if (next) u.searchParams.set('nextToken', next);
-      let r = await fetch(u, { headers: { Authorization: 'Bearer ' + tok.at } });
-      if (r.status === 401 && (await doRefresh())) r = await fetch(u, { headers: { Authorization: 'Bearer ' + tok.at } });
-      if (r.status === 401) { const e = new Error('auth'); e.auth = true; throw e; }
-      if (!r.ok) { if (path === '/v2/recovery') { const e = new Error('whoop_' + r.status); throw e; } return out; }
-      const j = await r.json(); (j.records || []).forEach(x => out.push(x));
-      next = j.next_token; pages++;
-    } while (next && pages < maxPages);
-    return out;
-  };
+
   let rec, slp, cyc;
   try {
-    rec = await pull('/v2/recovery', 6);
-    [slp, cyc] = await Promise.all([pull('/v2/activity/sleep', 8).catch(() => []), pull('/v2/cycle', 6).catch(() => [])]);
+    rec = await pull(session, '/v2/recovery', { start, maxPages: 6 });
+    [slp, cyc] = await Promise.all([
+      pull(session, '/v2/activity/sleep', { start, maxPages: 8 }).catch(() => []),
+      pull(session, '/v2/cycle', { start, maxPages: 6 }).catch(() => []),
+    ]);
   } catch (e) {
-    if (e.auth) { await store.delete(id); return json({ connected: false }, 401); }
+    // Only a grant WHOOP has actually rejected clears the saved login. A rate
+    // limit, a 5xx or a network blip returns 502 instead, which IRON reports as
+    // "sync failed, try again" and retries later -- it no longer forces a
+    // reconnect from the phone over a momentary WHOOP outage.
+    if (e instanceof WhoopAuthError) { await dropSession(session).catch(() => {}); return json({ connected: false }, 401); }
     return json({ connected: true, error: e.message }, 502);
   }
+
   const records = rec.map(x => ({ cycle_id: x.cycle_id, sleep_id: x.sleep_id, created_at: x.created_at, state: x.score_state,
     rec: x.score ? x.score.recovery_score : null, rhr: x.score ? x.score.resting_heart_rate : null,
     hrv: x.score ? x.score.hrv_rmssd_milli : null, spo2: x.score ? x.score.spo2_percentage : null,
@@ -68,7 +44,7 @@ export default async (req) => {
     steps: x.score.step_count != null ? x.score.step_count : (x.step_count != null ? x.step_count : null) }));
   let body = null;
   try {
-    const br = await fetch(API + '/v2/user/measurement/body', { headers: { Authorization: 'Bearer ' + tok.at } });
+    const br = await authedFetch(session, new URL(API + '/v2/user/measurement/body'));
     if (br.ok) { const b = await br.json(); body = { height: b.height_meter, weight: b.weight_kilogram, maxhr: b.max_heart_rate }; }
   } catch (e) {}
   return json({ connected: true, records, sleeps, cycles, body });
