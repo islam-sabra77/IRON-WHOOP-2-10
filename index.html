@@ -359,6 +359,29 @@ button.insight:first-of-type{border-top:0}
 .gitem summary b{font-size:15.5px}.gitem summary span{font-size:12.5px;color:var(--mu)}
 .gitem summary em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--ok)}
 .gitem[open] summary{margin-bottom:8px}
+/* plan builder */
+.bdday{border-top:1px solid var(--ln);padding:6px 0 8px;border-left:4px solid var(--c);padding-left:10px;margin-left:-2px}
+.bdday .srow{padding:2px 0}.bdsum{font-size:12.5px;color:var(--mu);margin:2px 0 6px}
+.bdcyc{border:1px solid var(--ln);border-left:5px solid var(--c);border-radius:12px;padding:8px 10px;margin:6px 0;font-size:13.5px}
+.bdcyc>div:first-child{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.bdmv{display:flex;align-items:center;gap:8px;border:1px solid var(--ln);border-left:4px solid var(--c,var(--ln));border-radius:12px;padding:8px;margin:6px 0;background:var(--sf)}
+.bdmvn{flex:1;min-width:0}.bdmvn b{display:block;font-size:14.5px}.bdmvn span{font-size:12px;color:var(--mu)}
+.bdmvb{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.bdmvb .mini{height:32px;min-width:32px;padding:0 7px;font-size:12px}
+.bdmvb .mini[disabled]{opacity:.35}.mini.on{background:var(--upper);color:#fff;border-color:var(--upper)}
+/* lift history */
+.lh{display:block;width:100%;text-align:left;border:0;background:none;color:inherit;font:inherit;padding:8px 0;border-top:1px solid var(--ln);cursor:pointer}
+.lh .lhr{display:flex;align-items:center;gap:10px}.lh .lhgo{color:var(--mu);font-size:18px;font-weight:800}
+.sugg.tap{cursor:pointer}.sugg.tap u{text-decoration:none;font-weight:800;color:var(--c)}
+.lhs{border:1px solid var(--ln);background:var(--sf);border-radius:14px;margin:8px 0;padding:10px 12px}
+.lhs summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.lhs summary::-webkit-details-marker{display:none}
+.lhs summary b{font-size:15px}.lhs summary span{font-size:12.5px;color:var(--mu)}
+.lhs summary em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--ok);margin-left:6px}
+.lhs[open] summary{margin-bottom:8px}.lhs[open] summary .chev{transform:rotate(180deg)}
+.lhsets{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:4px 12px;font-size:13.5px;align-items:center}
+.lhsets .hd{font-size:11.5px;color:var(--mu);font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+.lhmeta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--mu);margin-top:8px}
+.lhmeta b{color:var(--ink)}
 .onb{position:fixed;inset:0;z-index:70;background:var(--bg);overflow:auto;padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px))}
 .obwrap{max-width:560px;margin:0 auto}
 .obbar{height:6px;border-radius:3px;background:var(--sf2);overflow:hidden;margin:4px 0 14px}.obbar span{display:block;height:100%;background:var(--upper);transition:width .3s}
@@ -366,7 +389,7 @@ button.insight:first-of-type{border-top:0}
 .obopt{display:block;width:100%;text-align:left;border:1.5px solid var(--ln);background:var(--sf);border-radius:16px;padding:12px 14px;margin:8px 0;font:inherit;color:inherit;cursor:pointer}
 .obopt b{display:block;font-size:16px}.obopt span{font-size:13px;color:var(--mu)}
 .obopt.on{border-color:var(--upper);background:color-mix(in srgb,var(--upper) 10%,var(--sf));box-shadow:inset 0 0 0 1.5px var(--upper)}
-.obrow{display:flex;gap:8px}.obrow .obopt{margin:6px 0;text-align:center;padding:10px 8px}.obrow.wrap{flex-wrap:wrap}.obrow.wrap .obopt{width:auto;flex:1 1 30%}
+.obrow{display:flex;gap:8px}.obrow .obopt{margin:6px 0;text-align:center;padding:10px 8px}.obrow.wrap{flex-wrap:wrap;padding:0;max-width:none;margin:0}.obrow.wrap .obopt{width:auto;flex:1 1 30%}
 .obdays{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .obday{height:52px;border-radius:12px;border:1.5px solid var(--ln);background:var(--sf);font-weight:800;font-size:13px;color:inherit}
 .obday.on{background:var(--upper);border-color:var(--upper);color:#fff}
@@ -415,9 +438,9 @@ button.insight:first-of-type{border-top:0}
 
 /* tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--sf);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tabsin{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(7,1fr)}
+.tabsin{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(8,1fr)}
 .tab span{font-size:10.5px;letter-spacing:-.01em;white-space:nowrap}
-.tab{border:0;background:none;padding:8px 0 9px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--mu)}
+.tab{border:0;background:none;padding:8px 0 9px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;color:var(--mu)}
 .tab svg{width:24px;height:24px}
 .tab.on{color:var(--ink)}
 .tab.on svg{color:var(--cardio)}
@@ -502,7 +525,7 @@ button.insight:first-of-type{border-top:0}
 /* ---------- storage ---------- */
 const KEY='stronghold-plan-v1';
 const PLAN_START='2026-09-28', PLAN_END='2026-12-31';
-const COLORS={upper:'#2F5BFF',lower:'#FF6A13',mob:'#00B39A',core:'#E8A900',cardio:'#FF2D78',long:'#7B4DFF',rest:'#8E97BF',travel:'#00A3FF',warm:'#43A512',full:'#E11D74'};
+const COLORS={upper:'#2F5BFF',lower:'#FF6A13',mob:'#00B39A',core:'#E8A900',cardio:'#FF2D78',long:'#7B4DFF',rest:'#8E97BF',travel:'#00A3FF',warm:'#43A512',full:'#E11D74',hiit:'#F04438'};
 const HAB_COLORS=['#2F5BFF','#FF6A13','#00B39A','#FF2D78','#7B4DFF','#E8A900','#12B76A','#00A3FF'];
 const EMOJIS=['💧','👟','🌙','📖','🧘','🥗','☀️','🚭','🧊','📵','🙏','✍️','🦷','💤','🍎','🏃'];
 function defaults(){return{
@@ -776,6 +799,50 @@ hipThrustBand:{n:'Banded glute bridge',bw:1,c:'Band above the knees, push the kn
 rowErg:{n:'Rowing machine',t:1,s:60,c:'Legs, then body, then arms; reverse on the way back.'}
 };
 Object.assign(E,E2);
+/* ---------- more classic moves (each has a demo video) ---------- */
+const E3={
+smithBench:{n:'Smith machine bench press',c:'Bench under the bar so it lands on the mid-chest. Shoulder blades pinned, lower with control, press up.'},
+declineBench:{n:'Decline barbell bench press',c:'Feet locked under the pads, lower the bar to the bottom of the chest, press up. Use a spotter.'},
+cableCross:{n:'High-to-low cable crossover',c:'Pulleys high, step forward, sweep the hands down and together in front of the hips. Soft elbows.'},
+machDip:{n:'Seated dip machine',c:'Sit tall, elbows tucked, press the handles down to straight arms, return slowly.'},
+declinePU:{n:'Decline push-up',bw:1,c:'Feet on a bench, hands on the floor, body in one line, lower the chest and press up.'},
+archerPU:{n:'Archer push-up',bw:1,u:1,c:'Hands wide, lower toward one hand while the other arm stays straight. Alternate sides.'},
+uprightRow:{n:'Cable upright row',c:'Low pulley, wide grip, lead with the elbows up to chest height, no higher than the shoulders.'},
+kbPress:{n:'Kettlebell overhead press',u:1,c:'Bell in the rack position, ribs down, glutes tight, press straight up and lower with control.'},
+dbPullover:{n:'Dumbbell pullover',c:'Lie across a bench, arms slightly bent, lower the dumbbell behind the head, pull back over the chest.'},
+pendlayRow:{n:'Pendlay row',c:'Torso parallel to the floor, row the bar from a dead stop on the floor to the lower chest each rep.'},
+kbRow:{n:'Kettlebell bent-over row',c:'Hinge with a flat back, row the bells to the hips, squeeze the shoulder blades.'},
+bbShrug:{n:'Barbell shrug',c:'Bar at arm’s length, lift the shoulders straight up to the ears, pause, lower slowly.'},
+revCurl:{n:'Reverse-grip EZ-bar curl',c:'Palms down, elbows at the sides, curl up slowly. Builds the forearms and brachialis.'},
+dbPreacher:{n:'Dumbbell preacher curl',u:1,c:'Upper arm flat on the pad, curl up, lower until the arm is almost straight.'},
+zottman:{n:'Zottman curl',c:'Curl up palms up, turn the palms down at the top, lower slowly with palms down.'},
+cableOHExt:{n:'Cable overhead triceps extension',c:'Face away from a low pulley, elbows by the head, extend the rope forward and up.'},
+dbSkull:{n:'Dumbbell skull crusher',c:'Lie on a bench, palms facing in, bend only the elbows to lower beside the head, extend.'},
+airSquat:{n:'Bodyweight squat',bw:1,c:'Feet just outside the hips, sit down between the heels, knees track the toes, stand tall.'},
+kbGoblet:{n:'Kettlebell goblet squat',c:'Hold the bell by the horns at the chest, elbows inside the knees at the bottom, chest tall.'},
+sumoDbSq:{n:'Dumbbell sumo squat',c:'Wide stance, toes out, dumbbell hanging between the legs, squat straight down, knees out.'},
+sissySq:{n:'Sissy squat (assisted)',bw:1,c:'Hold a support, rise onto the toes and lean back as the knees travel forward. Small range to start.'},
+singleLegPress:{n:'Single-leg leg press',u:1,c:'One foot in the middle of the platform, lower until the knee is about 90°, press without locking.'},
+curtsy:{n:'Curtsy lunge',u:1,bw:1,c:'Step one foot diagonally behind the other, lower into a lunge, push back up through the front foot.'},
+standLegCurl:{n:'Standing leg curl',u:1,c:'Pad just above the heel, thigh against the pad, curl the heel up and lower slowly.'},
+ghr:{n:'Glute-ham raise',bw:1,c:'Knees on the pad, body straight from head to knees, lower forward slowly and pull back with the hamstrings.'},
+revHyper:{n:'Reverse hyperextension',c:'Lie face down on the pad, legs hanging, lift the legs to hip height with the glutes, lower with control.'},
+gluteBridge:{n:'Glute bridge',bw:1,c:'Feet close to the hips, flatten the low back, drive through the heels, squeeze the glutes at the top.'},
+donkeyCalf:{n:'Donkey calf raise',c:'Hinge forward with the hips loaded, balls of the feet on a block, full stretch, full squeeze.'},
+russianTwist:{n:'Russian twist',bw:1,c:'Sit leaning back with a long spine, rotate the ribs side to side, hips stay still.'},
+bicycleCrunch:{n:'Bicycle crunch',bw:1,c:'Low back down, bring one elbow toward the opposite knee as the other leg extends. Slow and controlled.'},
+vUp:{n:'V-up',bw:1,c:'Lie long, lift the arms and legs together to meet over the hips, lower slowly without resting.'},
+landmineRot:{n:'Landmine rotation',c:'Arms straight, bar end at chest height, rotate the bar to one hip and back, pivot the back foot.'},
+tgu:{n:'Turkish get-up',u:1,c:'Bell locked out overhead, eyes on it, stand up step by step and reverse the same way. Go light.'},
+medBallSlam:{n:'Medicine ball slam',c:'Lift the ball overhead, rise tall, then slam it into the floor with the whole body. Use a dead ball.'},
+jumpSquat:{n:'Jump squat',bw:1,c:'Squat to a comfortable depth, drive through the floor and jump, land softly with bent knees.'},
+broadJump:{n:'Broad jump',bw:1,c:'Swing the arms back, jump forward as far as you can, land softly and stick the landing.'},
+assaultBike:{n:'Air bike',t:1,s:60,c:'Push and pull the handles while you pedal. Seat high enough for a slight knee bend at the bottom.'},
+skiErg:{n:'Ski erg',t:1,s:60,c:'Reach tall, pull the handles down by hinging and bending the knees, finish with hands by the hips.'},
+stairClimber:{n:'Stair climber',t:1,s:120,c:'Stand tall, whole foot on each step, hands only lightly on the rails.'},
+sledPull:{n:'Backward sled drag',t:1,s:30,c:'Hold the straps with straight arms, sit back slightly and walk backward with short steps.'}
+};
+Object.assign(E,E3);
 /* tags: pattern | equipment | level 1-3 | joints it loads (avoid if injured) | M = can be a main lift
    equipment: gym (machines/cables), bb (barbell, trap bar, landmine), db, kb, band, bw
    joints: lb lower back, sh shoulder, kn knee, el elbow, wr wrist, hp hip, an ankle */
@@ -802,7 +869,14 @@ bbCurl:'bi|bb|1|el,wr|',ezCurl:'bi|bb|1|el|',concCurl:'bi|db|1||',inclineCurl:'b
 walkLunge:'lunge|db|1|kn|M',fwdLunge:'lunge|bw|1|kn|',cossack:'lunge|bw|2|kn,hp|',latStepDown:'quad|bw|1||',nordic:'ham|bw|3|kn|',gluteKick:'glute|gym|1||',slHipThrust:'glute|bw|2||',clamshell:'abd|band|1||',sideLyingAbd:'abd|bw|1||',legPressCalf:'calf|gym|1||',
 hangLegRaise:'coreFlex|bw|3|lb,sh|',abWheel:'coreAE|bw|3|lb,sh|',cableCrunch:'coreFlex|gym|2|lb|',woodchop:'coreAR|gym|1||',hollow:'coreAE|bw|2|lb|',shoulderTap:'coreAR|bw|1|wr|',revCrunch:'coreFlex|bw|1|lb|',legRaise:'coreFlex|bw|2|lb|',
 mtnClimber:'cardio|bw|1|wr|',sledPush:'cardio|gym|2||',battleRopes:'cardio|gym|1|sh|',burpee:'cardio|bw|2|kn,wr,lb|',jumpRope:'cardio|bw|1|kn,an|',boxJump:'power|bw|2|kn,an|',rowErg:'cardio|gym|1|lb|',
-frontRaise:'lat|db|1|sh|',rearDbFly:'rear|db|1|lb|',deadHang:'shrug|bw|1|sh|',bandFacePull:'rear|band|1||',bandRow:'hpull|band|1||M',bandPress:'hpush|band|1||M',bandOHP:'vpush|band|1|sh|M',bandCurl:'bi|band|1||',bandPushdown:'tri|band|1||',bandPullDown:'vpull|band|1||M',hipThrustBand:'glute|band|1||M'
+frontRaise:'lat|db|1|sh|',rearDbFly:'rear|db|1|lb|',deadHang:'shrug|bw|1|sh|',bandFacePull:'rear|band|1||',bandRow:'hpull|band|1||M',bandPress:'hpush|band|1||M',bandOHP:'vpush|band|1|sh|M',bandCurl:'bi|band|1||',bandPushdown:'tri|band|1||',bandPullDown:'vpull|band|1||M',hipThrustBand:'glute|band|1||M',
+smithBench:'hpush|gym|1||M',declineBench:'hpush|bb|2|sh|M',cableCross:'fly|gym|1||',machDip:'tri|gym|1|sh|',declinePU:'hpush|bw|2|wr|M',archerPU:'hpush|bw|3|wr,sh|',
+uprightRow:'lat|gym|2|sh|',kbPress:'vpush|kb|2|sh|M',dbPullover:'vpull|db|1|sh|',pendlayRow:'hpull|bb|3|lb|M',kbRow:'hpull|kb|1||M',bbShrug:'shrug|bb|1||',
+revCurl:'bi|bb|1|wr|',dbPreacher:'bi|db|1||',zottman:'bi|db|2|wr|',cableOHExt:'tri|gym|1|el|',dbSkull:'tri|db|1|el|',
+airSquat:'squat|bw|1||M',kbGoblet:'squat|kb|1||M',sumoDbSq:'squat|db|1||M',sissySq:'quad|bw|2|kn|',singleLegPress:'squat|gym|1||',curtsy:'lunge|bw|1|kn|',
+standLegCurl:'ham|gym|1||',ghr:'ham|gym|3|kn|',revHyper:'hinge|gym|1||',gluteBridge:'glute|bw|1||M',donkeyCalf:'calf|gym|1||',
+russianTwist:'coreAR|bw|1|lb|',bicycleCrunch:'coreFlex|bw|1||',vUp:'coreFlex|bw|2|lb|',landmineRot:'coreAR|bb|2|lb|',tgu:'coreAR|kb|3|sh|',
+medBallSlam:'power|gym|1|lb|',jumpSquat:'power|bw|2|kn,an|',broadJump:'power|bw|2|kn,an|',assaultBike:'cardio|gym|1||',skiErg:'cardio|gym|1|lb|',stairClimber:'cardio|gym|1||',sledPull:'cardio|gym|1||'
 };
 const META={};Object.keys(META_RAW).forEach(id=>{const[p,eq,l,av,f]=META_RAW[id].split('|');META[id]={pat:p,eq,lvl:+l,av:av?av.split(','):[],main:f==='M'}});
 // auto-alternatives for exercises without a hand-picked list
@@ -859,7 +933,7 @@ function buildPlan(a){
     l.sort((x,y)=>(week[x]||0)-(week[y]||0));const id=l[0];if(!id)return null;week[id]=(week[id]||0)+1;used.add(id);return[id,E[id].t?'coreT':'coreR']};
   const keep=a.len==45?2:a.len==60?3:9;
   const mods={muscle:'',strength:'',fat:'',health:''};
-  const days=(a.days||[]).slice().sort((x,y)=>x-y),split=SPLITS[Math.min(6,Math.max(2,days.length))]||SPLITS[4];
+  const days=(a.days||[]).slice().sort((x,y)=>x-y),split=a.split||SPLITS[Math.min(6,Math.max(2,days.length))]||SPLITS[4];
   const firstPicks={};
   const mobList=kind=>{const f=sc.focus,out=[];const add=arr=>arr.forEach(x=>{if(!out.includes(x)&&E[x]&&!(x==='mckenzie'&&!inj.has('lb')))out.push(x)});
     const up=()=>{if(f.includes('sh'))add(MOBPOOL.shoulder.slice(0,2));if(f.includes('overhead'))add(MOBPOOL.overhead.slice(0,2));if(f.includes('el')||f.includes('wr'))add(MOBPOOL.arm.slice(0,1))};
@@ -933,7 +1007,7 @@ function drawOb(){
     <div class="obtest"><b>5. Overhead reach</b><span>Back flat against a wall, raise straight arms overhead. Do your thumbs touch the wall?</span><div class="obrow">${ch('overhead',1,'No')}${ch('overhead',2,'Almost')}${ch('overhead',3,'Yes, easily')}</div></div>
     <div class="obtest"><b>6. Deep squat</b><span>Feet shoulder-width, squat as low as you can. Do your heels stay down?</span><div class="obrow">${ch('deepsq',1,'Heels lift')}${ch('deepsq',2,'With effort')}${ch('deepsq',3,'Yes, easily')}</div></div>
     <div class="obtest"><b>7. Single-leg balance</b><span>Eyes open, hands on hips. Seconds on each leg (stop at 60).</span><div class="grid2">${inp('balL','Left','e.g. 40','number','sec')}${inp('balR','Right','e.g. 45','number','sec')}</div></div>`;
-  if(st==='stack')h=head('Supplements and habits','Start fresh, or with a simple starter set you can edit later.')+`<label class="fl2">Supplements</label>${ch('supps','empty','Start empty','Add your own from the 42-supplement guide')}${ch('supps','starter','Starter stack','Protein, creatine, vitamin D3, omega-3, magnesium')}${!UI.fresh?ch('supps','keep','Keep my current stack'):''}
+  if(st==='stack')h=head('Supplements and habits','Start fresh, or with a simple starter set you can edit later.')+`<label class="fl2">Supplements</label>${ch('supps','empty','Start empty','Add your own from the 200-supplement guide')}${ch('supps','starter','Starter stack','Protein, creatine, vitamin D3, omega-3, magnesium')}${!UI.fresh?ch('supps','keep','Keep my current stack'):''}
     <label class="fl2" style="margin-top:10px">Habits</label>${ch('habits','empty','Start empty')}${ch('habits','starter','Starter habits','Water, 8,000 steps and 7h+ sleep (the last two auto-track with WHOOP)')}${!UI.fresh?ch('habits','keep','Keep my current habits'):''}`;
   if(st==='review'){const P=buildPlan(a),sc=P.sc;UI.ob.preview=P;const bar=(l,v,t)=>`<div class="obscore"><span>${l}</span><div class="bar2"><span style="width:${v/3*100}%;background:${v<1.7?'var(--bad)':v<2.5?'var(--warn)':'var(--ok)'}"></span></div><em>${t}</em></div>`;const tx=v=>v<1.7?'Needs work':v<2.5?'Average':'Good';
     h=head(`${a.name?a.name+', y':'Y'}our plan is ready`,'Here\u2019s what your answers and tests show, and the plan IRON built.')+`<div class="card"><h4 class="disp" style="font-size:22px;margin:0 0 8px">Assessment</h4>${bar('Strength',sc.st,tx(sc.st))}${bar('Core',sc.core,tx(sc.core))}${bar('Mobility',sc.mob,tx(sc.mob))}${bar('Balance',sc.bal,tx(sc.bal)+(sc.asym?', uneven sides':''))}
@@ -949,7 +1023,7 @@ function obFinish(){
   const a=UI.ob.a,P=buildPlan(a);
   if(!UI.fresh&&!S.planBackup)S.planBackup={map:clone(S.map),start:S.start,end:S.end,moves:clone(S.moves),ext:clone(S.ext),prof:clone(S.prof)};
   S.prof={ans:a,plan:{tpls:P.tpls,mob:P.mob,wu:P.wu,rot:P.rot,target:P.target,cardioRange:P.cardioRange},sc:P.sc,created:todayS()};
-  S.map=P.map;S.start=a.start;S.end=addD(a.start,(+a.weeks||12)*7-1);S.moves={};S.ext=[];S.hist=[];S.swaps={};S.swapsAll={};
+  S.map=P.map;S.start=a.start;S.end=addD(a.start,(+a.weeks||12)*7-1);S.moves={};S.custom=null;delete S.customPrev;S.ext=[];S.hist=[];S.swaps={};S.swapsAll={};
   if(a.supps==='empty')S.supps=[];
   if(a.supps==='starter')S.supps=[['Creatine monohydrate','5 g','Morning'],['Whey protein','1 scoop','Post-workout'],['Vitamin D3','2,000 IU','With meals'],['Omega-3 (fish oil)','2 g EPA+DHA','With meals'],['Magnesium glycinate','300 mg','Evening']].map((x,i)=>({id:'s'+Date.now()+i,n:x[0],d:x[1],slot:x[2],note:'',c:HAB_COLORS[i%HAB_COLORS.length]}));
   if(a.habits==='empty')S.habits=[];
@@ -1025,10 +1099,61 @@ const PH_COLOR={F:'#00B39A',H:'#2F5BFF',S:'#FF6A13'};
 const REST={tw:60,main:120,sec:90,acc:60,arm:60,pre:45,coreR:40,coreT:40};
 function weekNo(d){return Math.floor(diffD(sunOf(S.start),sunOf(d))/7)+1}
 function totalWeeks(){return weekNo(S.end)}
+/* cycles can be 6, 7 or 8 weeks (last week is always a deload). Build weeks follow these patterns. */
+const FOCUS_SEQ={5:[0,1,2,3,4],6:[0,1,2,3,1,4],7:[0,1,2,3,1,2,3]};
+const OFF_SEQ={5:[0,1,2,0,1],6:[0,1,2,0,1,2],7:[0,1,2,0,1,2,0]};
+function rirAt(s,pos,n){if(n===5)return WK_RIR[s][pos];const st=s==='S'?2:3;return String(Math.max(1,Math.round(st-(st-1)*pos/(n-1))))}
+/* plan segments: each has its own cycle length. Without the builder there is one 6-week segment from the plan start. */
+function segs(){const base={from:sunOf(S.start),CL:6,c0:0};const x=(S.custom&&S.custom.segs)||[];return[base,...x.filter(g=>g.from>base.from)]}
+function segAt(d){const w=sunOf(d);let g=null;for(const x of segs())if(x.from<=w)g=x;return g||segs()[0]}
+function cycleOf(d){const g=segAt(d),ws=Math.max(0,Math.floor(diffD(g.from,sunOf(d))/7));return{c:g.c0+Math.floor(ws/g.CL),pos:ws%g.CL,CL:g.CL}}
+function cycleStart(c){let g=segs()[0];for(const x of segs())if(x.c0<=c)g=x;return addD(g.from,(c-g.c0)*g.CL*7)}
+function cycleEnd(c){const st=cycleStart(c),nx=cycleStart(c+1);return addD(nx>st?nx:addD(st,cycleOf(st).CL*7),-1)}
+function goalOf(){return(S.custom&&S.custom.goal)||(S.prof&&S.prof.ans&&S.prof.ans.goal)||'muscle'}
+function nextPhase(s){const g=goalOf();if(g==='strength')return s==='S'?'H':'S';if(g==='fat'||g==='health')return s==='F'?'H':'F';return s==='F'?'H':s==='H'?'S':'H'}
+function defaultPhase(c){
+  if(S.custom&&S.custom.goal){let s=goalOf()==='strength'?'H':'F';for(let i=0;i<c;i++)s=nextPhase(s);return s}
+  const gs=S.prof&&S.prof.ans&&S.prof.ans.goal==='strength'&&S.prof.sc&&S.prof.sc.lvl>=2;return gs?(c%2===0?'H':'S'):(c===0?'F':(c%2===1?'H':'S'))}
+function phaseForCycle(c){const dec=cycleDecision(c);if(dec)return dec.s;if(c<=0)return defaultPhase(0);
+  if(S.custom&&S.custom.adapt!==false&&Object.keys(S.custom.cycles||{}).some(k=>+k<c))return nextPhase(phaseForCycle(c-1));return defaultPhase(c)}
 function phaseOf(d){
-  const w=Math.max(1,weekNo(d)),c=Math.floor((w-1)/6),pos=(w-1)%6;
-  const gs=S.prof&&S.prof.ans&&S.prof.ans.goal==='strength'&&S.prof.sc&&S.prof.sc.lvl>=2;const s=gs?(c%2===0?'H':'S'):(c===0?'F':(c%2===1?'H':'S'));const deload=pos===5;
-  return {w,c,b:c,pos,s,deload,cw:pos+1,name:deload?'Deload':SCH[s].name,focus:WK_FOCUS[pos],rir:deload?'4':WK_RIR[s][pos]};
+  const w=Math.max(1,weekNo(d)),cy=cycleOf(d),c=cy.c,pos=cy.pos,CL=cy.CL,n=CL-1,deload=pos===n;
+  const s=phaseForCycle(c),dec=cycleDecision(c),fi=deload?5:FOCUS_SEQ[n][pos];
+  return {w,c,b:c,pos,n,CL,s,deload,cw:pos+1,fi,off:deload?0:OFF_SEQ[n][pos],mainset:!deload&&pos>=3?1:0,vol:dec?dec.vol:0,dec,name:deload?'Deload':SCH[s].name,focus:WK_FOCUS[fi],rir:deload?'4':rirAt(s,pos,n)};
+}
+/* at the start of each cycle (after you set up the builder) the app reviews the last cycle and decides the next phase */
+function cycleReview(c){
+  const ps=cycleStart(c-1),pe=addD(cycleStart(c),-1);const t=todayS();
+  const days=[];for(let d=ps;d<=pe&&d<=S.end;d=addD(d,1))if(d>=S.start&&isTraining(tplOf(d))&&T[tplOf(d)].k!=='long')days.push(d);
+  const past=days.filter(d=>d<t),adh=past.length>=3?past.filter(d=>S.done[d]).length/past.length:null;
+  const h=hist();let up=0,tracked=0;Object.keys(h).forEach(ex=>{const a=h[ex].filter(x=>x.d>=ps&&x.d<=pe&&!phaseOf(x.d).deload);if(a.length<2)return;tracked++;const be=x=>Math.max(...x.sets.map(q=>e1rm(+q.w,+q.r)));const f=be(a[0]),l=Math.max(...a.slice(-2).map(be));if(l>f*1.01)up++});
+  const prog=tracked>=2?up/tracked:null;
+  const rv=[];for(let d=ps;d<=pe;d=addD(d,1)){const x=S.wdata&&S.wdata[d];if(x&&x.rec!=null&&!x.cal)rv.push(+x.rec)}const rec=rv.length>=7?rv.reduce((a,b)=>a+b,0)/rv.length:null;
+  const prev=phaseForCycle(c-1),pc=v=>Math.round(v*100)+'%';
+  const stats={adh,prog,rec,tracked};
+  if(adh!==null&&adh<0.6)return{s:prev,vol:-1,stats,why:`You finished ${pc(adh)} of last cycle's sessions, so this cycle keeps the same rep ranges and trims one accessory set. Shorter sessions are easier to show up for.`};
+  if(rec!==null&&rec<45)return{s:prev,vol:-1,stats,why:`WHOOP recovery averaged ${Math.round(rec)}% last cycle. Same rep ranges, one set fewer on accessories, so you can recover and keep progressing.`};
+  if(prog!==null&&prog<0.3){const s2=prev==='F'?'H':'F';return{s:s2,vol:0,stats,why:`Only ${pc(prog)} of your lifts went up last cycle. Switching to ${SCH[s2].name.toLowerCase()} rep ranges for a fresh stimulus.`}}
+  if(prog!==null&&prog>=0.6&&(adh===null||adh>=0.8)&&(rec===null||rec>=60)){const s2=nextPhase(prev);return{s:s2,vol:1,stats,why:`Strong cycle: ${pc(prog)} of lifts went up${adh!==null?', '+pc(adh)+' attendance':''}${rec!==null?', recovery '+Math.round(rec)+'%':''}. Moving to ${SCH[s2].name.toLowerCase()} with one extra accessory set.`}}
+  const s2=nextPhase(prev);return{s:s2,vol:0,stats,why:prog===null?`Not enough logged lifts to judge last cycle, so the plan follows the standard progression to ${SCH[s2].name.toLowerCase()}.`:`Steady progress (${pc(prog)} of lifts up). Moving on to ${SCH[s2].name.toLowerCase()}.`};
+}
+let DECIDING=false;
+function cycleDecision(c){
+  const C=S.custom;if(!C||C.adapt===false||c<1)return null;
+  if(C.cycles&&C.cycles[c])return C.cycles[c];
+  const st=cycleStart(c);if(st<C.since||st>todayS()||DECIDING)return null;
+  if(c>1)cycleDecision(c-1);
+  DECIDING=true;let r;try{r=cycleReview(c)}finally{DECIDING=false}
+  r.at=todayS();C.cycles=C.cycles||{};C.cycles[c]=r;setTimeout(save,0);return r;
+}
+/* WHOOP weekly intensity: last week's recovery sets this week's volume */
+function weekInt(d){
+  if(!S.custom||S.custom.whoopWeekly===false||!S.whoop||!S.whoop.connected)return null;
+  const ws=sunOf(d),vals=[];let reds=0;for(let i=1;i<=7;i++){const x=S.wdata&&S.wdata[addD(ws,-i)];if(x&&x.rec!=null&&!x.cal){vals.push(+x.rec);if(+x.rec<34)reds++}}
+  if(vals.length<4)return null;const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  if(avg<45||reds>=3)return{lvl:'ease',avg,reds,why:`Recovery averaged ${Math.round(avg)}% last week${reds?' with '+reds+' red day'+(reds>1?'s':''):''}. One set fewer on secondary and accessory moves, 1 more rep in reserve, HIIT becomes Zone 2.`};
+  if(avg>=70&&reds===0)return{lvl:'push',avg,reds,why:`Recovery averaged ${Math.round(avg)}% last week with no red days. One extra set on main and secondary lifts this week.`};
+  return{lvl:'normal',avg,reds,why:`Recovery averaged ${Math.round(avg)}% last week. Normal volume.`};
 }
 /* every other cycle, accessories and arm moves rotate to a sister exercise; main lifts stay so strength keeps building */
 const ROT={incMach:'incDB',incDB:'incMach',csRow:'sealRow',sealRow:'csRow',lmPress:'saDBPress',saDBPress:'machShoulder',cLat:'machLat',dbLat:'cLat',ropePush:'vbarPush',vbarPush:'ropePush',hammer:'crossHammer',ropeHammer:'hammer',saCableRow:'machRow',machChest:'floorPress',revPec:'cRearFly',cRearFly:'revPec',preacherM:'cableCurl',cableCurl:'dbCurl',crossExt:'kickback',rfess:'revLunge',seatHam:'lyingHam',legPress:'hackSq',standCalf:'slCalf',dbRDL:'slRDL',stepUp:'splitSq',legExt:'spanishSq',seatCalf:'standCalf',backExt45:'pullThrough'};
@@ -1036,13 +1161,15 @@ function rotated(base,role,d){if(role==='main'||role==='pre'||role==='tw'||role=
 function extAt(d){return S.ext.find(x=>d>=x.from&&d<=x.to)||null}
 function rangeOf(r){if(typeof r==='number')return[r,r];const m=String(r).match(/(\d+)(?:-(\d+))?/);return m?[+m[1],+(m[2]||m[1])]:[8,10]}
 function rx(role,d,dose,isT){
-  const ph=phaseOf(d),off=ph.deload?0:WK_OFF[ph.pos];
-  if(role==='tw'){let sets=ph.s==='S'?4:3;const add={F:0,H:2,S:4}[ph.s]+off;if(ph.deload)sets=2;if(readyOf(d)==='y')sets--;sets=Math.max(1,sets);
+  const ph=phaseOf(d),off=ph.off,wi=weekInt(d);
+  if(role==='tw'){let sets=ph.s==='S'?4:3;const add={F:0,H:2,S:4}[ph.s]+off;if(ph.deload)sets=2;if(readyOf(d)==='y')sets--;if(wi&&wi.lvl==='ease'&&!ph.deload)sets--;sets=Math.max(1,sets);
     const v=isT?dose+(ph.deload?0:add*5):String(dose+(ph.deload?0:add));return{sets,reps:v,rir:ph.rir,rest:60}}
   const sc=SCH[ph.s];let[sets,base]=sc[role];let rir=ph.rir;
   let reps=role==='coreT'?base+off*5:(role==='pre'?base:base+off);
-  if(role==='main'&&!ph.deload)sets+=WK_MAINSET[ph.pos];
+  if(role==='main'&&!ph.deload)sets+=ph.mainset;
   const ex=extAt(d);if(ex&&ex.vol>0&&role==='arm')sets+=1;if(ex&&ex.vol<0&&(role==='acc'||role==='arm'))sets-=1;
+  if(ph.vol>0&&(role==='acc'||role==='arm'))sets+=1;if(ph.vol<0&&(role==='acc'||role==='arm'))sets-=1;
+  if(wi&&!ph.deload){if(wi.lvl==='push'&&(role==='main'||role==='sec'))sets+=1;if(wi.lvl==='ease'&&(role==='sec'||role==='acc'||role==='arm'))sets-=1;if(wi.lvl==='ease'&&+rir<4)rir=String(+rir+1)}
   if(ph.deload){sets=2;rir='4'}
   if(readyOf(d)==='y'&&(role==='acc'||role==='arm'||role==='pre'))sets--;
   if(readyOf(d)==='y'&&role==='main'&&!ph.deload&&+rir<2)rir='2';
@@ -1103,8 +1230,10 @@ function whoopCard(d){
 const inPlan=d=>d>=S.start&&d<=S.end;
 const isLift=k=>!!k&&!!T[k]&&(T[k].k==='upper'||T[k].k==='lower'||T[k].k==='full');
 function tripAt(d){return(S.trips||[]).find(x=>d>=x.from&&d<=x.to)||null}
-function baseTpl(d){if(!inPlan(d))return null;const b=S.map[dow(d)]||'rest';const tr=tripAt(d);
-  if(tr&&isLift(b)){let n=0;for(let x=tr.from;x<d;x=addD(x,1)){if(isLift(S.moves[x]||S.map[dow(x)]))n++}return TRAVEL[n%4]}return b}
+function mapAt(d){const ms=(S.custom&&S.custom.maps)||[];let m=null;for(const x of ms)if(x.from<=d)m=x.map;return m||S.map}
+function activeMap(){const ms=(S.custom&&S.custom.maps)||[];if(!ms.length)return S.map;const t=todayS();let m=ms[0];for(const x of ms)if(x.from<=t)m=x;return m.map}
+function baseTpl(d){if(!inPlan(d))return null;const b=(mapAt(d)[dow(d)])||'rest';const tr=tripAt(d);
+  if(tr&&isLift(b)){let n=0;for(let x=tr.from;x<d;x=addD(x,1)){if(isLift(S.moves[x]||mapAt(x)[dow(x)]))n++}return TRAVEL[n%4]}return b}
 function tplOf(d){if(!inPlan(d))return null;return S.moves[d]||baseTpl(d)}
 function setSession(d,k){if(k===baseTpl(d))delete S.moves[d];else S.moves[d]=k}
 const clone=o=>o==null?null:JSON.parse(JSON.stringify(o));
@@ -1112,12 +1241,12 @@ function snapSched(label,dates,swapDates,mapToo){
   const e={label,t:Date.now(),m:{},s:{}};
   dates.forEach(d=>{e.m[d]=Object.prototype.hasOwnProperty.call(S.moves,d)?S.moves[d]:null});
   (swapDates||[]).forEach(d=>{e.s[d]=clone(S.swaps[d])});
-  if(mapToo)e.map=clone(S.map);
+  if(mapToo){e.map=clone(S.map);if(S.custom)e.cmaps=clone(S.custom.maps)}
   S.hist=S.hist||[];S.hist.push(e);if(S.hist.length>40)S.hist.shift();return e}
 function undoSched(){const e=(S.hist||[]).pop();if(!e)return null;
   Object.keys(e.m).forEach(d=>{if(e.m[d]==null)delete S.moves[d];else S.moves[d]=e.m[d]});
   Object.keys(e.s).forEach(d=>{if(e.s[d]==null)delete S.swaps[d];else S.swaps[d]=e.s[d]});
-  if(e.map)S.map=e.map;save();return e}
+  if(e.map)S.map=e.map;if(e.cmaps&&S.custom)S.custom.maps=e.cmaps;save();return e}
 function doSchedule(mode,target){
   const d=UI.date;if(!target||target===d||!inPlan(target)){toast('Pick a different day inside your plan');return false}
   const a1=tplOf(d),a2=tplOf(target);
@@ -1144,7 +1273,7 @@ function blocksFor(d){
     const slot=b.key+'-'+ii,b0=rotated(it[0],it[1],d),ex2=exAt(d,slot,b0);return{slot,base:b0,orig:it[0],ex:ex2,role:it[1],rx:rx(it[1],d,E[ex2].t===E[b0].t?it[2]:(E[ex2].t?(E[ex2].s||30):10),!!E[ex2].t)}})}));
 }
 function coreFor(d){const t=T[tplOf(d)];if(!t||!t.core)return[];return t.core.map((c,i)=>{const slot='c'+i;return{slot,base:c[0],ex:exAt(d,slot,c[0]),role:c[1],rx:rx(c[1],d)}})}
-function listFor(d,kind){const t=T[tplOf(d)];if(!t)return[];const src=kind==='wu'?(t.wu&&readyOf(d)!=='r'?WU[t.wu]:null):MOB[t.mob];if(!src)return[];const pre=kind==='wu'?'w':'m';return src.map((m,i)=>{const slot=pre+i;const ex=exAt(d,slot,m[0]);let dose=m[1];if(ex!==m[0]){const b=E[m[0]],a=E[ex];if(a.t&&!b.t)dose=a.s||30;else if(!a.t&&b.t)dose=8}return{slot,base:m[0],ex,dose,kind}})}
+function listFor(d,kind){const t=T[tplOf(d)];if(!t)return[];const src=kind==='wu'?(t.wu&&readyOf(d)!=='r'?WU[t.wu]:null):(mobListAt(d,t.k)||MOB[t.mob]);if(!src)return[];const pre=kind==='wu'?'w':'m';return src.map((m,i)=>{const slot=pre+i;const ex=exAt(d,slot,m[0]);let dose=m[1];if(ex!==m[0]){const b=E[m[0]],a=E[ex];if(a.t&&!b.t)dose=a.s||30;else if(!a.t&&b.t)dose=8}return{slot,base:m[0],ex,dose,kind}})}
 const mobFor=d=>listFor(d,'mob'),warmFor=d=>listFor(d,'wu');
 function secsOf(it){const e=E[it.ex];if(!e.t)return 0;return typeof it.rx.reps==='number'?it.rx.reps:(e.s||30)}
 function repTxt(it){const e=E[it.ex];if(e.t)return secsOf(it)+' s'+(e.u?' / side':'');return it.rx.reps+(e.u?' / side':'')}
@@ -1163,7 +1292,8 @@ function cardioFor(d){
   if(t.k==='travel')return{mins:readyOf(d)==='r'?20:t.cardio.mins,m:readyOf(d)==='r'?'Easy walk outside or in the hotel':'Low-impact bodyweight circuit',z:readyOf(d)==='r'?'z2':'circ',moves:t.cardio.moves};
   if(readyOf(d)==='r')return{mins:30,m:'Easy walk or bike',z:'z2'};
   const used=(mobSecs(d)+warmSecs(d)+strSecs(d)+coreSecs(d))/60;
-  const PP=S.prof&&S.prof.plan,tgt=PP?PP.target:84,rgc=PP?PP.cardioRange:[10,20];const mins=Math.max(rgc[0],Math.min(rgc[1],Math.round(tgt-used)));
+  const PP=(S.custom&&S.custom.target)?S.custom:(S.prof&&S.prof.plan),tgt=PP?PP.target:84,rgc=PP?PP.cardioRange:[10,20];const mins=Math.max(rgc[0],Math.min(rgc[1],Math.round(tgt-used)));
+  const wi=weekInt(d);if(t.cardio.z==='int'&&((wi&&wi.lvl==='ease')||readyOf(d)==='y'))return{mins,m:'Zone 2 instead of intervals (recovery is low)',z:'z2'};
   return{mins,m:t.cardio.m,z:t.cardio.z};
 }
 function cardioPhases(c){
@@ -1188,7 +1318,7 @@ function units(d){
   return r;
 }
 function pctOf(u){const ks=['mob','wu','str','core','cardio'];const a=ks.reduce((x,k)=>x+u[k][0],0),b=ks.reduce((x,k)=>x+u[k][1],0);return b?a/b:0}
-const isTraining=k=>k&&T[k]&&(T[k].k==='upper'||T[k].k==='lower'||T[k].k==='full'||T[k].k==='long'||T[k].k==='travel');
+const isTraining=k=>k&&T[k]&&(T[k].k==='hiit'||T[k].k==='upper'||T[k].k==='lower'||T[k].k==='full'||T[k].k==='long'||T[k].k==='travel');
 
 /* ---------- progression engine ---------- */
 let HISTCACHE=null;
@@ -1207,7 +1337,7 @@ function suggest(it,d){
     const recent=(hist()[it.ex]||[]).filter(x=>x.d<d&&diffD(x.d,d)<=49&&!phaseOf(x.d).deload);
     const best=Math.max(...(recent.length?recent:[lp]).flatMap(x=>x.sets.map(s=>e1rm(+s.w,+s.r))));
     w=roundTo(best/(1+(tgt+(+ph.rir||2))/30),step);why=`New cycle: set from your strength for ${tgt} reps`}
-  else if(ph.pos===3&&lph.pos<3){w=top+inc;why='Week 4: add weight, reps reset'}
+  else if(ph.fi===3&&lph.w<ph.w&&lph.fi!==3){w=top+inc;why='Week '+ph.cw+': add weight, reps reset'}
   else if(reps.every(r=>r>=tgt+2)){w=top+inc;why='That was easy, add weight'}
   else if(reps.filter(r=>r<tgt-2).length>=2){w=roundTo(top*0.95,step);why='Missed the target twice, trim a little'}
   else why=`Same weight, aim for ${tgt} reps`;
@@ -1229,6 +1359,7 @@ swap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2
 gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
 info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.1"/></svg>',
 train:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>',
+build:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>',
 plan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
 prog:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V11M10 19V5M16 19v-6M22 19H2"/></svg>',
 supp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-40 12 12)"/><path d="M9.2 8.7l6.1 6.6"/></svg>',
@@ -1256,7 +1387,7 @@ function renderTop(){
   <div class="weeklab"><span>${w?`Week ${w} of ${totalWeeks()} · Cycle ${ph.c+1}, wk ${ph.cw}/6`:'Outside the plan dates'}</span>${UI.date!==t?`<button class="linkbtn" data-a="today">Jump to today</button>`:'<span></span>'}</div>`;
 }
 function renderTabs(){
-  const tabs=[['train','Train',IC.train],['travel','Travel',IC.travel],['plan','Plan',IC.plan],['whoop','WHOOP',IC.pulse],['progress','Progress',IC.prog],['supps','Supps',IC.supp],['habits','Habits',IC.hab]];
+  const tabs=[['train','Train',IC.train],['travel','Travel',IC.travel],['plan','Plan',IC.plan],['build','Builder',IC.build],['whoop','WHOOP',IC.pulse],['progress','Progress',IC.prog],['supps','Supps',IC.supp],['habits','Habits',IC.hab]];
   document.getElementById('tabs').innerHTML=tabs.map(t=>`<button class="tab ${UI.tab===t[0]?'on':''}" data-a="tab" data-v="${t[0]}">${t[2]}<span>${t[1]}</span></button>`).join('');
 }
 
@@ -1273,7 +1404,7 @@ function renderTrain(){
     <div class="when">${nice(d)}</div>
     <h2 class="disp">${t.n}</h2>
     <div class="focus">${t.f}</div>
-    <div class="tags"><span class="tag">About ${mins(est.total)}</span><span class="tag">Cycle ${ph.c+1}, week ${ph.cw} of 6</span>${t.blocks?`<span class="tag">${ph.name}${ph.deload?'':', RIR '+ph.rir}</span>`:''}${moved?'<span class="tag">Rescheduled</span>':''}${S.done[d]?'<span class="tag">Complete</span>':''}</div>
+    <div class="tags"><span class="tag">About ${mins(est.total)}</span><span class="tag">Cycle ${ph.c+1}, week ${ph.cw} of ${ph.CL}</span>${t.blocks?`<span class="tag">${ph.name}${ph.deload?'':', RIR '+ph.rir}</span>`:''}${moved?'<span class="tag">Rescheduled</span>':''}${S.done[d]?'<span class="tag">Complete</span>':''}</div>
     <div class="seg">${segs.map(s=>`<div style="flex:${Math.max(s[1],10)}"><span style="width:${s[2][1]?s[2][0]/s[2][1]*100:0}%"></span></div>`).join('')}</div>
     <div class="seglab">${segs.map(s=>`<span style="flex:${Math.max(s[1],10)}">${s[1]>=20?s[0]+' ':''}${Math.round(s[1])}′</span>`).join('')}</div>
     <div class="hero-actions"><button class="hbtn solid" data-a="colall">${SECS.every(isCol)?'Expand all':'Compact view'}</button><button class="hbtn" data-a="move">Move or copy</button>${(S.hist||[]).length?'<button class="hbtn" data-a="undosched" title="'+esc(S.hist[S.hist.length-1].label)+'">↶ Undo</button>':''}</div>
@@ -1284,10 +1415,11 @@ function renderTrain(){
       <button class="rbtn ${r==='g'?'on':''}" data-a="ready" data-v="g">Green<small>full session</small></button>
       <button class="rbtn ${r==='y'?'on':''}" data-a="ready" data-v="y">Yellow<small>lighter day</small></button>
       <button class="rbtn ${r==='r'?'on':''}" data-a="ready" data-v="r">Red<small>recovery only</small></button></div>`;
+    {const wi=weekInt(d);if(wi&&wi.lvl!=='normal')h+=`<div class="note" style="--c:${wi.lvl==='push'?'var(--ok)':'var(--bad)'}"><b>WHOOP week: ${wi.lvl==='push'?'push':'ease off'}.</b> ${esc(wi.why)}</div>`}
     if(r==='y')h+=`<div class="note"><b>Lighter day.</b> One set fewer on accessories and arms, main lifts stop at 2 reps in reserve, cardio stays Zone 2.</div>`;
     if(r==='r')h+=`<div class="note" style="--c:var(--bad)"><b>Recovery day.</b> Lifting is off today. Do the mobility, core and an easy 30-minute Zone 2. Come back tomorrow fresh.</div>`;
     if(ph.deload)h+=`<div class="note"><b>Deload week.</b> Two sets per exercise, loads about 15% lighter, leave 4 reps in the tank. This is where the gains lock in. A new cycle starts next week.</div>`;
-    else h+=`<div class="note"><b>This week: ${ph.focus}.</b> ${[(ph.c>0?'The app suggests starting weights from your strength last cycle. ':'')+'Pick loads that leave '+ph.rir+' reps in reserve. They become your starting point for the cycle.','Keep last week’s weights and add one rep to every set.','Same weights again, one more rep. You should be near the top now.','Add weight (the app suggests how much). Reps drop back down.','Same weight as last week, push for one more rep. The hardest week of the cycle.'][ph.pos]}${ph.pos===0&&ph.c>0?(ph.c%2===1?' <b>New cycle:</b> lower reps, heavier loads, and accessories and arm moves rotate to new variations.':' <b>New cycle:</b> lower reps, heavier loads, and the original accessory moves return.'):''}</div>`;
+    else h+=`<div class="note"><b>This week: ${ph.focus}.</b> ${[(ph.c>0?'The app suggests starting weights from your strength last cycle. ':'')+'Pick loads that leave '+ph.rir+' reps in reserve. They become your starting point for the cycle.','Keep last week’s weights and add one rep to every set.','Same weights again, one more rep. You should be near the top now.','Add weight (the app suggests how much). Reps drop back down.','Same weight as last week, push for one more rep. The hardest week of the cycle.'][ph.fi]}${ph.pos===0&&ph.c>0&&ph.dec?' <b>Cycle review:</b> '+esc(ph.dec.why):''}${ph.pos===0&&ph.c>0&&!ph.dec?(ph.c%2===1?' <b>New cycle:</b> lower reps, heavier loads, and accessories and arm moves rotate to new variations.':' <b>New cycle:</b> lower reps, heavier loads, and the original accessory moves return.'):''}</div>`;
   }
   if(t.k==='rest')h+=`<div class="note"><b>Rest day.</b> The 10-minute flow below is optional but great for the pelvic tilt and low back. Supplements still count today.</div>`;
   if(t.k==='travel')h+=`<div class="note"><b>Travel session, no equipment.</b> All you need is a sturdy chair, a door frame and a towel.${tripAt(d)&&!S.moves[d]?' Swapped in automatically because this day is inside a trip.':''}</div>`;
@@ -1341,7 +1473,7 @@ function mobRow(d,m,c){
     <button class="chevbtn" data-a="excol" data-k="${m.slot}" data-s="${shut?1:0}" aria-label="${shut?'Expand':'Collapse'}">${CHEV}</button></div>`;
   if(!shut){
     h+=`<div class="mvb">${thumb(m.ex,c)}<div class="cue">${esc(cueOf(e))}${sideNote(e)}</div>${e.p?`<span class="chipinj" style="--c:${c}">${esc(protOf(e))}</span>`:''}
-    <div class="tools" style="clear:both"><button class="mini demo" data-a="demo" data-e="${m.ex}">${IC.play} Demo</button>${e.a?`<button class="mini" data-a="swap" data-k="${m.slot}" data-b="${m.base}">${IC.swap} Replace</button>`:''}${sw?`<button class="mini" data-a="undoswap" data-k="${m.slot}" data-b="${m.base}">Undo swap</button>`:''}</div></div>`;
+    <div class="tools" style="clear:both"><button class="mini demo" data-a="demo" data-e="${m.ex}">${IC.play} Demo</button>${m.base!=='rampUp'?`<button class="mini" data-a="swap" data-k="${m.slot}" data-b="${m.base}">${IC.swap} Replace</button>`:''}${sw?`<button class="mini" data-a="undoswap" data-k="${m.slot}" data-b="${m.base}">Undo swap</button>`:''}</div></div>`;
   }
   return h+'</div>';
 }
@@ -1362,7 +1494,7 @@ function exCard(d,it,o){
   if(shut)return hh+'</article>';
   hh+=`<div style="overflow:hidden;margin-top:8px">${thumb(it.ex,o.c)}<div class="cue" style="font-size:13.5px">${esc(cueOf(e))}${sideNote(e)}</div></div>`;
   if(it.ex!==it.base){const scope=S.swaps[d]&&S.swaps[d][it.slot]?'today':'in every session';hh+=`<div class="swapped"><span>Replaces ${esc(E[it.base].n)} ${scope}</span><button data-a="undoswap" data-k="${it.slot}" data-b="${it.base}">Undo</button></div>`}
-  if(sug)hh+=`<div class="sugg num">Last (${short(sug.lp.d)}): ${sug.lp.sets.map(s=>s.w+'×'+s.r).join(', ')}. Try <b>${sug.w} kg</b>. <span class="muted">${sug.why}.</span></div>`;
+  if(sug)hh+=`<div class="sugg num tap" data-a="lifthist" data-e="${it.ex}" role="button">Last (${short(sug.lp.d)}): ${sug.lp.sets.map(s=>s.w+'×'+s.r).join(', ')}. Try <b>${sug.w} kg</b>. <span class="muted">${sug.why}.</span> <u>History ›</u></div>`;
   else if(!e.bw&&!e.t&&!isCore)hh+=`<div class="sugg">First time: pick a load you could lift ${Number(String(it.rx.rir)[0])+0||2} more reps with. The app suggests next time.</div>`;
   hh+=`<div class="sets">`;
   for(let i=0;i<n;i++){
@@ -1371,7 +1503,7 @@ function exCard(d,it,o){
     else if(e.bw){hh+=`<div class="set bw ${s.d?'done':''}"><span class="sn">${i+1}</span><label class="fld"><input inputmode="numeric" data-in="r" data-k="${k}" value="${esc(s.r)}" placeholder="${rangeOf(it.rx.reps)[1]}"><em>reps</em></label><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
     else{hh+=`<div class="set ${s.d?'done':''}"><span class="sn">${i+1}</span><label class="fld"><input inputmode="decimal" data-in="w" data-k="${k}" value="${esc(s.w)}" placeholder="${sug?sug.w:'–'}"><em>kg</em></label><label class="fld"><input inputmode="numeric" data-in="r" data-k="${k}" value="${esc(s.r)}" placeholder="${rangeOf(it.rx.reps)[1]}"><em>reps</em></label><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
   }
-  hh+=`</div><div class="tools"><button class="mini demo" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button><button class="mini" data-a="swap" data-k="${it.slot}" data-b="${it.base}">${IC.swap} Replace</button><button class="mini" data-a="exinfo" data-k="${it.slot}">${IC.info} Form</button></div>
+  hh+=`</div><div class="tools"><button class="mini demo" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button><button class="mini" data-a="swap" data-k="${it.slot}" data-b="${it.base}">${IC.swap} Replace</button><button class="mini" data-a="exinfo" data-k="${it.slot}">${IC.info} Form</button>${!e.bw&&!e.t&&(hist()[it.ex]||[]).length?`<button class="mini" data-a="lifthist" data-e="${it.ex}">History</button>`:''}</div>
   <div class="info hide" id="info-${it.slot}">${esc(cueOf(e))}${sideNote(e,1)}${e.p?`<div><span class="chipinj" style="--c:${o.c}">Protects: ${esc(protOf(e))}</span></div>`:''}</div>
   </article>`;
   return hh;
@@ -1393,14 +1525,14 @@ function renderPlan(){
   const W=totalWeeks(),curW=inPlan(t)?weekNo(t):0;let ps='';
   for(let w=1;w<=W;w++){const d=addD(sunOf(S.start),(w-1)*7+1);const ph=phaseOf(d<S.start?S.start:d);ps+=`<span class="${ph.deload?'dl':''} ${w===curW?'now':''}" style="--c:${PH_COLOR[ph.s]}" title="Week ${w}">${w}</span>`}
   h+=`<div class="card">${cardHead('pblocks','Training blocks')}${isCol('pblocks')?'':`<div class="phases">${ps}</div><div class="legend"><span style="--c:${PH_COLOR.F}"><i></i>Cycle 1: Hypertrophy base</span><span style="--c:${PH_COLOR.H}"><i></i>Cycle 2: Build</span><span style="--c:${PH_COLOR.S}"><i></i>Cycle 3: Strength</span><span style="--c:#c8cdea"><i></i>Deload</span></div>
-<p class="muted" style="font-size:13.5px;margin:0 0 8px">Each 6-week cycle: weeks 1–3 add a rep at the same weight, week 4 adds weight and resets the reps, week 5 pushes the reps again, week 6 is a lighter deload. Every new cycle drops the rep targets and raises the loads, and accessory and arm moves rotate every other cycle. Main lifts stay so your strength keeps building.</p>
-<div style="overflow-x:auto"><table class="cyc"><tr><th></th>${[1,2,3,4,5,6].map(i=>`<th>W${i}</th>`).join('')}</tr>${['F','H','S'].map(k=>`<tr><td><b style="color:${PH_COLOR[k]}">${SCH[k].name}</b></td>${[0,1,2,3,4,5].map(i=>`<td>${i===5?'2×'+SCH[k].main[1]:(SCH[k].main[0]+WK_MAINSET[i])+'×'+(SCH[k].main[1]+WK_OFF[i])}${i===3?'<br><span class="up">+kg</span>':''}</td>`).join('')}</tr>`).join('')}</table></div>`}</div>`;
+<p class="muted" style="font-size:13.5px;margin:0 0 8px">Each cycle (6 weeks unless you change it in the Builder): weeks 1–3 add a rep at the same weight, week 4 adds weight and resets the reps, later weeks push the reps again, and the last week is a lighter deload. Every new cycle drops the rep targets and raises the loads, and accessory and arm moves rotate every other cycle. Main lifts stay so your strength keeps building.</p>
+${(()=>{const CL=cycleOf(todayS()<S.start?S.start:todayS()).CL,n=CL-1,ix=[...Array(CL).keys()];return`<div style="overflow-x:auto"><table class="cyc"><tr><th></th>${ix.map(i=>`<th>W${i+1}</th>`).join('')}</tr>${['F','H','S'].map(k=>`<tr><td><b style="color:${PH_COLOR[k]}">${SCH[k].name}</b></td>${ix.map(i=>`<td>${i===n?'2×'+SCH[k].main[1]:(SCH[k].main[0]+(i>=3?1:0))+'×'+(SCH[k].main[1]+OFF_SEQ[n][i])}${FOCUS_SEQ[n][i]===3?'<br><span class="up">+kg</span>':''}</td>`).join('')}</tr>`).join('')}</table></div>`})()}`}</div>`;
   // weekly schedule
   {const hs=S.hist||[];h+=`<div class="card">${cardHead('phist','Schedule changes')}`;
    if(!isCol('phist')){h+=hs.length?`<p class="muted" style="font-size:13.5px;margin:0 0 6px">Every move, copy and weekly change is saved here. Undo them one at a time, newest first, or go back to the original plan.</p>${hs.slice(-6).reverse().map((e,i)=>`<div class="hrow" style="grid-template-columns:1fr auto"><span>${esc(e.label)}${i===0?' <span class="pill" style="--c:var(--ink)">latest</span>':''}</span><em class="muted">${short(ds(new Date(e.t)))}</em></div>`).join('')}<div class="grid2" style="margin-top:10px"><button class="cta" style="--c:var(--cardio);margin:0" data-a="undosched">↶ Undo latest</button><button class="cta ghost" style="margin:0" data-a="resetsched">Reset to original</button></div>`:`<p class="muted" style="font-size:13.5px;margin:0">Nothing changed yet. Open any day in the Train tab and tap <b>Move or copy</b>.</p>${Object.keys(S.moves).length?'<button class="cta ghost" data-a="resetsched">Reset to original</button>':''}`}
    h+=`</div>`}
   h+=`<div class="card">${cardHead('psched','Weekly schedule')}`;if(!isCol('psched')){h+=`<p class="muted" style="font-size:13.5px;margin:0 0 6px">Change which day each session falls on. It applies to every week; single-day moves are made from the Train tab.</p>`;
-  for(let i=0;i<7;i++){h+=`<div class="srow"><b>${DN[i]}</b><select data-in="map" data-k="${i}">${TPL_KEYS.map(k=>`<option value="${k}" ${S.map[i]===k?'selected':''}>${T[k].n} — ${T[k].f}</option>`).join('')}</select></div>`}
+  const AM=activeMap();for(let i=0;i<7;i++){h+=`<div class="srow"><b>${DN[i]}</b><select data-in="map" data-k="${i}">${TPL_KEYS.map(k=>`<option value="${k}" ${AM[i]===k?'selected':''}>${T[k].n} — ${T[k].f}</option>`).join('')}</select></div>`}
   h+=`<div class="srow"><b>Start date</b><input type="date" data-in="start" value="${S.start}"></div><div class="srow"><b>End date</b><div style="display:flex;gap:8px;align-items:center"><span class="num" style="font-weight:750">${nice(S.end)}</span><button class="mini" data-a="tab" data-v="progress" style="margin-left:auto">Extend plan</button></div></div>`}h+=`</div>`;
   h+=`<div class="legend">${[['Upper','upper'],['Lower','lower'],['Travel','travel'],['Long cardio','long'],['Rest','rest']].map(x=>`<span style="--c:${COLORS[x[1]]}"><i></i>${x[0]}</span>`).join('')}<span style="--c:transparent"><i style="outline:2.5px solid var(--ok)"></i>Done</span></div>`;
   // months
@@ -1674,12 +1806,14 @@ function renderProgress(){
     const H=90,hh=sch?don/sch*H:0,x=(w-1)*(bw+4);bars+=`<rect x="${x}" y="0" width="${bw}" height="${H}" rx="4" fill="var(--sf2)"/><rect x="${x}" y="${H-hh}" width="${bw}" height="${hh}" rx="4" fill="${phaseOf(addD(s,1)).deload?'#9aa8ff':COLORS.upper}"/><text x="${x+bw/2}" y="${H+14}" font-size="10" text-anchor="middle" fill="var(--mu)" font-weight="700">${w}</text>`}
   h+=`<div class="card"><h4 class="disp">Sessions per week</h4><div style="overflow-x:auto"><svg viewBox="0 0 ${W*(bw+4)} 108" width="100%" style="min-width:${W*(bw+4)}px;display:block">${bars}</svg></div></div>`;
   // lifts
-  const hs=hist();const lifts=Object.keys(hs).filter(ex=>!E[ex].bw&&!E[ex].t).sort((a,b)=>hs[b].length-hs[a].length).slice(0,10);
+  const hs=hist();const liftsAll=Object.keys(hs).filter(ex=>E[ex]&&!E[ex].bw&&!E[ex].t).sort((a,b)=>hs[b].length-hs[a].length),lifts=UI.allLifts?liftsAll:liftsAll.slice(0,10);
   if(S.whoop.connected)h+=`<button class="card" style="display:block;width:100%;text-align:left" data-a="tab" data-v="whoop"><h4 class="disp" style="margin:0">WHOOP dashboard →</h4><span class="muted" style="font-size:13.5px">Recovery, sleep, strain and trends now live in the WHOOP tab.</span></button>`;
   h+=`<div class="card"><h4 class="disp">Strength trends</h4>`;
   if(!lifts.length)h+=`<p class="muted" style="margin:0;font-size:14px">Log weights and reps on any exercise and its estimated one-rep max shows up here, session by session.</p>`;
   lifts.forEach(ex=>{const pts=hs[ex].map(x=>Math.max(...x.sets.map(s=>e1rm(+s.w,+s.r))));const best=Math.max(...hs[ex].map(x=>Math.max(...x.sets.map(s=>+s.w))));
-    h+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--ln)"><div style="flex:1;min-width:0"><b style="font-size:14.5px">${esc(E[ex].n)}</b><div class="muted num" style="font-size:12.5px">Best ${best} kg, ${hs[ex].length} session${hs[ex].length>1?'s':''}</div></div>${spark(pts)}</div>`});
+    h+=`<button class="lh" data-a="lifthist" data-e="${ex}" aria-label="See ${esc(E[ex].n)} history"><div class="lhr"><div style="flex:1;min-width:0"><b style="font-size:14.5px">${esc(E[ex].n)}</b><div class="muted num" style="font-size:12.5px">Best ${best} kg, ${hs[ex].length} session${hs[ex].length>1?'s':''}</div></div>${spark(pts)}<span class="lhgo">›</span></div></button>`});
+  if(lifts.length)h+=`<p class="tapnote" style="margin:6px 0 0">Tap any lift to see every session and set.</p>`;
+  if(liftsAll.length>10)h+=`<button class="cta ghost" data-a="alllifts">${UI.allLifts?'Show top 10':'Show all '+liftsAll.length+' lifts'}</button>`;
   h+=`</div>`;
   // extend
   const r=A.rec;
@@ -1706,8 +1840,234 @@ function weekStreak(){const t=todayS();let w=sunOf(t),n=0;const cnt=s=>{let c=0;
 function ring(p,c,size,sw,label){const r=(size-sw)/2,C=2*Math.PI*r;return`<svg class="ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--sf2)" stroke-width="${sw}"/><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-Math.min(1,p))}" transform="rotate(-90 ${size/2} ${size/2})"/>${label?`<text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-size="${size/4.6}" font-weight="850" fill="var(--ink)" style="font-stretch:68%">${label}</text>`:''}</svg>`}
 function spark(pts){const W=110,H=34;if(pts.length<2)return`<span class="pill" style="--c:${COLORS.upper}">${Math.round(pts[0])} e1RM</span>`;const mn=Math.min(...pts),mx=Math.max(...pts),rg=mx-mn||1;const p=pts.map((v,i)=>`${(i/(pts.length-1)*(W-6)+3).toFixed(1)},${(H-3-(v-mn)/rg*(H-6)).toFixed(1)}`).join(' ');const up=pts[pts.length-1]>=pts[0];return`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><polyline points="${p}" fill="none" stroke="${up?'#12B76A':'#EF3B55'}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`}
 
+
+/* =====================================================================
+   PLAN BUILDER
+   Pick a split, set each day, edit the moves in any session, choose the
+   cycle length, WHOOP intensity and mobility focus. Changes apply from a
+   chosen day onward; earlier weeks and logs stay as they were.
+   ===================================================================== */
+const BT={push:{l:'Push',k:'upper',spec:['gPu']},pull:{l:'Pull',k:'upper',spec:['gPl']},legs:{l:'Legs',k:'lower',spec:['gLg']},upper:{l:'Upper',k:'upper',spec:['gUA','gUB','gUC']},lower:{l:'Lower',k:'lower',spec:['gLA','gLB']},full:{l:'Full body',k:'full',spec:['gFA','gFB','gFC']},hiit:{l:'HIIT',k:'hiit'},long:{l:'Long cardio',k:'long'},rest:{l:'Rest',k:'rest'}};
+const BPRESETS=[
+  {id:'pp',l:'Push / Pull',s:'Push and pull days alternate, HIIT in the middle, long cardio at the weekend',w:['push','pull','hiit','push','pull','rest','long']},
+  {id:'ppl',l:'Push / Pull / Legs',s:'Six lifting days and one rest day',w:['push','pull','legs','rest','push','pull','legs']},
+  {id:'ppl5',l:'Push / Pull / Legs + HIIT',s:'Five lifting days, a HIIT day and long cardio',w:['push','pull','legs','hiit','upper','lower','long']},
+  {id:'ul',l:'Upper / Lower',s:'Four lifting days, HIIT and long cardio',w:['upper','lower','hiit','upper','lower','rest','long']},
+  {id:'fb',l:'Full body',s:'Three full-body days, HIIT and long cardio',w:['full','rest','full','hiit','full','rest','long']}
+];
+const GOALS=[['muscle','Build muscle'],['strength','Get stronger'],['fat','Lose fat'],['health','General health']];
+const EQ_L={gym:'Machine or cable',bb:'Barbell',db:'Dumbbell',kb:'Kettlebell',band:'Band',bw:'Bodyweight'};
+const PICK_GROUPS=[['all','All'],['chest','Chest',['hpush','fly']],['back','Back',['hpull','vpull','shrug']],['shoulders','Shoulders',['vpush','lat','rear','cuff']],['arms','Arms',['bi','tri']],['legs','Legs',['squat','lunge','quad','calf','tib','abd','add']],['post','Glutes and hams',['hinge','ham','glute']],['core','Core',['coreAE','coreAR','coreLat','coreFlex','carry']],['cond','Conditioning',['cardio','power']]];
+const HIIT_POOL=['kbSwing','burpee','mtnClimber','jumpSquat','battleRopes','medBallSlam','rowErg','assaultBike','skiErg','sledPush','boxJump','jumpRope','broadJump','bearCrawl','shoulderTap','skater','gobletSq','pushup','airSquat','walkLunge','dbRow','invRow'];
+
+/* ---------- mobility focus ---------- */
+const MOB_AREAS={tspine:{l:'Upper back',d:['openBook','thread','catCamel']},shoulders:{l:'Shoulders',d:['wallSlide','crossBody','sleeper','thread']},overhead:{l:'Overhead reach',d:['wallSlide','openBook','thread']},wrists:{l:'Wrists and elbows',d:['wristStretch','wristEcc']},
+  hips:{l:'Hips',d:['hip9090','hipFlexPPT','couch','adductRock']},hams:{l:'Hamstrings',d:['worldGreatest','adductRock']},lowback:{l:'Low back',d:['catCamel','childPose','bridgePPT']},knees:{l:'Knees',d:['tkeMob','slBalance']},ankles:{l:'Ankles',d:['kneeWall','slantCalf']}};
+const AREA_KIND={upper:['tspine','shoulders','overhead','wrists'],lower:['hips','hams','lowback','knees','ankles']};
+const INJ_AREA={lb:'lowback',sh:'shoulders',kn:'knees',el:'wrists',wr:'wrists',hp:'hips',an:'ankles'};
+function mobPlanAt(d){const mp=(S.custom&&S.custom.mobPlan)||[];let m=null;for(const x of mp)if(x.from<=d)m=x;return m}
+/* auto focus: injuries and screening first, then what today's session loads, then the stage of the cycle */
+function autoAreas(d,kind){
+  const out=[],add=a=>{if(MOB_AREAS[a]&&!out.includes(a))out.push(a)};const a=S.prof&&S.prof.ans,sc=S.prof&&S.prof.sc,ph=phaseOf(d);
+  ((a&&a.inj)||[]).forEach(j=>add(INJ_AREA[j]));
+  const f=(sc&&sc.focus)||[];if(f.includes('overhead'))add('overhead');if(f.includes('ham'))add('hams');if(f.includes('ankle'))add('ankles');if(f.includes('hip'))add('hips');
+  if(kind==='upper'){add('tspine');add('shoulders');if(ph.s==='S')add('overhead');add('wrists')}
+  else if(kind==='lower'){add('hips');add('ankles');if(ph.s!=='F')add('hams');add('lowback')}
+  else if(kind==='full'||kind==='hiit'){add('hips');add('tspine');add('ankles')}
+  else{add('hips');add('lowback');add('tspine');add('hams')}
+  return out;
+}
+function mobAreasFor(p,d,kind){if(!p||p.auto||!(p.areas||[]).length)return autoAreas(d,kind);const rel=AREA_KIND[kind];return rel?[...p.areas.filter(x=>rel.includes(x)),...p.areas.filter(x=>!rel.includes(x))]:p.areas.slice()}
+function mobListFrom(p,d,kind){
+  const areas=mobAreasFor(p,d,kind),ph=phaseOf(d),wi=weekInt(d);
+  let n=Math.max(3,Math.min(8,Math.round((p.mins||8)/1.6)));if(ph.deload)n++;if(wi&&wi.lvl==='ease')n++;if(kind==='rest'||kind==='long')n=Math.max(n,5);
+  const out=[];for(let pass=0;pass<4&&out.length<n;pass++)areas.forEach(a=>{if(out.length>=n)return;const x=MOB_AREAS[a].d.find(y=>E[y]&&!out.includes(y));if(x)out.push(x)});
+  ['catCamel','worldGreatest','openBook','hip9090','childPose'].forEach(x=>{if(out.length<n&&!out.includes(x))out.push(x)});
+  return out.map(x=>[x,MOBDOSE[x]||(E[x].t?30:8)]);
+}
+function mobListAt(d,kind){const p=mobPlanAt(d);return p?mobListFrom(p,d,kind):null}
+
+/* ---------- load saved builder templates ---------- */
+function applyCustom(){const C=S.custom;if(!C)return;Object.assign(T,C.tpls||{});Object.assign(MOB,C.mob||{});Object.assign(WU,C.wu||{});Object.keys(C.rot||{}).forEach(k=>{ROT[k]=C.rot[k]});
+  const keys=[...new Set(Object.values(activeMap()))].filter(k=>T[k]&&!TPL_KEYS.includes(k));const i=TPL_KEYS.indexOf('long');TPL_KEYS.splice(i<0?TPL_KEYS.length:i,0,...keys)}
+
+/* ---------- generate sessions for a draft week ---------- */
+function bdAns(bd){return Object.assign(obDefaults(),{len:bd.len,goal:bd.goal})}
+function genHiit(a,v){
+  const eqs=eqList(a.equip),inj=new Set(a.inj||[]);
+  let l=HIIT_POOL.filter(id=>E[id]&&META[id]&&eqs.includes(META[id].eq)&&!META[id].av.some(j=>inj.has(j)));if(v)l=l.slice(3).concat(l.slice(0,3));
+  l=l.slice(0,a.len==45?4:6);const blocks=[];for(let i=0;i<l.length;i+=2)blocks.push({i:l.slice(i,i+2).map(id=>[id,'tw',E[id].t?(E[id].s||30):12])});
+  const cp=['deadBug','plank','russianTwist','hollow','sidePlankK','bicycleCrunch','birdDog','mcgill'].filter(id=>E[id]&&META[id]&&!META[id].av.some(j=>inj.has(j)));
+  const core=cp.slice(v?2:0,(v?2:0)+2).map(id=>[id,E[id].t?'coreT':'coreR']);
+  const cm=a.cardio==='walk'||!a.cardio?(a.equip==='gym'?'Bike or rower':'Fast walk or jog'):(CARDIO_PREF[a.cardio]||CARDIO_PREF.walk)[a.equip==='gym'?0:1];
+  return{n:'HIIT'+(v?' (B)':''),f:'Conditioning circuit and intervals',k:'hiit',mob:'p_hiit',wu:'p_hiit',blocks,core,cardio:{m:'Intervals: '+cm.toLowerCase(),z:'int'}};
+}
+function genDraft(bd){
+  const a=bdAns(bd),cnt={},split=[],idx={};
+  bd.week.forEach((ty,i)=>{const B=BT[ty];if(B&&B.spec){const n=cnt[ty]||0;cnt[ty]=n+1;split.push(B.spec[n%B.spec.length]);idx[i]=split.length-1}});
+  const P=split.length?buildPlan(Object.assign({},a,{split})):{tpls:{},mob:{},wu:{},rot:{}};
+  const keys=split.map((sk,i)=>split.indexOf(sk)===i?sk:sk+'2');
+  const tpls={},mob=Object.assign({},P.mob),wu=Object.assign({},P.wu),map={};let hn=0;
+  bd.week.forEach((ty,i)=>{
+    if(BT[ty]&&BT[ty].spec){const k=keys[idx[i]];map[i]=k;tpls[k]=bd.edits[k]||clone(P.tpls[k]);if(BT[ty].l!==SPEC[split[idx[i]]].n&&!bd.edits[k])tpls[k].n=BT[ty].l+(k.endsWith('2')?' (B)':'')}
+    else if(ty==='hiit'){const k=hn?'hiit2':'hiit';map[i]=k;if(!tpls[k])tpls[k]=bd.edits[k]||genHiit(a,hn);hn++}
+    else if(ty==='long'||ty==='rest')map[i]=ty;
+    else if(ty.slice(0,2)==='k:'){const k=ty.slice(2);map[i]=k;if(bd.edits[k])tpls[k]=bd.edits[k]}
+    else map[i]='rest';
+  });
+  if(hn){mob.p_hiit=mob.p_full||mob.p_lower||clone(MOB.lower);wu.p_hiit=[[a.equip==='gym'?'bikeWU':'marchWU',a.equip==='gym'?180:90],['worldGreatest',6],['tempoSquat',8],['scapPU',10]]}
+  return{tpls,mob,wu,rot:P.rot||{},map};
+}
+function bdTpl(i){const g=genDraft(UI.bd),key=g.map[i];return{key,tpl:g.tpls[key]||T[key],g}}
+
+/* ---------- draft state ---------- */
+function initBd(){
+  const C=S.custom||{},am=activeMap(),a=obDefaults(),mp=(C.mobPlan||[]).slice(-1)[0];
+  UI.bd={week:[0,1,2,3,4,5,6].map(i=>{const k=am[i]||'rest';return k==='rest'||k==='long'?k:'k:'+k}),goal:C.goal||a.goal||'muscle',len:+(C.len||a.len||60),
+    cycleLen:cycleOf(todayS()<S.start?S.start:todayS()).CL,adapt:C.adapt!==false,whoopWeekly:C.whoopWeekly!==false,newCycle:false,from:'next',
+    mob:mp?{auto:!!mp.auto,areas:(mp.areas||[]).slice(),mins:mp.mins||8}:{auto:true,areas:[],mins:8},edits:{},dirty:false};
+}
+const bdLabel=v=>v.slice(0,2)==='k:'?(T[v.slice(2)]?T[v.slice(2)].n:'Session'):(BT[v]?BT[v].l:v);
+
+/* ---------- apply ---------- */
+function applyBuild(){
+  const bd=UI.bd,g=genDraft(bd),C=S.custom||{},prev=clone(S.custom);
+  const ver=(C.ver||0)+1,pre='v'+ver+'_',tpls={},mob={},wu={};
+  Object.keys(g.tpls).forEach(k=>{const t=clone(g.tpls[k]);delete t.edited;if(g.mob[t.mob]||MOB[t.mob])t.mob=g.mob[t.mob]?pre+t.mob:t.mob;if(g.wu[t.wu])t.wu=pre+t.wu;tpls[pre+k]=t});
+  Object.keys(g.mob).forEach(k=>mob[pre+k]=g.mob[k]);Object.keys(g.wu).forEach(k=>wu[pre+k]=g.wu[k]);
+  const map={};for(let i=0;i<7;i++){const k=g.map[i];map[i]=g.tpls[k]?pre+k:k}
+  const t0=todayS(),from=bd.from==='next'?(addD(sunOf(t0),7)<S.start?S.start:addD(sunOf(t0),7)):(t0<S.start?S.start:t0);
+  const N=Object.assign({},C,{ver,since:C.since||from,goal:bd.goal,adapt:bd.adapt,whoopWeekly:bd.whoopWeekly,len:bd.len,
+    target:(bd.len==45?45:bd.len==60?60:84)+(bd.goal==='fat'?5:0),cardioRange:bd.len==45?[5,10]:bd.len==60?[8,14]:[10,20],
+    tpls:Object.assign({},C.tpls,tpls),mob:Object.assign({},C.mob,mob),wu:Object.assign({},C.wu,wu),rot:Object.assign({},C.rot,g.rot),
+    maps:[...(C.maps||[]).filter(x=>x.from<from),{from,map}],
+    mobPlan:[...(C.mobPlan||[]).filter(x=>x.from<from),{from,auto:bd.mob.auto,areas:bd.mob.areas.slice(),mins:bd.mob.mins}],
+    segs:(C.segs||[]).slice(),cycles:Object.assign({},C.cycles)});
+  // cycle length: a new length starts with the next cycle, or right away if you ask for a fresh cycle
+  const ws=sunOf(from),cy=cycleOf(ws);
+  if(bd.cycleLen!==cy.CL||bd.newCycle){let sf,c0;if(cy.pos===0){sf=ws;c0=cy.c}else if(bd.newCycle){sf=ws;c0=cy.c+1}else{sf=addD(cycleStart(cy.c),cy.CL*7);c0=cy.c+1}
+    N.segs=N.segs.filter(x=>x.from<sf);N.segs.push({from:sf,CL:bd.cycleLen,c0});Object.keys(N.cycles).forEach(k=>{if(+k>=c0)delete N.cycles[k]})}
+  S.custom=N;S.customPrev=prev||'none';applyCustom();save();initBd();rerender();window.scrollTo(0,0);
+  toast('Plan updated from '+short(from),()=>{undoBuild()});
+}
+function undoBuild(){if(!S.customPrev)return;S.custom=S.customPrev==='none'?null:S.customPrev;delete S.customPrev;save();location.reload()}
+
+/* ---------- builder tab ---------- */
+function bdChips(f,opts,cur){return`<div class="obrow wrap">${opts.map(([v,l])=>`<button class="obopt ${String(cur)===String(v)?'on':''}" data-a="bdset" data-f="${f}" data-v="${v}"><b>${l}</b></button>`).join('')}</div>`}
+function bdToggle(f,on,l,sub){return`<button class="obopt ${on?'on':''}" data-a="bdtog" data-f="${f}"><b>${on?'✓ ':''}${l}</b>${sub?`<span>${sub}</span>`:''}</button>`}
+function renderBuild(){
+  if(!UI.bd)initBd();const bd=UI.bd,v=document.getElementById('view'),t0=todayS(),g=genDraft(bd);
+  const curKeys=[...new Set(Object.values(activeMap()))].filter(k=>k!=='rest'&&k!=='long'&&T[k]);
+  let h=`<h2 class="pagetitle disp">Plan builder</h2><p class="sub">Shape your week, edit any session, then apply. The plan keeps progressing from there, cycle by cycle.</p>`;
+  // presets
+  h+=`<div class="card">${cardHead('bpre','Start from a split')}${isCol('bpre')?'':BPRESETS.map(p=>`<button class="obopt" data-a="bdpreset" data-v="${p.id}"><b>${p.l}</b><span>${p.s}</span></button>`).join('')}</div>`;
+  // week
+  h+=`<div class="card">${cardHead('bweek','Your week')}`;
+  if(!isCol('bweek')){h+=`<p class="muted" style="font-size:13.5px;margin:0 0 6px">Pick a session for each day. Tap <b>Edit moves</b> to replace, add, remove or reorder exercises.</p>`;
+    for(let i=0;i<7;i++){const val=bd.week[i],key=g.map[i],tp=g.tpls[key]||T[key],kd=tp?tp.k:'rest';
+      const opts=Object.keys(BT).map(k=>`<option value="${k}" ${val===k?'selected':''}>${BT[k].l}</option>`).join('')+(curKeys.length?`<optgroup label="Keep a current session">${[...new Set([...curKeys,...(val.slice(0,2)==='k:'?[val.slice(2)]:[])])].filter(k=>T[k]).map(k=>`<option value="k:${k}" ${val==='k:'+k?'selected':''}>${esc(T[k].n)}</option>`).join('')}</optgroup>`:'');
+      const moves=tp&&tp.blocks?tp.blocks.flatMap(b=>b.i.map(x=>x[0])).filter(x=>E[x]):[];
+      h+=`<div class="bdday" style="--c:${KCOLOR(kd)}"><div class="srow" style="border:0"><b>${DN[i]}</b><select data-in="bdday" data-k="${i}">${opts}</select></div>
+      ${moves.length?`<div class="bdsum">${moves.slice(0,4).map(x=>esc(E[x].n)).join(' · ')}${moves.length>4?` · +${moves.length-4} more`:''}${bd.edits[key]?' <span class="pill" style="--c:var(--ok)">edited</span>':''}</div><button class="mini" data-a="bdedit" data-k="${i}">✎ Edit moves (${moves.length})</button>`:''}</div>`}}
+  h+=`</div>`;
+  // cycles
+  h+=`<div class="card">${cardHead('bcyc','Cycles and progression')}`;
+  if(!isCol('bcyc')){
+    h+=`<label class="fl2">Cycle length</label>${bdChips('cycleLen',[[6,'6 weeks'],[7,'7 weeks'],[8,'8 weeks']],bd.cycleLen)}<p class="muted" style="font-size:12.5px;margin:4px 0 0">Build weeks add reps, then weight. The last week of every cycle is a lighter deload.</p>
+    <label class="fl2" style="margin-top:10px">Goal</label>${bdChips('goal',GOALS,bd.goal)}
+    <label class="fl2" style="margin-top:10px">Session length</label>${bdChips('len',[[45,'45 min'],[60,'60 min'],[90,'75–90 min']],bd.len)}
+    ${bdToggle('adapt',bd.adapt,'Adapt each new cycle to my progress','At the start of each cycle the app reviews your lifts, attendance and WHOOP recovery, then moves on, holds or trims volume.')}
+    ${bdToggle('newCycle',bd.newCycle,'Start a fresh cycle when I apply','Otherwise a new cycle length starts after the current cycle ends.')}`;
+    // timeline
+    const cn=cycleOf(t0<S.start?S.start:t0).c;let tl='';
+    for(let c=Math.max(0,cn-1);c<=cn+3;c++){const st=cycleStart(c);if(st>S.end)break;const dec=cycleDecision(c),s2=phaseForCycle(c),L2=cycleOf(st).CL;
+      tl+=`<div class="bdcyc" style="--c:${PH_COLOR[s2]}"><div><b>Cycle ${c+1}</b> <span class="muted num">${short(st)} · ${L2} weeks</span></div><div><span class="pill" style="--c:${PH_COLOR[s2]}">${SCH[s2].name}</span>${c===cn?' <span class="pill" style="--c:var(--ink)">now</span>':''}${dec?(dec.vol>0?' <span class="pill" style="--c:var(--ok)">+volume</span>':dec.vol<0?' <span class="pill" style="--c:var(--bad)">trimmed</span>':''):''}</div>${dec?`<div class="muted" style="font-size:12.5px;margin-top:4px">${esc(dec.why)}</div>`:c>cn?'<div class="muted" style="font-size:12.5px;margin-top:4px">Projected. Decided from your progress when the cycle starts.</div>':''}</div>`}
+    h+=`<label class="fl2" style="margin-top:12px">Your cycles</label>${tl}`;
+  }
+  h+=`</div>`;
+  // WHOOP
+  const wi=S.custom?weekInt(t0):null;
+  h+=`<div class="card">${cardHead('bwhoop','WHOOP intensity')}`;
+  if(!isCol('bwhoop')){h+=bdToggle('whoopWeekly',bd.whoopWeekly,'Let last week’s recovery set this week’s volume','High recovery adds a set to main and secondary lifts. Low recovery removes a set from accessories, adds a rep in reserve and turns HIIT into Zone 2. Daily Green/Yellow/Red still applies on top.');
+    h+=!S.whoop.connected?`<div class="note">Connect WHOOP in Settings to use this.</div>`:wi?`<div class="note" style="--c:${wi.lvl==='push'?'var(--ok)':wi.lvl==='ease'?'var(--bad)':'var(--upper)'}"><b>This week: ${wi.lvl==='push'?'Push':wi.lvl==='ease'?'Ease off':'Normal'}.</b> ${esc(wi.why)}</div>`:S.custom?`<div class="note">Needs at least 4 days of WHOOP data from last week.</div>`:`<div class="note">Starts working once you apply a plan from the builder.</div>`}
+  h+=`</div>`;
+  // mobility
+  h+=`<div class="card">${cardHead('bmob','Mobility focus')}`;
+  if(!isCol('bmob')){const m=bd.mob;
+    h+=`<div class="obrow"><button class="obopt ${m.auto?'on':''}" data-a="bdmob" data-v="auto"><b>Auto</b><span>Follows your sessions, injuries and cycle stage</span></button><button class="obopt ${!m.auto?'on':''}" data-a="bdmob" data-v="pick"><b>I choose</b><span>Pick the areas to work on now</span></button></div>`;
+    if(!m.auto)h+=`<label class="fl2" style="margin-top:8px">Areas to work on</label><div class="obrow wrap">${Object.keys(MOB_AREAS).map(k=>`<button class="obopt ${m.areas.includes(k)?'on':''}" data-a="bdarea" data-v="${k}"><b>${MOB_AREAS[k].l}</b></button>`).join('')}</div>`;
+    h+=`<label class="fl2" style="margin-top:8px">Minutes per session</label>${bdChips('mobmins',[[5,'5'],[8,'8'],[12,'12'],[15,'15']],m.mins)}`;
+    const ref=t0<S.start?S.start:t0,prv=k=>mobListFrom(m,ref,k).map(x=>E[x[0]].n).join(', ');
+    h+=`<div class="note" style="margin-top:10px"><b>Upper days:</b> ${esc(prv('upper'))}<br><b>Lower days:</b> ${esc(prv('lower'))}<br><span class="muted" style="font-size:12.5px">Deload weeks and low-recovery weeks add one more drill.</span></div>`}
+  h+=`</div>`;
+  // apply
+  const nx=addD(sunOf(t0),7);
+  h+=`<div class="card"><h4 class="disp">Apply</h4><div class="obrow"><button class="obopt ${bd.from==='today'?'on':''}" data-a="bdset" data-f="from" data-v="today"><b>From today</b><span>${short(t0<S.start?S.start:t0)}</span></button><button class="obopt ${bd.from==='next'?'on':''}" data-a="bdset" data-f="from" data-v="next"><b>From next week</b><span>${short(nx<S.start?S.start:nx)}</span></button></div>
+  <p class="muted" style="font-size:12.5px;margin:6px 0 0">Earlier days, your logs and single-day moves stay as they are.</p>
+  <button class="cta" style="--c:var(--upper)" data-a="bdapply">Apply to my plan</button>
+  ${S.customPrev?'<button class="cta ghost" data-a="bdundo">↶ Undo last apply</button>':''}
+  ${bd.dirty?'<button class="cta ghost" data-a="bddiscard">Discard changes</button>':''}</div>`;
+  v.innerHTML=h;
+}
+
+/* ---------- edit a session's moves ---------- */
+function flatOf(t){return{sizes:t.blocks.map(b=>b.i.length),flags:t.blocks.map(b=>({opt:b.opt,arms:b.arms})),flat:t.blocks.flatMap(b=>b.i.map(x=>x.slice()))}}
+function rebuild(t,sizes,flags,flat){const out=[];let j=0;sizes.forEach((n,bi)=>{if(n<=0)return;const b={i:flat.slice(j,j+n)};j+=n;if(flags[bi]&&flags[bi].opt)b.opt=1;if(flags[bi]&&flags[bi].arms)b.arms=1;out.push(b)});if(j<flat.length)flat.slice(j).forEach(x=>out.push({i:[x]}));t.blocks=out}
+function bdMut(fn){const{key,tpl}=bdTpl(UI.bde);const t=clone(tpl);fn(t);t.edited=1;UI.bd.edits[key]=t;UI.bd.dirty=true;drawBdEdit()}
+function roleFor(id,t){if(t.k==='hiit')return'tw';const m=META[id];if(!m)return'acc';const has=t.blocks.some(b=>b.i.some(x=>x[1]==='main'));if(m.main&&!has)return'main';if(m.pat==='bi'||m.pat==='tri')return'arm';if(['rear','cuff','abd','add','tib'].includes(m.pat))return'pre';if(m.main)return'sec';return'acc'}
+const ROLE_L={main:'Main lift',sec:'Secondary',acc:'Accessory',arm:'Arms',pre:'Prehab',tw:'Circuit',coreR:'Core',coreT:'Core hold'};
+function drawBdEdit(){
+  const pn=document.getElementById('panel'),keep=!document.getElementById('sheet').classList.contains('hide')&&!UI.pk?pn.scrollTop:0;setTimeout(()=>{pn.scrollTop=keep},0);
+  const i=UI.bde,{key,tpl}=bdTpl(i);if(!tpl){closeSheet();return}const c=KCOLOR(tpl.k),F=flatOf(tpl);
+  const row=(x,j,kind,n)=>`<div class="bdmv" style="--c:${c}"><div class="bdmvn"><b>${esc(E[x[0]]?E[x[0]].n:x[0])}</b><span>${ROLE_L[x[1]]||x[1]}${META[x[0]]?' · '+EQ_L[META[x[0]].eq]:''}</span></div>
+    <div class="bdmvb"><button class="mini demo" data-a="demo" data-e="${x[0]}" aria-label="Play video">${IC.play}</button><button class="mini" data-a="bdrep" data-k="${kind}" data-v="${j}">Replace</button><button class="mini" data-a="bdmove" data-k="${kind}" data-v="${j}" data-d="-1" ${j===0?'disabled':''} aria-label="Move up">↑</button><button class="mini" data-a="bdmove" data-k="${kind}" data-v="${j}" data-d="1" ${j===n-1?'disabled':''} aria-label="Move down">↓</button><button class="mini" data-a="bddel" data-k="${kind}" data-v="${j}" aria-label="Remove">✕</button></div></div>`;
+  openSheet(`<h4 class="disp">${esc(tpl.n)}, ${DN[i]}</h4><p class="muted" style="font-size:13.5px;margin:0 0 6px">Changes are saved in the builder. Tap <b>Apply to my plan</b> when you are done.</p>
+  <label class="fl2">Session name</label><input type="text" data-in="bdname" value="${esc(tpl.n)}" maxlength="30">
+  <label class="fl2" style="margin-top:10px">Strength${tpl.k==='hiit'?' circuit':''}</label>${F.flat.map((x,j)=>row(x,j,'s',F.flat.length)).join('')||'<p class="muted">No moves yet.</p>'}
+  <button class="cta ghost" style="margin-top:6px" data-a="bdadd" data-k="s">＋ Add exercise</button>
+  <label class="fl2" style="margin-top:12px">Core</label>${(tpl.core||[]).map((x,j)=>row(x,j,'c',tpl.core.length)).join('')||'<p class="muted">No core moves.</p>'}
+  <button class="cta ghost" style="margin-top:6px" data-a="bdadd" data-k="c">＋ Add core move</button>
+  ${UI.bd.edits[key]?`<button class="cta ghost" data-a="bdrevert">Undo my edits to this session</button>`:''}
+  <button class="cta" style="--c:${c}" data-a="close">Done</button>`);
+}
+function drawPicker(){
+  const pk=UI.pk;const grp=PICK_GROUPS.find(x=>x[0]===pk.g)||PICK_GROUPS[0];
+  openSheet(`<h4 class="disp">${pk.mode==='rep'?'Replace with':'Add a move'}</h4>
+  <input type="search" id="pkq" data-in="pkq" placeholder="Search ${Object.keys(META).length} moves" value="${esc(pk.q)}" autocomplete="off">
+  <div class="chipsrow">${PICK_GROUPS.map(x=>`<button class="mini ${x[0]===pk.g?'on':''}" data-a="pkg" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>
+  <div id="pklist">${pickList()}</div><button class="cta ghost" data-a="pkback">Back</button>`);
+}
+function pickList(){
+  const pk=UI.pk,grp=PICK_GROUPS.find(x=>x[0]===pk.g),q=(pk.q||'').toLowerCase().trim();
+  const eqs=eqList((S.prof&&S.prof.ans&&S.prof.ans.equip)||'gym');
+  let l=Object.keys(META).filter(id=>E[id]&&(!grp||!grp[2]||grp[2].includes(META[id].pat))&&(!q||E[id].n.toLowerCase().includes(q)));
+  if(pk.kind==='c'&&pk.g==='all')l=l.filter(id=>/^core|carry/.test(META[id].pat));
+  l.sort((a,b)=>(eqs.includes(META[a].eq)?0:1)-(eqs.includes(META[b].eq)?0:1)||E[a].n.localeCompare(E[b].n));
+  return l.slice(0,80).map(id=>`<div class="bdmv"><div class="bdmvn"><b>${esc(E[id].n)}</b><span>${EQ_L[META[id].eq]}${eqs.includes(META[id].eq)?'':' · not in your usual equipment'}</span></div><div class="bdmvb"><button class="mini demo" data-a="demo" data-e="${id}" aria-label="Play video">${IC.play}</button><button class="mini" style="background:var(--upper);color:#fff;border:0" data-a="bdpick" data-e="${id}">Choose</button></div></div>`).join('')||'<p class="muted">No moves match.</p>';
+}
+
+/* ---------- per-move weight history ---------- */
+function liftStats(x){const sets=x.sets.map(q=>({w:+q.w,r:+q.r}));const top=Math.max(...sets.map(q=>q.w));const vol=sets.reduce((a,q)=>a+q.w*q.r,0);const best=Math.max(...sets.map(q=>e1rm(q.w,q.r)));return{sets,top,vol,best,reps:sets.reduce((a,q)=>a+q.r,0)}}
+function bigChart(pts,c){const W=320,H=120;if(pts.length<2)return'';const mn=Math.min(...pts),mx=Math.max(...pts),rg=mx-mn||1;const xy=pts.map((v,i)=>[(i/(pts.length-1)*(W-16)+8),(H-10-(v-mn)/rg*(H-28))]);
+  return`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;margin:6px 0 2px"><polyline points="${xy.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${xy.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="${c}"/>`).join('')}<text x="8" y="12" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mx)} kg</text><text x="8" y="${H-1}" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mn)} kg</text></svg>`}
+function liftSheet(ex){
+  const e=E[ex];if(!e)return;const all=(hist()[ex]||[]).slice(),c=COLORS.upper;
+  if(!all.length){openSheet(`<h4 class="disp">${esc(e.n)}</h4><p class="muted" style="font-size:14px">No weights logged for this move yet. Log a set with a weight and it shows up here.</p><button class="cta ghost" data-a="close">Close</button>`);return}
+  const st=all.map(liftStats),bestW=Math.max(...st.map(x=>x.top)),bestE=Math.max(...st.map(x=>x.best)),totV=st.reduce((a,x)=>a+x.vol,0);
+  const first=st[0].best,last=st[st.length-1].best,chg=first?(last-first)/first:0;
+  let prevTop=-1,prevBest=-1;const prW=st.map(x=>{const pr=x.top>prevTop&&prevTop>=0;prevTop=Math.max(prevTop,x.top);return pr}),prE=st.map(x=>{const pr=x.best>prevBest&&prevBest>=0;prevBest=Math.max(prevBest,x.best);return pr});
+  let rows='';for(let i=all.length-1;i>=0;i--){const x=all[i],s2=st[i],k=tplOf(x.d),tn=k&&T[k]?T[k].n:'';const prev=i>0?st[i-1]:null;const dTop=prev?s2.top-prev.top:null;
+    rows+=`<details class="lhs" ${i===all.length-1?'open':''}><summary><div><b>${nice(x.d)}</b>${prW[i]?'<em>Weight PR</em>':prE[i]?'<em>e1RM PR</em>':''}<br><span class="num">${s2.sets.length} set${s2.sets.length>1?'s':''} · top ${s2.top} kg${dTop?` (${dTop>0?'+':''}${+dTop.toFixed(1)})`:''}</span></div><span class="chev">${CHEV}</span></summary>
+    <div class="lhsets num"><span class="hd">Set</span><span class="hd">Weight</span><span class="hd">Reps</span><span class="hd">Est. 1RM</span>${s2.sets.map((q,j)=>`<span>${j+1}</span><b>${q.w} kg</b><span>${q.r}</span><span>${Math.round(e1rm(q.w,q.r))} kg</span>`).join('')}</div>
+    <div class="lhmeta num"><span>Volume <b>${Math.round(s2.vol).toLocaleString()} kg</b></span><span>Total reps <b>${s2.reps}</b></span><span>Best e1RM <b>${Math.round(s2.best)} kg</b></span>${tn?`<span>Session <b>${esc(tn)}</b></span>`:''}</div>
+    <button class="mini" style="margin-top:8px" data-a="histday" data-d="${x.d}">Open this day →</button></details>`}
+  openSheet(`<h4 class="disp">${esc(e.n)}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Every session you logged, newest first. Tap a session to see each set.</p>
+  <div class="grid2" style="margin-bottom:6px"><div class="stat"><b class="disp num">${bestW} kg</b><span>Heaviest set</span></div><div class="stat"><b class="disp num">${Math.round(bestE)} kg</b><span>Best est. 1RM</span></div><div class="stat"><b class="disp num">${all.length}</b><span>Sessions logged</span></div><div class="stat"><b class="disp num">${totV>=1000?(totV/1000).toFixed(1)+'t':Math.round(totV)+'kg'}</b><span>Total volume</span></div></div>
+  ${all.length>1?`<div class="card" style="margin:8px 0"><b style="font-size:13.5px">Estimated 1RM by session</b> <span class="muted num" style="font-size:12.5px">${chg>=0?'+':''}${Math.round(chg*100)}% since ${short(all[0].d)}</span>${bigChart(st.map(x=>x.best),c)}</div>`:''}
+  ${rows}<button class="cta ghost" data-a="close">Close</button>`);
+}
 /* ---------- SUPPLEMENTS ---------- */
-/* ---------- SUPPLEMENT GUIDE (40 common supplements) ----------
+/* ---------- SUPPLEMENT GUIDE (200 common supplements) ----------
    a: names to recognise (lower case, matched as text inside the name you type)
    d: typical dose, w: best time, s: slot in the stack, b: benefits, tip: practical tip, c: caution */
 const SUPP_DB=[
@@ -1752,7 +2112,165 @@ const SUPP_DB=[
 {id:'tartcherry',n:'Tart cherry',a:['tart cherry','montmorency','cherry'],d:'30 mL concentrate or about 480 mg extract',w:'Evening, or twice daily during hard training blocks',s:'Evening',b:['Reduces muscle soreness and speeds recovery','Natural source of melatonin for sleep','Antioxidant'],tip:'Useful in the week of a hard training block or after long cardio.',c:'Juice concentrate contains sugar.'},
 {id:'beetroot',n:'Beetroot (nitrate)',a:['beet','beetroot','nitrate'],d:'300–600 mg nitrate (about 70 mL concentrated shot)',w:'2–3 hours before endurance or cardio sessions',s:'Pre-workout',b:['Improves endurance and blood flow','Can lower blood pressure','Makes cardio feel easier'],tip:'Avoid antibacterial mouthwash; mouth bacteria are needed to activate the nitrate.',c:'Pink urine is harmless. Talk to your doctor if you take blood-pressure medicines.'},
 {id:'tongkat',n:'Tongkat Ali',a:['tongkat','longjack','eurycoma'],d:'200–400 mg standardised extract',w:'Morning',s:'Morning',b:['May support testosterone in men with low levels','May reduce stress hormones','May support energy and mood'],tip:'Effects take several weeks; many cycle it.',c:'Quality varies a lot between brands. Avoid with hormone-sensitive conditions; check with your doctor.'},
-{id:'inositol',n:'Myo-inositol',a:['inositol'],d:'2–4 g',w:'Evening or split with meals',s:'Evening',b:['Supports insulin sensitivity','May support calm and sleep','Supports hormone balance'],tip:'Powder dissolves easily in water.',c:'High doses can cause mild stomach upset.'}
+{id:'inositol',n:'Myo-inositol',a:['inositol'],d:'2–4 g',w:'Evening or split with meals',s:'Evening',b:['Supports insulin sensitivity','May support calm and sleep','Supports hormone balance'],tip:'Powder dissolves easily in water.',c:'High doses can cause mild stomach upset.'},
+{id:"vita",n:"Vitamin A",a:["vitamin a", "retinol", "retinyl"],d:"700–900 mcg RAE (2,300–3,000 IU)",w:"With a meal that has some fat",s:"With meals",b:["Supports night vision and eye health", "Supports immune function", "Helps keep skin and mucous membranes healthy"],tip:"Most people get enough from food (liver, eggs, orange and green vegetables). Beta-carotene forms are safer than retinol.",c:"Fat-soluble and builds up. Stay under 3,000 mcg retinol a day; avoid high doses in pregnancy."},
+{id:"vite",n:"Vitamin E",a:["vitamin e", "tocopherol", "tocotrienol"],d:"15 mg (about 22 IU) from food; supplements often 100–400 IU",w:"With a meal that has some fat",s:"With meals",b:["Antioxidant that protects cell membranes", "Supports immune function", "Supports skin health"],tip:"Mixed tocopherols are closer to what food provides than plain alpha-tocopherol.",c:"High doses can thin the blood. Check with your doctor if you take blood thinners."},
+{id:"thiamine",n:"Vitamin B1 (thiamine)",a:["thiamin", "benfotiamine"],d:"1–100 mg",w:"Morning, with food",s:"Morning",b:["Helps turn carbs into energy", "Supports nerve function", "Often low in heavy drinkers"],tip:"Benfotiamine is a fat-soluble form that is absorbed well.",c:"Very safe; excess is passed in urine."},
+{id:"riboflavin",n:"Vitamin B2 (riboflavin)",a:["riboflavin"],d:"1.3 mg daily; 400 mg for migraine prevention",w:"Morning, with food",s:"Morning",b:["Helps make energy from food", "May reduce migraine frequency at 400 mg", "Supports eye and skin health"],tip:"It turns urine bright yellow. That is harmless.",c:"Very safe at normal doses."},
+{id:"niacin",n:"Vitamin B3 (niacin)",a:["niacin", "nicotinic", "niacinamide", "nicotinamide"],d:"14–16 mg daily; higher only under medical advice",w:"With meals",s:"With meals",b:["Helps turn food into energy", "Supports skin and nerve health", "Niacinamide form supports skin barrier"],tip:"Niacinamide does not cause the hot flush that nicotinic acid does.",c:"High-dose niacin (500 mg+) can cause flushing and liver strain. Use only with medical supervision."},
+{id:"b5",n:"Vitamin B5 (pantothenic acid)",a:["pantothenic", "pantothenate", "vitamin b5"],d:"5 mg daily",w:"Morning, with food",s:"Morning",b:["Needed to make coenzyme A for energy metabolism", "Supports hormone production", "Supports skin health"],tip:"Found in almost every food, so deficiency is rare.",c:"Very safe; large doses may cause loose stools."},
+{id:"b6",n:"Vitamin B6",a:["vitamin b6", "pyridoxine", "pyridoxal", "p5p", "p-5-p"],d:"1.3–2 mg daily; up to 25 mg in supplements",w:"Morning, with food",s:"Morning",b:["Supports mood and neurotransmitter production", "Helps metabolise protein", "Supports immune function"],tip:"P5P is the active form.",c:"Long-term intake above about 50–100 mg a day can cause nerve tingling. Check combined amounts in all products."},
+{id:"biotin",n:"Biotin",a:["biotin", "vitamin b7", "vitamin h"],d:"30 mcg daily; beauty products often 2,500–10,000 mcg",w:"Morning",s:"Morning",b:["Helps turn food into energy", "Supports hair, skin and nails if you are low", "Supports healthy blood sugar processing"],tip:"Benefits for hair are mostly in people who are deficient.",c:"High doses can distort thyroid and heart blood tests. Stop 2–3 days before blood work."},
+{id:"folate",n:"Folate (vitamin B9)",a:["folate", "folic", "methylfolate", "5-mthf", "vitamin b9"],d:"400 mcg DFE daily (600 mcg in pregnancy)",w:"Morning",s:"Morning",b:["Needed for making DNA and red blood cells", "Lowers neural tube defect risk in pregnancy", "Helps keep homocysteine in check"],tip:"Methylfolate is the active form, useful if you have an MTHFR variant.",c:"High folic acid can mask a B12 deficiency. Pair with B12."},
+{id:"choline",n:"Choline",a:["choline"],d:"425–550 mg daily from food and supplements",w:"With meals",s:"With meals",b:["Supports liver health and fat metabolism", "Building block for acetylcholine (memory, muscles)", "Important in pregnancy for baby brain development"],tip:"Eggs are the richest food source: about 150 mg per yolk.",c:"Very high doses can cause a fishy body odour and low blood pressure."},
+{id:"selenium",n:"Selenium",a:["selenium", "selenomethionine"],d:"55–200 mcg",w:"With meals",s:"With meals",b:["Supports thyroid hormone production", "Antioxidant enzyme support", "Supports immune function"],tip:"Two Brazil nuts give about 100–150 mcg.",c:"Stay under 400 mcg a day. Too much causes hair loss and brittle nails."},
+{id:"iodine",n:"Iodine",a:["iodine", "iodide", "kelp"],d:"150 mcg daily (220–290 mcg in pregnancy)",w:"Morning",s:"Morning",b:["Needed to make thyroid hormones", "Supports metabolism and energy", "Important for baby brain development"],tip:"Iodised salt and seafood cover most needs.",c:"Too much can upset the thyroid. Talk to your doctor if you have thyroid disease."},
+{id:"copper",n:"Copper",a:["copper"],d:"0.9–2 mg",w:"With meals",s:"With meals",b:["Helps absorb and use iron", "Supports connective tissue and collagen", "Supports nerve and immune health"],tip:"Worth adding if you take more than 30 mg zinc a day long term.",c:"Do not exceed 10 mg a day."},
+{id:"manganese",n:"Manganese",a:["manganese"],d:"1.8–2.3 mg",w:"With meals",s:"With meals",b:["Supports bone formation", "Antioxidant enzyme support", "Helps metabolise carbs and fats"],tip:"Whole grains, nuts and tea cover most needs.",c:"Stay under 11 mg a day."},
+{id:"boron",n:"Boron",a:["boron"],d:"3–6 mg",w:"With meals",s:"With meals",b:["Supports bone health", "May raise free testosterone and vitamin D slightly", "May ease joint discomfort"],tip:"Effects in studies show up after a few weeks.",c:"Stay under 20 mg a day."},
+{id:"chromium",n:"Chromium",a:["chromium", "picolinate"],d:"200–1,000 mcg",w:"With meals",s:"With meals",b:["May support healthy blood sugar", "May reduce carb cravings", "Supports insulin action"],tip:"Most studied form is chromium picolinate.",c:"Check with your doctor if you take diabetes medication."},
+{id:"silica",n:"Silica",a:["silica", "silicon", "horsetail"],d:"10–40 mg silicon",w:"With meals",s:"With meals",b:["Supports hair, skin and nail strength", "Supports bone and connective tissue", "Supports collagen formation"],tip:"Often sold as orthosilicic acid or bamboo/horsetail extract.",c:"Avoid horsetail long term if you have kidney problems."},
+{id:"trace",n:"Trace minerals",a:["trace mineral", "ionic mineral", "concentrace"],d:"Per label (often a few drops in water)",w:"With meals",s:"With meals",b:["Covers small amounts of many minerals", "Useful when drinking only filtered or RO water", "Can improve taste of very pure water"],tip:"Add drops to a water bottle rather than a single glass.",c:"Check sodium and magnesium totals if you have kidney or blood pressure issues."},
+{id:"magthreonate",n:"Magnesium L-threonate",a:["l-threonate", "threonate", "magtein"],d:"1,500–2,000 mg (about 144 mg elemental magnesium)",w:"Evening",s:"Evening",b:["Crosses into the brain better than other forms", "May support memory and focus", "May support sleep quality"],tip:"Lower elemental magnesium than glycinate, so it is often combined with another form.",c:"Expensive for the dose. Can cause drowsiness or headache at first."},
+{id:"codliver",n:"Cod liver oil",a:["cod liver"],d:"1 teaspoon (about 5 ml)",w:"With a meal",s:"With meals",b:["Omega-3 EPA and DHA", "Natural vitamins A and D", "Supports joints and immune health"],tip:"Lemon-flavoured versions taste much better.",c:"Contains vitamin A. Do not stack with other high-dose vitamin A, especially in pregnancy."},
+{id:"algaeoil",n:"Algae oil (vegan omega-3)",a:["algae oil", "algal", "vegan omega"],d:"250–1,000 mg EPA+DHA",w:"With meals",s:"With meals",b:["Plant-based source of DHA and EPA", "Supports heart and brain health", "No fishy taste or ocean contaminants"],tip:"The best omega-3 option for vegans; flax does not convert well.",c:"May thin the blood slightly at high doses."},
+{id:"primrose",n:"Evening primrose oil",a:["primrose", "epo"],d:"500–1,500 mg",w:"With meals",s:"With meals",b:["Source of GLA, an anti-inflammatory fat", "May ease PMS breast tenderness", "May support dry skin and eczema"],tip:"Effects build over 8–12 weeks.",c:"Avoid if you take blood thinners or have a seizure disorder."},
+{id:"flax",n:"Flaxseed oil",a:["flax", "linseed"],d:"1–2 tbsp oil or 1–2 tbsp ground seeds",w:"With meals",s:"With meals",b:["Plant omega-3 (ALA)", "Ground seeds add fibre", "Supports heart health"],tip:"Grind the seeds; whole seeds pass straight through. Keep the oil in the fridge.",c:"The body converts only a small amount of ALA to EPA/DHA."},
+{id:"mct",n:"MCT oil",a:["mct", "c8", "caprylic"],d:"1–2 tbsp (start with 1 tsp)",w:"Morning, in coffee or a shake",s:"Morning",b:["Quick energy that does not need digestion like other fats", "Supports ketone production on low-carb diets", "May help you feel full"],tip:"Build up slowly to avoid an upset stomach.",c:"Calorie-dense: about 120 kcal per tablespoon."},
+{id:"cla",n:"CLA (conjugated linoleic acid)",a:["conjugated linoleic", "tonalin"],d:"3–6 g",w:"With meals",s:"With meals",b:["May slightly reduce body fat", "May help preserve lean mass while dieting", "Found naturally in grass-fed dairy and beef"],tip:"Effects in studies are small; diet and training matter far more.",c:"Can upset the stomach and may affect insulin sensitivity at high doses."},
+{id:"blackseed",n:"Black seed oil",a:["black seed", "nigella", "black cumin"],d:"1–3 g oil",w:"With meals",s:"With meals",b:["May support healthy blood sugar and cholesterol", "May ease allergy symptoms", "Antioxidant (thymoquinone)"],tip:"Capsules avoid the strong peppery taste.",c:"May lower blood pressure and blood sugar. Avoid in pregnancy."},
+{id:"eggprot",n:"Egg white protein",a:["egg protein", "egg white"],d:"20–40 g",w:"After training or between meals",s:"Post-workout",b:["Dairy-free complete protein", "Rich in leucine for muscle building", "Low in fat and carbs"],tip:"Mixes thinner than whey; blend with milk or fruit.",c:"Avoid if you have an egg allergy."},
+{id:"beefprot",n:"Beef protein isolate",a:["beef protein isolate","beef protein","beef isolate"],d:"20–40 g",w:"After training",s:"Post-workout",b:["Dairy-free protein option", "Often contains natural creatine", "Low in lactose"],tip:"Usually flavoured; works best in fruit-based shakes.",c:"Lower in leucine than whey. Check the label for added collagen."},
+{id:"gainer",n:"Mass gainer",a:["gainer", "weight gainer", "mass gainer"],d:"1 serving (often 500–1,200 kcal)",w:"After training or between meals",s:"Post-workout",b:["Easy extra calories for hard gainers", "Mix of protein and carbs", "Convenient when appetite is low"],tip:"Half servings with whole milk are often easier to digest.",c:"Very high in sugar and calories. Only useful if you struggle to eat enough."},
+{id:"protbar",n:"Protein bar",a:["protein bar"],d:"1 bar (15–30 g protein)",w:"Between meals or after training",s:"Post-workout",b:["Convenient protein on the go", "Helps hit daily protein targets", "Can replace a less healthy snack"],tip:"Look for at least 15 g protein and under 10 g sugar.",c:"Sugar alcohols in some bars cause bloating."},
+{id:"carbs",n:"Carb powder (cyclic dextrin / maltodextrin)",a:["cyclic dextrin", "cluster dextrin", "highly branched", "maltodextrin", "carb powder", "dextrose"],d:"30–60 g per hour of long training",w:"During long sessions or right after",s:"Pre-workout",b:["Fuels long or very hard sessions", "Speeds glycogen refill after training", "Easy on the stomach (cyclic dextrin)"],tip:"Only needed for sessions longer than 75–90 minutes or two-a-days.",c:"Adds calories fast. Not needed for normal lifting sessions."},
+{id:"gel",n:"Energy gel",a:["energy gel", "gu gel", "maurten"],d:"1 gel (20–40 g carbs) every 30–45 minutes",w:"During runs or rides longer than 75 minutes",s:"Pre-workout",b:["Fast carbs during endurance efforts", "Delays fatigue", "Easy to carry"],tip:"Take with water and practice in training before race day.",c:"Can cause stomach upset if taken without water."},
+{id:"bicarb",n:"Sodium bicarbonate",a:["bicarbonate", "baking soda", "bicarb"],d:"0.2–0.3 g per kg body weight",w:"60–180 minutes before hard efforts",s:"Pre-workout",b:["Buffers acid during 1–7 minute hard efforts", "Can improve high-intensity performance", "Well researched in rowing and sprinting"],tip:"Split the dose or use enteric capsules to protect the stomach.",c:"Commonly causes stomach cramps and diarrhoea. Very high in sodium."},
+{id:"glycerol",n:"Glycerol",a:["glycerol", "glycerin", "hydromax"],d:"1–1.2 g per kg with 25 ml water per kg",w:"60–120 minutes before long sessions in the heat",s:"Pre-workout",b:["Helps the body hold more water", "Delays dehydration in the heat", "Gives a fuller muscle \"pump\""],tip:"Mainly for endurance events in hot conditions.",c:"Can cause headache, bloating and nausea."},
+{id:"ribose",n:"D-ribose",a:["ribose"],d:"5 g, 1–3 times a day",w:"Before or after training",s:"Pre-workout",b:["Building block of ATP, the cell energy molecule", "May ease fatigue in some heart and muscle conditions", "May speed energy recovery after intense exercise"],tip:"Dissolves easily and tastes slightly sweet.",c:"Can lower blood sugar; take with food if you are prone to lows."},
+{id:"agmatine",n:"Agmatine sulfate",a:["agmatine"],d:"500 mg–1.5 g",w:"30–45 minutes before training",s:"Pre-workout",b:["May boost nitric oxide and muscle pump", "May ease nerve pain", "May support mood"],tip:"Often stacked with citrulline in pre-workouts.",c:"Can lower blood pressure. Avoid with MAOI antidepressants."},
+{id:"arginine",n:"L-Arginine",a:["arginine", "aakg"],d:"3–6 g",w:"Before training",s:"Pre-workout",b:["Precursor to nitric oxide", "Supports blood flow", "Supports wound healing"],tip:"Citrulline raises arginine levels in the blood better than arginine itself.",c:"Large doses cause stomach upset. Avoid if you get cold sores often."},
+{id:"ornithine",n:"L-Ornithine",a:["ornithine"],d:"2–6 g",w:"Evening or before training",s:"Evening",b:["Helps clear ammonia during long exercise", "May reduce fatigue", "May support sleep quality"],tip:"Often combined with arginine.",c:"High doses cause stomach upset."},
+{id:"tmg",n:"Betaine (TMG)",a:["tmg", "trimethylglycine", "betaine anhydrous"],d:"2.5 g",w:"Before training",s:"Pre-workout",b:["May improve power and training volume", "Supports healthy homocysteine levels", "May support body composition"],tip:"Split into two doses if it upsets the stomach.",c:"May raise LDL cholesterol slightly at high doses."},
+{id:"ketone",n:"Exogenous ketones",a:["ketone", "bhb", "beta-hydroxybutyrate"],d:"5–25 g",w:"Before endurance sessions or in the morning",s:"Pre-workout",b:["Raises blood ketones quickly", "May reduce appetite", "May support mental clarity"],tip:"Ketone esters raise levels much more than salts but taste strong.",c:"Salts add a lot of sodium. Performance benefits are mixed."},
+{id:"leucine",n:"Leucine",a:["leucine"],d:"2–5 g",w:"With meals low in protein",s:"With meals",b:["Main trigger for muscle protein building", "Makes plant meals more muscle-friendly", "Useful for older adults"],tip:"Not needed if each meal already has 25–40 g quality protein.",c:"Taking it alone without enough total protein gives little benefit."},
+{id:"ecdysterone",n:"Ecdysterone",a:["ecdysterone", "ecdysteroid", "beta-ecdysterone"],d:"200–500 mg",w:"With meals",s:"With meals",b:["Plant compound (spinach, quinoa) studied for muscle growth", "May improve strength gains", "Not a hormone in humans"],tip:"Research is early and product quality varies.",c:"Banned in some tested sports. Evidence is limited."},
+{id:"turkesterone",n:"Turkesterone",a:["turkesterone", "ajuga"],d:"500 mg–1 g",w:"With meals",s:"With meals",b:["Plant ecdysteroid marketed for muscle growth", "Not a steroid hormone", "Popular in natural bodybuilding"],tip:"Human evidence is very thin so far.",c:"Many products contain far less than claimed. Expect modest results at best."},
+{id:"peakatp",n:"ATP (Peak ATP)",a:["peak atp", "adenosine triphosphate"],d:"400 mg",w:"30 minutes before training",s:"Pre-workout",b:["May improve strength and power output", "May support blood flow", "May reduce fatigue in long training blocks"],tip:"Benefits appear after several weeks of daily use.",c:"Research is mostly industry-funded."},
+{id:"lysine",n:"L-Lysine",a:["lysine"],d:"1–3 g",w:"With meals",s:"With meals",b:["May reduce cold sore outbreaks", "Supports collagen formation", "Helps absorb calcium"],tip:"Most useful for people prone to cold sores.",c:"High doses may cause stomach upset."},
+{id:"tryptophan",n:"L-Tryptophan",a:["tryptophan"],d:"500 mg–2 g",w:"30–60 minutes before bed",s:"Evening",b:["Precursor to serotonin and melatonin", "May improve sleep quality", "May support mood"],tip:"Take away from protein meals for better uptake into the brain.",c:"Do not combine with SSRIs or other serotonin drugs."},
+{id:"tyrosine",n:"L-Tyrosine",a:["tyrosine"],d:"500 mg–2 g",w:"Morning or 30–60 minutes before demanding tasks",s:"Morning",b:["Supports focus under stress or sleep loss", "Precursor to dopamine and adrenaline", "Supports thyroid hormone production"],tip:"Works best when you are stressed, cold or short on sleep.",c:"Avoid with MAOIs or if you have an overactive thyroid."},
+{id:"htp",n:"5-HTP",a:["5-htp", "5htp", "griffonia"],d:"50–300 mg",w:"Evening",s:"Evening",b:["Precursor to serotonin", "May support mood", "May reduce appetite and support sleep"],tip:"Start at 50 mg; some feel nauseous at first.",c:"Do not combine with antidepressants or triptans."},
+{id:"gaba",n:"GABA",a:["gaba", "pharmagaba"],d:"100–750 mg",w:"30–60 minutes before bed",s:"Evening",b:["Calming neurotransmitter", "May help you fall asleep", "May reduce stress"],tip:"Effects vary a lot between people.",c:"Can cause tingling or shortness of breath at higher doses."},
+{id:"glutathione",n:"Glutathione",a:["glutathione"],d:"250–1,000 mg (liposomal or S-acetyl forms)",w:"Morning, on an empty stomach",s:"Morning",b:["The body’s main antioxidant", "Supports liver detox pathways", "Supports immune function"],tip:"NAC and glycine are cheaper ways to raise your own glutathione.",c:"Standard oral glutathione is poorly absorbed."},
+{id:"same",n:"SAM-e",a:["sam-e", "s-adenosyl", "adomet"],d:"400–1,600 mg",w:"Morning, on an empty stomach",s:"Morning",b:["May support mood", "May ease osteoarthritis pain", "Supports liver health"],tip:"Use enteric-coated tablets; they spoil if exposed to air.",c:"Avoid with antidepressants or if you have bipolar disorder."},
+{id:"alphagpc",n:"Alpha-GPC",a:["alpha-gpc", "alpha gpc", "glycerylphosphorylcholine"],d:"300–600 mg",w:"Morning or 60 minutes before training",s:"Pre-workout",b:["Raises acetylcholine for focus", "May improve power output", "Supports memory"],tip:"Often stacked with caffeine for focus.",c:"Can cause headache in some people."},
+{id:"citicoline",n:"Citicoline (CDP-choline)",a:["citicoline", "cdp-choline", "cognizin"],d:"250–500 mg",w:"Morning",s:"Morning",b:["Supports focus and attention", "Supports brain cell membranes", "May support memory with age"],tip:"Pairs well with caffeine and theanine.",c:"Can cause headache or insomnia if taken late."},
+{id:"ps",n:"Phosphatidylserine",a:["phosphatidylserine"],d:"100–300 mg",w:"With meals",s:"With meals",b:["Supports memory with age", "May blunt cortisol after hard training", "Supports brain cell membranes"],tip:"Sunflower-derived versions avoid soy.",c:"Can interact with blood thinners."},
+{id:"lionsmane",n:"Lion’s mane mushroom",a:["lion’s mane", "lions mane", "lion's mane", "hericium"],d:"500 mg–3 g extract",w:"Morning",s:"Morning",b:["May support nerve growth factor", "May support memory and focus", "May support mood"],tip:"Choose fruiting-body extracts listing beta-glucan content.",c:"Rare skin itching. Avoid if allergic to mushrooms."},
+{id:"bacopa",n:"Bacopa monnieri",a:["bacopa", "brahmi"],d:"300 mg extract (50% bacosides)",w:"With a meal",s:"With meals",b:["Supports memory and learning", "May reduce anxiety", "Antioxidant in the brain"],tip:"Benefits build over 8–12 weeks, not overnight.",c:"Take with food to avoid stomach upset. Can cause tiredness."},
+{id:"ginkgo",n:"Ginkgo biloba",a:["ginkgo"],d:"120–240 mg extract",w:"Morning",s:"Morning",b:["Supports blood flow to the brain", "May support memory with age", "Antioxidant"],tip:"Look for a standardised extract (EGb 761).",c:"Thins the blood. Stop before surgery; avoid with blood thinners."},
+{id:"huperzine",n:"Huperzine A",a:["huperzine"],d:"50–200 mcg",w:"Morning",s:"Morning",b:["Slows breakdown of acetylcholine", "May support memory", "Often used in focus stacks"],tip:"Cycle it, for example 2 weeks on and 1 week off.",c:"Can cause nausea and slow heart rate. Avoid with heart conditions."},
+{id:"ginseng",n:"Panax ginseng",a:["panax", "korean ginseng", "red ginseng", "ginseng"],d:"200–400 mg extract",w:"Morning",s:"Morning",b:["May reduce fatigue", "May support focus and mood", "May support immune health"],tip:"Cycle 2–3 weeks on, 1 week off.",c:"Can cause insomnia. May interact with blood thinners and diabetes drugs."},
+{id:"pqq",n:"PQQ",a:["pqq", "pyrroloquinoline"],d:"10–20 mg",w:"Morning",s:"Morning",b:["May support new mitochondria", "Antioxidant", "May support focus and sleep quality"],tip:"Often combined with CoQ10.",c:"Research in humans is limited."},
+{id:"uridine",n:"Uridine monophosphate",a:["uridine"],d:"250–500 mg",w:"Morning",s:"Morning",b:["Supports brain cell membranes with choline and DHA", "May support mood", "May support focus"],tip:"Studied as part of a stack with fish oil and choline.",c:"Evidence alone is limited."},
+{id:"paraxanthine",n:"Paraxanthine",a:["paraxanthine", "enfinity"],d:"100–300 mg",w:"Morning or before training",s:"Pre-workout",b:["Caffeine’s main active breakdown product", "Alertness with fewer jitters for some", "Shorter-lasting than caffeine"],tip:"Count it toward your total stimulant intake.",c:"Same cautions as caffeine: not late in the day."},
+{id:"theacrine",n:"Theacrine",a:["theacrine", "teacrine"],d:"50–200 mg",w:"Morning",s:"Morning",b:["Energy and focus without a strong crash", "Tolerance builds slowly", "Pairs well with caffeine"],tip:"Often stacked with a smaller caffeine dose.",c:"Can disrupt sleep if taken late."},
+{id:"guarana",n:"Guarana",a:["guarana"],d:"Per label (often 50–200 mg caffeine)",w:"Morning or before training",s:"Pre-workout",b:["Natural caffeine source", "Energy and alertness", "Slightly slower release than coffee for some"],tip:"Count the caffeine toward your daily limit (about 400 mg).",c:"Same cautions as caffeine."},
+{id:"yerbamate",n:"Yerba mate",a:["yerba mate", "yerba"],d:"1–2 cups or 500 mg–1 g extract",w:"Morning",s:"Morning",b:["Caffeine plus antioxidants", "Steady energy", "May support fat burning"],tip:"Brew below boiling to avoid bitterness.",c:"Avoid very hot mate drinks; scalding hot drinks are linked to throat cancer."},
+{id:"greentea",n:"Green tea extract (EGCG)",a:["green tea", "egcg", "matcha", "catechin"],d:"250–500 mg extract or 2–3 cups of tea",w:"Morning, with food",s:"Morning",b:["Antioxidants (EGCG)", "May slightly increase fat burning", "Supports heart health"],tip:"Matcha gives you the whole leaf.",c:"High-dose extracts on an empty stomach have caused liver damage. Take with food and stay under 800 mg EGCG."},
+{id:"apigenin",n:"Apigenin",a:["apigenin"],d:"50 mg",w:"30–60 minutes before bed",s:"Evening",b:["Mild calming effect", "May help you fall asleep", "Found in chamomile"],tip:"Often stacked with magnesium threonate and theanine.",c:"May interact with sedatives."},
+{id:"valerian",n:"Valerian root",a:["valerian"],d:"300–600 mg extract",w:"30–60 minutes before bed",s:"Evening",b:["May help you fall asleep faster", "May improve sleep quality", "Mild calming effect"],tip:"Smells strong; capsules are easier than tea.",c:"Can cause morning grogginess. Avoid with alcohol and sedatives."},
+{id:"chamomile",n:"Chamomile",a:["chamomile"],d:"1–2 cups tea or 220–1,100 mg extract",w:"Evening",s:"Evening",b:["Mild calming effect", "May improve sleep quality", "Soothes the stomach"],tip:"A warm cup is a good wind-down habit.",c:"Avoid if allergic to ragweed or daisies."},
+{id:"lemonbalm",n:"Lemon balm",a:["lemon balm", "melissa"],d:"300–600 mg extract",w:"Evening or during stressful periods",s:"Evening",b:["May reduce stress and anxiety", "May improve sleep", "May support focus"],tip:"Often combined with valerian for sleep.",c:"Can interact with thyroid medication."},
+{id:"passionflower",n:"Passionflower",a:["passionflower", "passiflora"],d:"250–500 mg extract or 1 cup tea",w:"Evening",s:"Evening",b:["May reduce anxiety", "May improve sleep quality", "Mild sedative effect"],tip:"Tea works well about an hour before bed.",c:"Can cause drowsiness. Avoid with sedatives and in pregnancy."},
+{id:"kava",n:"Kava",a:["kava"],d:"70–250 mg kavalactones",w:"Evening",s:"Evening",b:["Reduces anxiety", "Promotes relaxation", "May help sleep"],tip:"Use water-based extracts from the root only.",c:"Can harm the liver. Avoid alcohol and do not use with liver disease or daily long term."},
+{id:"lavender",n:"Lavender oil (Silexan)",a:["lavender", "silexan"],d:"80–160 mg oral lavender oil",w:"Evening",s:"Evening",b:["Reduces anxiety", "May improve sleep quality", "Non-sedating during the day"],tip:"Only use oral products made for ingestion, not essential oil bottles.",c:"Can cause burping with a lavender taste."},
+{id:"saffron",n:"Saffron extract",a:["saffron", "affron"],d:"28–30 mg extract",w:"Morning or evening",s:"Morning",b:["May support mood", "May improve sleep quality", "May reduce PMS symptoms"],tip:"Look for standardised extracts like affron.",c:"Avoid high doses in pregnancy."},
+{id:"holybasil",n:"Holy basil (tulsi)",a:["holy basil", "tulsi"],d:"300–600 mg extract or 1–2 cups tea",w:"Morning or evening",s:"Morning",b:["Adaptogen that may lower stress", "May support healthy blood sugar", "Antioxidant"],tip:"Tulsi tea is a simple way to try it.",c:"May lower blood sugar. Avoid if trying to conceive."},
+{id:"cbd",n:"CBD (cannabidiol)",a:["cbd", "cannabidiol"],d:"10–50 mg (prescription doses are much higher)",w:"Evening",s:"Evening",b:["May reduce anxiety", "May improve sleep", "May ease pain and inflammation"],tip:"Choose third-party tested products with a certificate of analysis.",c:"Interacts with many drugs. Legal status varies by country; may fail some drug tests."},
+{id:"stjohns",n:"St John’s wort",a:["st john", "st. john", "hypericum"],d:"300 mg extract, 3 times a day",w:"With meals",s:"With meals",b:["May help mild to moderate low mood", "Studied for mild depression", "Effects build over weeks"],tip:"Talk to your doctor before using it for mood.",c:"Interacts with many drugs, including the pill, antidepressants and blood thinners. Can cause sun sensitivity."},
+{id:"maca",n:"Maca root",a:["maca"],d:"1.5–3 g",w:"Morning",s:"Morning",b:["May support libido", "May support energy and mood", "May ease menopause symptoms"],tip:"Gelatinised maca is easier to digest.",c:"Contains goitrogens; take care if you have thyroid issues."},
+{id:"tribulus",n:"Tribulus terrestris",a:["tribulus"],d:"250–750 mg",w:"Morning",s:"Morning",b:["May support libido", "Popular in testosterone boosters", "May support urinary health"],tip:"Studies show libido benefits but not real testosterone increases.",c:"Avoid in pregnancy. Rare reports of kidney issues at high doses."},
+{id:"fenugreek",n:"Fenugreek",a:["fenugreek", "testofen"],d:"500–600 mg extract",w:"With meals",s:"With meals",b:["May support libido", "May support healthy blood sugar", "May support milk supply when breastfeeding"],tip:"Can make sweat smell like maple syrup.",c:"May lower blood sugar. Avoid in pregnancy."},
+{id:"sawpalmetto",n:"Saw palmetto",a:["saw palmetto", "serenoa"],d:"320 mg extract",w:"With meals",s:"With meals",b:["May ease urinary symptoms of an enlarged prostate", "May slow hair loss", "Supports prostate health"],tip:"Effects take 4–8 weeks.",c:"Check with your doctor if you take hormonal drugs or blood thinners."},
+{id:"nettle",n:"Stinging nettle root",a:["nettle"],d:"300–600 mg root extract",w:"With meals",s:"With meals",b:["May support prostate and urinary health", "May raise free testosterone slightly", "Leaf may ease hay fever"],tip:"Root and leaf are used for different things.",c:"May interact with blood pressure and diabetes drugs."},
+{id:"hgw",n:"Horny goat weed (icariin)",a:["horny goat", "epimedium", "icariin"],d:"500 mg–1 g extract",w:"Morning",s:"Morning",b:["May support erectile function", "May support libido", "May support bone health"],tip:"Look for extracts that state icariin content.",c:"Can cause dizziness and fast heartbeat at high doses."},
+{id:"shilajit",n:"Shilajit",a:["shilajit"],d:"250–500 mg purified resin",w:"Morning",s:"Morning",b:["Rich in fulvic acid and minerals", "May support testosterone in men", "May support energy"],tip:"Only buy purified, heavy-metal tested products.",c:"Raw shilajit can contain heavy metals."},
+{id:"fadogia",n:"Fadogia agrestis",a:["fadogia"],d:"300–600 mg",w:"Morning",s:"Morning",b:["Marketed for testosterone support", "May support libido", "Popular in men’s stacks"],tip:"Human research is almost non-existent.",c:"Animal studies raise concerns about testicular toxicity. Cycle and use with caution."},
+{id:"dim",n:"DIM (diindolylmethane)",a:["dim", "diindolylmethane"],d:"100–200 mg",w:"With meals",s:"With meals",b:["Supports healthy oestrogen metabolism", "From cruciferous vegetables", "Popular in hormone balance stacks"],tip:"Broccoli, kale and cabbage contain its precursor.",c:"Can darken urine. Avoid in pregnancy."},
+{id:"dhea",n:"DHEA",a:["dhea"],d:"25–50 mg",w:"Morning",s:"Morning",b:["Precursor to sex hormones", "May support mood and libido in older adults", "Levels drop with age"],tip:"Get blood levels tested before and during use.",c:"A hormone. Banned in tested sport. Can cause acne and hair changes. Use with medical advice."},
+{id:"vitex",n:"Vitex (chasteberry)",a:["vitex", "chasteberry", "chaste tree"],d:"20–40 mg extract",w:"Morning",s:"Morning",b:["May ease PMS symptoms", "May support cycle regularity", "May ease breast tenderness"],tip:"Takes about 3 cycles to judge results.",c:"Avoid with hormonal contraception, IVF or in pregnancy."},
+{id:"cranberry",n:"Cranberry extract",a:["cranberry"],d:"500 mg–1.5 g extract (36 mg PACs)",w:"Morning",s:"Morning",b:["May reduce recurring urinary tract infections", "Antioxidants", "Supports bladder health"],tip:"Extracts work better than sugary juice.",c:"Check with your doctor if you take warfarin."},
+{id:"dmannose",n:"D-Mannose",a:["mannose"],d:"1–2 g, 1–3 times a day",w:"Morning",s:"Morning",b:["May prevent recurring urinary tract infections", "Stops bacteria sticking to the bladder wall", "Gentle sugar that is mostly not stored"],tip:"Dissolve the powder in water.",c:"Not a replacement for antibiotics in an active infection."},
+{id:"lycopene",n:"Lycopene",a:["lycopene"],d:"10–30 mg",w:"With a meal that has some fat",s:"With meals",b:["Antioxidant from tomatoes", "May support prostate health", "May support skin against sun damage"],tip:"Cooked tomatoes with olive oil are an excellent food source.",c:"Very safe; extreme intake can tint skin orange."},
+{id:"elderberry",n:"Elderberry",a:["elderberry", "sambucus"],d:"300–600 mg extract or per syrup label",w:"At the first sign of a cold",s:"Morning",b:["May shorten colds and flu", "Antioxidants (anthocyanins)", "Supports immune health"],tip:"Use during illness or travel, not all year.",c:"Raw elderberries are toxic; only use prepared products."},
+{id:"echinacea",n:"Echinacea",a:["echinacea"],d:"300–500 mg, up to 3 times a day",w:"At the first sign of a cold",s:"Morning",b:["May shorten colds", "May reduce the chance of catching a cold", "Supports immune health"],tip:"Use for short periods (up to 10 days).",c:"Avoid if allergic to daisies or with autoimmune disease."},
+{id:"betaglucan",n:"Beta-glucan",a:["beta-glucan", "beta glucan", "yeast glucan", "wellmune"],d:"250–500 mg (yeast) or 3 g (oat)",w:"Morning",s:"Morning",b:["Supports immune defences", "Oat beta-glucan lowers LDL cholesterol", "Supports gut health"],tip:"Yeast beta-glucan is used for immunity; oat for cholesterol.",c:"Generally very safe."},
+{id:"colostrum",n:"Colostrum",a:["colostrum"],d:"10–20 g",w:"Morning, on an empty stomach",s:"Morning",b:["Supports gut lining and immunity", "May reduce upper respiratory infections in athletes", "Contains growth factors and antibodies"],tip:"Bovine colostrum is the common form.",c:"Contains dairy proteins."},
+{id:"quercetin",n:"Quercetin",a:["quercetin"],d:"500–1,000 mg",w:"With meals",s:"With meals",b:["Antioxidant and anti-inflammatory", "May ease allergy symptoms", "May support immune health"],tip:"Absorption improves with bromelain or phytosome forms.",c:"Can interact with some antibiotics and blood pressure drugs."},
+{id:"oregano",n:"Oregano oil",a:["oregano"],d:"Per label (often 150–200 mg)",w:"With meals",s:"With meals",b:["Contains carvacrol, which fights microbes", "May support gut balance", "Traditional cold remedy"],tip:"Always use capsules made for ingestion.",c:"Can irritate the stomach. Avoid in pregnancy."},
+{id:"oliveleaf",n:"Olive leaf extract",a:["olive leaf", "oleuropein"],d:"500–1,000 mg",w:"With meals",s:"With meals",b:["May support immune health", "May lower blood pressure slightly", "Antioxidant"],tip:"Look for oleuropein content on the label.",c:"May add to blood pressure and diabetes medications."},
+{id:"lactoferrin",n:"Lactoferrin",a:["lactoferrin"],d:"200–400 mg",w:"Morning",s:"Morning",b:["Supports immune defences", "Helps the body manage iron", "Supports gut health"],tip:"Comes from milk; often sold for immune or iron support.",c:"Contains milk protein."},
+{id:"propolis",n:"Propolis",a:["propolis"],d:"250–500 mg",w:"Morning",s:"Morning",b:["Antimicrobial bee resin", "May soothe sore throats", "Antioxidant"],tip:"Throat sprays act right where you need them.",c:"Avoid if allergic to bees or bee products."},
+{id:"astragalus",n:"Astragalus",a:["astragalus"],d:"500 mg–1 g extract",w:"Morning",s:"Morning",b:["Traditional immune tonic", "Antioxidant", "May support heart health"],tip:"Often found in immune blends with mushrooms.",c:"Avoid with autoimmune disease or immune-suppressing drugs."},
+{id:"garlic",n:"Garlic extract",a:["garlic", "allicin", "aged garlic", "kyolic"],d:"600–1,200 mg aged garlic extract",w:"With meals",s:"With meals",b:["May lower blood pressure slightly", "Supports heart health", "May support immune function"],tip:"Aged garlic extract is odourless and well studied.",c:"Thins the blood. Stop before surgery."},
+{id:"glucosamine",n:"Glucosamine",a:["glucosamine"],d:"1,500 mg",w:"With meals",s:"With meals",b:["May ease knee osteoarthritis pain", "Building block for cartilage", "Often paired with chondroitin"],tip:"Glucosamine sulfate has the best evidence. Give it 8–12 weeks.",c:"Made from shellfish in most products."},
+{id:"chondroitin",n:"Chondroitin",a:["chondroitin"],d:"800–1,200 mg",w:"With meals",s:"With meals",b:["May ease joint pain", "Part of cartilage structure", "Often paired with glucosamine"],tip:"Results vary; give it 3 months.",c:"May interact with blood thinners."},
+{id:"msm",n:"MSM",a:["msm", "methylsulfonylmethane"],d:"1.5–3 g",w:"With meals",s:"With meals",b:["May ease joint pain and stiffness", "May reduce muscle soreness", "Source of sulfur for connective tissue"],tip:"Split into two doses.",c:"Can cause mild stomach upset."},
+{id:"boswellia",n:"Boswellia",a:["boswellia", "frankincense", "akba"],d:"100–500 mg extract",w:"With meals",s:"With meals",b:["May ease joint pain and stiffness", "Anti-inflammatory", "May support gut comfort"],tip:"Look for AKBA-standardised extracts (e.g. 5-Loxin, AflaPin).",c:"Can cause mild stomach upset."},
+{id:"uc2",n:"Undenatured type II collagen (UC-II)",a:["uc-ii", "uc2", "type ii collagen", "type 2 collagen"],d:"40 mg",w:"Once a day, ideally away from meals",s:"Morning",b:["May ease joint pain and stiffness", "Works at a tiny dose", "May improve joint mobility"],tip:"Different from regular collagen peptides; dose is just 40 mg.",c:"From chicken cartilage."},
+{id:"hyaluronic",n:"Hyaluronic acid",a:["hyaluronic", "hyaluronan"],d:"120–240 mg",w:"Morning",s:"Morning",b:["Supports skin hydration", "May ease joint discomfort", "Part of joint fluid"],tip:"Often found with collagen in skin and joint products.",c:"Generally well tolerated."},
+{id:"greenlipped",n:"Green-lipped mussel",a:["green-lipped", "green lipped", "perna"],d:"500 mg–1 g extract",w:"With meals",s:"With meals",b:["May ease joint pain", "Contains unique omega-3s", "Anti-inflammatory"],tip:"Often combined with fish oil.",c:"Avoid if allergic to shellfish."},
+{id:"prebiotic",n:"Prebiotic fibre (inulin)",a:["prebiotic", "inulin", "fos", "gos", "chicory"],d:"3–10 g (start low)",w:"With meals",s:"With meals",b:["Feeds good gut bacteria", "Supports regularity", "May help you feel full"],tip:"Start with 2–3 g and build up to avoid gas.",c:"Can cause bloating, especially with IBS."},
+{id:"enzymes",n:"Digestive enzymes",a:["digestive enzyme", "enzyme", "bromelain", "papain"],d:"1–2 capsules",w:"At the start of a meal",s:"With meals",b:["Helps break down protein, fats and carbs", "May ease bloating after big meals", "Useful with low enzyme production"],tip:"Take with the first bites, not after the meal.",c:"Check with your doctor if you have stomach ulcers."},
+{id:"betainehcl",n:"Betaine HCl",a:["betaine hcl", "betaine hydrochloride"],d:"500–1,500 mg",w:"With protein-rich meals",s:"With meals",b:["Supports stomach acid levels", "May improve protein digestion", "May help absorb minerals"],tip:"Start with one capsule; stop if you feel warmth or burning.",c:"Do not use with ulcers, gastritis or NSAIDs."},
+{id:"ginger",n:"Ginger",a:["ginger"],d:"1–3 g",w:"With meals",s:"With meals",b:["Eases nausea and motion sickness", "Supports digestion", "May reduce muscle soreness"],tip:"Fresh ginger tea works too.",c:"May thin the blood slightly at high doses."},
+{id:"peppermint",n:"Peppermint oil capsules",a:["peppermint"],d:"180–225 mg enteric-coated",w:"30–60 minutes before meals",s:"With meals",b:["Eases IBS cramps and bloating", "Relaxes gut muscles", "Supports digestion"],tip:"Use enteric-coated capsules so they open in the gut, not the stomach.",c:"Can worsen heartburn."},
+{id:"slipperyelm",n:"Slippery elm",a:["slippery elm"],d:"400–500 mg or 1 tbsp powder in water",w:"Between meals",s:"With meals",b:["Coats and soothes the throat and gut", "May ease heartburn", "May ease IBS symptoms"],tip:"Mix the powder into warm water to make a gel.",c:"Take other medicines 2 hours apart; it can slow their absorption."},
+{id:"dgl",n:"Licorice root (DGL)",a:["dgl", "deglycyrrhizinated", "licorice", "liquorice"],d:"380–760 mg chewable",w:"20 minutes before meals",s:"With meals",b:["Soothes the stomach lining", "May ease heartburn", "Supports gut healing"],tip:"Chew the tablets so they mix with saliva.",c:"Regular licorice (not DGL) raises blood pressure. Use the DGL form."},
+{id:"aloe",n:"Aloe vera (inner leaf)",a:["aloe"],d:"50–100 ml juice or per label",w:"Before meals",s:"With meals",b:["May soothe the gut", "May ease IBS symptoms", "Hydrating"],tip:"Use decolourised inner-leaf products.",c:"Whole-leaf aloe with latex is a strong laxative."},
+{id:"zinccarnosine",n:"Zinc carnosine",a:["zinc carnosine", "polaprezinc"],d:"75 mg (about 16 mg zinc)",w:"Twice a day with meals",s:"With meals",b:["Supports stomach and gut lining repair", "May ease gastritis", "May help with gut permeability"],tip:"Count the zinc toward your daily total.",c:"Long-term use may need copper."},
+{id:"glucomannan",n:"Glucomannan",a:["glucomannan", "konjac"],d:"1 g, 15–60 minutes before meals",w:"Before meals with a full glass of water",s:"With meals",b:["Expands to help you feel full", "May support weight loss", "May lower cholesterol"],tip:"Always take with plenty of water.",c:"Can be a choking risk if taken dry. Take medications 2 hours apart."},
+{id:"acv",n:"Apple cider vinegar",a:["apple cider", "cider vinegar", "acv"],d:"1–2 tbsp diluted in water",w:"Before meals",s:"With meals",b:["May lower blood sugar after meals", "May help you feel full", "May support digestion"],tip:"Dilute and drink through a straw to protect your teeth.",c:"Acidic: can damage tooth enamel and irritate the throat."},
+{id:"charcoal",n:"Activated charcoal",a:["charcoal"],d:"500 mg–1 g",w:"Away from meals and medicines",s:"With meals",b:["May ease gas and bloating", "Binds some substances in the gut", "Used in emergency poison care (by professionals)"],tip:"Use occasionally, not daily.",c:"Binds medicines and nutrients. Take 2 hours apart from everything else."},
+{id:"boulardii",n:"Saccharomyces boulardii",a:["boulardii"],d:"250–500 mg (5–10 billion CFU)",w:"With meals",s:"With meals",b:["Helps prevent antibiotic-related diarrhoea", "Helps with traveller’s diarrhoea", "A probiotic yeast that survives antibiotics"],tip:"Great to pack for travel.",c:"Avoid if immunocompromised or with a central line."},
+{id:"lactase",n:"Lactase enzyme",a:["lactase", "lactaid"],d:"3,000–9,000 FCC units",w:"With the first bite of dairy",s:"With meals",b:["Helps digest lactose", "Prevents bloating from dairy", "Lets lactose-intolerant people enjoy dairy"],tip:"Take with the first bite or sip.",c:"Does not help with a milk protein allergy."},
+{id:"butyrate",n:"Butyrate",a:["butyrate", "tributyrin"],d:"300–600 mg",w:"With meals",s:"With meals",b:["Fuel for the cells lining the colon", "May support gut barrier", "May ease IBS symptoms"],tip:"Tributyrin forms are better tolerated and less smelly.",c:"Can cause a strong odour and mild nausea."},
+{id:"redyeast",n:"Red yeast rice",a:["red yeast"],d:"1.2–2.4 g",w:"With the evening meal",s:"Evening",b:["May lower LDL cholesterol", "Contains natural monacolin K (like lovastatin)", "Supports heart health"],tip:"Choose citrinin-free products.",c:"Same risks as a statin: muscle pain and liver strain. Do not take with statins."},
+{id:"sterols",n:"Plant sterols",a:["sterol", "stanol", "phytosterol"],d:"2 g",w:"With meals",s:"With meals",b:["Lower LDL cholesterol by about 8–10%", "Block cholesterol absorption in the gut", "Well studied"],tip:"Split across meals that contain fat.",c:"May lower carotenoid absorption slightly."},
+{id:"nattokinase",n:"Nattokinase",a:["nattokinase", "natto"],d:"2,000 FU (about 100 mg)",w:"Evening, away from meals",s:"Evening",b:["May support healthy blood flow", "May lower blood pressure slightly", "Enzyme from fermented soy"],tip:"Usually taken on an empty stomach.",c:"Thins the blood. Do not combine with blood thinners or before surgery."},
+{id:"cocoa",n:"Cocoa flavanols",a:["cocoa", "flavanol", "cacao"],d:"500–900 mg flavanols",w:"Morning",s:"Morning",b:["Supports blood flow and blood pressure", "May support memory", "Antioxidant"],tip:"Most chocolate has few flavanols; extracts are standardised.",c:"Contains caffeine and theobromine."},
+{id:"cinnamon",n:"Ceylon cinnamon",a:["cinnamon"],d:"1–3 g",w:"With meals",s:"With meals",b:["May lower blood sugar after meals", "Antioxidant", "Adds flavour without sugar"],tip:"Ceylon is safer than Cassia for daily use.",c:"Cassia cinnamon contains coumarin, which can harm the liver in large amounts."},
+{id:"gymnema",n:"Gymnema sylvestre",a:["gymnema"],d:"200–400 mg extract",w:"Before meals",s:"With meals",b:["May reduce sugar cravings", "May support healthy blood sugar", "Blunts sweet taste briefly"],tip:"Chewing a tablet makes sweet foods taste bland for a while.",c:"Can lower blood sugar with diabetes drugs."},
+{id:"bittermelon",n:"Bitter melon",a:["bitter melon", "bitter gourd", "karela"],d:"500 mg–2 g extract",w:"With meals",s:"With meals",b:["May support healthy blood sugar", "Traditional use for diabetes", "Antioxidant"],tip:"Evidence is mixed; track your own response.",c:"Can drop blood sugar. Avoid in pregnancy."},
+{id:"bergamot",n:"Citrus bergamot",a:["bergamot"],d:"500–1,000 mg",w:"Before meals",s:"With meals",b:["May lower LDL cholesterol and triglycerides", "May support blood sugar", "Rich in citrus flavonoids"],tip:"Usually taken before the two biggest meals.",c:"May add to the effect of statins."},
+{id:"milkthistle",n:"Milk thistle",a:["milk thistle", "silymarin", "silybin"],d:"200–400 mg silymarin",w:"With meals",s:"With meals",b:["Supports liver health", "Antioxidant", "Traditional liver tonic"],tip:"Phytosome forms are absorbed better.",c:"Can cause mild stomach upset. Avoid if allergic to ragweed."},
+{id:"tudca",n:"TUDCA",a:["tudca", "tauroursodeoxycholic"],d:"250–500 mg",w:"With meals",s:"With meals",b:["Supports bile flow and liver health", "May protect liver cells", "Used during oral steroid use by some athletes"],tip:"Often taken with the biggest meal.",c:"Can cause loose stools."},
+{id:"resveratrol",n:"Resveratrol",a:["resveratrol"],d:"150–500 mg",w:"Morning, with a meal that has fat",s:"Morning",b:["Antioxidant", "May support blood vessel health", "Studied for healthy ageing"],tip:"Trans-resveratrol is the active form.",c:"May interact with blood thinners. Human anti-ageing evidence is limited."},
+{id:"fisetin",n:"Fisetin",a:["fisetin"],d:"100–500 mg",w:"With a meal that has fat",s:"With meals",b:["Antioxidant from strawberries", "Studied for clearing old cells (senolytic)", "May support brain health"],tip:"Often used in short pulses rather than daily.",c:"Human evidence is very early."},
+{id:"spermidine",n:"Spermidine",a:["spermidine"],d:"1–6 mg",w:"Morning",s:"Morning",b:["May support cell clean-up (autophagy)", "Studied for healthy ageing", "Found in wheat germ and aged cheese"],tip:"Wheat germ extracts contain gluten.",c:"Human evidence is early."},
+{id:"nmn",n:"NMN",a:["nmn", "nicotinamide mononucleotide"],d:"250–1,000 mg",w:"Morning",s:"Morning",b:["Raises NAD+ levels", "Studied for healthy ageing", "May support energy metabolism"],tip:"Take in the morning to match natural rhythms.",c:"Long-term human data is limited. Regulatory status varies by country."},
+{id:"nr",n:"Nicotinamide riboside (NR)",a:["nicotinamide riboside", "niagen", "tru niagen"],d:"300–1,000 mg",w:"Morning",s:"Morning",b:["Raises NAD+ levels", "May support energy metabolism", "Studied for healthy ageing"],tip:"Clinically studied as Niagen.",c:"Long-term benefits in humans are not yet proven."},
+{id:"astaxanthin",n:"Astaxanthin",a:["astaxanthin"],d:"4–12 mg",w:"With a meal that has fat",s:"With meals",b:["Strong antioxidant", "May protect skin from sun damage", "May support eye health and recovery"],tip:"Gives salmon its pink colour.",c:"Very safe; may tint skin slightly at high doses."},
+{id:"sulforaphane",n:"Sulforaphane",a:["sulforaphane", "broccoli sprout"],d:"10–40 mg (or 1–2 g broccoli sprout powder)",w:"Morning",s:"Morning",b:["Activates the body’s own antioxidant defences", "May support detox pathways", "From broccoli sprouts"],tip:"Products with active myrosinase work much better.",c:"Can cause gas."},
+{id:"urolithin",n:"Urolithin A",a:["urolithin", "mitopure"],d:"500 mg–1 g",w:"Morning",s:"Morning",b:["Supports mitochondrial renewal", "May improve muscle endurance", "Studied for healthy ageing"],tip:"Most people make little of it from pomegranate, so supplements help.",c:"Newer supplement; long-term data is limited."},
+{id:"pycnogenol",n:"Pycnogenol (pine bark)",a:["pycnogenol", "pine bark"],d:"100–200 mg",w:"With meals",s:"With meals",b:["Supports blood flow and circulation", "Antioxidant", "May support skin health"],tip:"Often combined with arginine.",c:"May interact with blood thinners and immune suppressants."},
+{id:"grapeseed",n:"Grape seed extract",a:["grape seed", "opc", "proanthocyanidin"],d:"150–300 mg",w:"With meals",s:"With meals",b:["Antioxidant (OPCs)", "May lower blood pressure slightly", "Supports blood vessels"],tip:"Standardised to 95% OPCs is common.",c:"May interact with blood thinners."},
+{id:"lutein",n:"Lutein and zeaxanthin",a:["lutein", "zeaxanthin"],d:"10 mg lutein + 2 mg zeaxanthin",w:"With a meal that has fat",s:"With meals",b:["Protects the eyes from blue light", "Supports healthy vision with age", "Supports eye health"],tip:"Leafy greens and egg yolks are good food sources.",c:"Very safe."},
+{id:"akg",n:"Calcium AKG",a:["calcium akg","alpha-ketoglutarate","ca-akg","akg"],d:"1–2 g",w:"Morning",s:"Morning",b:["Studied for healthy ageing", "Supports energy metabolism", "May support bone health"],tip:"Calcium salt form is the one used in ageing research.",c:"Human evidence is early."},
+{id:"spirulina",n:"Spirulina",a:["spirulina"],d:"1–8 g",w:"Morning",s:"Morning",b:["Protein, iron and antioxidants", "May lower cholesterol", "May ease allergy symptoms"],tip:"Add the powder to a smoothie.",c:"Buy tested products; contaminated spirulina can contain toxins."},
+{id:"chlorella",n:"Chlorella",a:["chlorella"],d:"2–6 g",w:"Morning",s:"Morning",b:["Nutrient-dense green algae", "May support detox of some metals", "Source of B12 (some products)"],tip:"Broken-cell-wall forms are digested better.",c:"Can cause green stools and gas at first."},
+{id:"greens",n:"Greens powder",a:["greens", "ag1", "athletic greens", "super greens"],d:"1 scoop",w:"Morning",s:"Morning",b:["Covers some vitamins and plant compounds", "Easy daily habit", "Often includes probiotics"],tip:"Helpful, but not a replacement for eating vegetables.",c:"Check vitamin A and K content if you take blood thinners."},
+{id:"moringa",n:"Moringa",a:["moringa"],d:"1–3 g leaf powder",w:"Morning",s:"Morning",b:["Rich in vitamins, minerals and antioxidants", "May support blood sugar", "Anti-inflammatory"],tip:"Earthy taste; mix into smoothies.",c:"Avoid the root and bark. Avoid in pregnancy."},
+{id:"seamoss",n:"Sea moss",a:["sea moss", "irish moss"],d:"1–2 tbsp gel or per label",w:"Morning",s:"Morning",b:["Source of iodine and minerals", "Soothing for the throat and gut", "Adds thickness to smoothies"],tip:"Iodine content varies a lot between products.",c:"Too much can upset the thyroid. Check for heavy-metal testing."},
+{id:"bonebroth",n:"Bone broth protein",a:["bone broth"],d:"1–2 cups or 1 scoop powder",w:"Any time",s:"With meals",b:["Collagen, glycine and minerals", "Warm, gut-friendly protein", "Supports joints and skin"],tip:"Pair with a complete protein; broth protein is low in leucine.",c:"Store-bought broth can be very high in sodium."},
+{id:"capsaicin",n:"Capsaicin (chili extract)",a:["capsaicin", "capsimax", "cayenne"],d:"2–6 mg capsaicinoids",w:"With meals",s:"With meals",b:["May slightly increase calorie burn", "May reduce appetite", "Supports circulation"],tip:"Encapsulated forms avoid stomach burn.",c:"Can cause heartburn."},
+{id:"yohimbine",n:"Yohimbine",a:["yohimbine", "yohimbe"],d:"0.2 mg per kg (start at 2.5 mg)",w:"Morning, fasted, before cardio",s:"Pre-workout",b:["May help burn stubborn fat when fasted", "Increases alertness", "May support erectile function"],tip:"Start low; effects are blunted by food and insulin.",c:"Can cause anxiety, racing heart and high blood pressure. Avoid with heart conditions or anxiety."},
+{id:"cordyceps",n:"Cordyceps",a:["cordyceps"],d:"1–3 g extract",w:"Morning or before training",s:"Pre-workout",b:["May improve endurance and oxygen use", "May support energy", "May support libido"],tip:"Cordyceps militaris (CS-4) is the common cultivated form.",c:"May lower blood sugar. Avoid with blood thinners."},
+{id:"reishi",n:"Reishi mushroom",a:["reishi", "ganoderma"],d:"1–3 g extract",w:"Evening",s:"Evening",b:["May support calm and sleep", "Supports immune health", "Antioxidant"],tip:"Bitter taste; capsules or tea blends work best.",c:"Can thin the blood. Rare liver issues with long-term use of powders."},
+{id:"chaga",n:"Chaga mushroom",a:["chaga"],d:"1–2 g extract",w:"Morning",s:"Morning",b:["Antioxidant", "May support immune health", "Often brewed as a coffee alternative"],tip:"Hot-water extracts are the traditional form.",c:"High in oxalates; avoid with kidney stones. May thin the blood."},
+{id:"turkeytail",n:"Turkey tail mushroom",a:["turkey tail", "coriolus", "psk"],d:"1–3 g extract",w:"Morning",s:"Morning",b:["Supports immune health", "Prebiotic for gut bacteria", "Studied alongside cancer care (PSK)"],tip:"Look for beta-glucan content on the label.",c:"Generally safe; check with your oncologist if in treatment."}
 ];
 const SUPP_GENERIC=new Set(['protein','isolate','protein powder','protein shake','fiber','fibre','cherry','sodium','potassium','hydration','beet','iron','multi vitamin']);
 function suppInfo(name){const n=(name||'').toLowerCase();if(!n.trim())return null;for(const pass of [0,1]){let best=null,bl=0;for(const e of SUPP_DB)for(const al of e.a){if((pass===0)===SUPP_GENERIC.has(al))continue;if(n.includes(al)&&al.length>bl){best=e;bl=al.length}}if(best)return best}return null}
@@ -1881,7 +2399,8 @@ const YT={incDB:'IyjIiR9-kBk',incMach:'-QRu-lMwh4k',floorPress:'urTyTno9Smg',mac
 trapDL:'v-SrIcAp3vM',gobletBox:'RC9KisnOpXM',beltSquat:'hy9h2IsXfnA',rfess:'FUvLMZJMGak',splitSq:'58wUUPMmCKA',revLunge:'ufjvjxrGyFM',seatHam:'lcW1M2VKNYc',lyingHam:'HQyWDIE_ILU',ballCurl:'YyDkAtdyu1Q',legPress:'6OApLJdHjps',hackSq:'udzewuz-BQY',standCalf:'B30JglFGx8Y',smithCalf:'ZckHjgIr3Y8',slCalf:'COQjDv1wxPs',seatCalf:'NrHJPauB01I',hipAbd:'Z6Aq5upUp4A',cableAbd:'Z6Aq5upUp4A',bandWalk:'6h3TVFPTSQo',tibRaise:'h57xceuiO40',heelWalk:'h57xceuiO40',hipThrust:'-1cAnwFNBLg',machThrust:'-1cAnwFNBLg',dbBridge:'OjJnGGYW21A',dbRDL:'vnEANU7BqqY',pullThrough:'v_L0e-SntSU',slRDL:'MeV_WFmvBCU',stepUp:'sh2imOUYhQ4',legExt:'-PiO10ilRYc',spanishSq:'YMfoUOxLWHM',tke:'8Et2kaositM',backExt45:'LJk_rYNMHHQ',adductM:'iPLvw74e7Tk',copen:'b5wAggnoT-4',cableAdd:'iPLvw74e7Tk',
 deadBug:'XcYtWYMz39w',birdDog:'MCkb_SwmSh0',sidePlank:'V2cUr7zG4hw',sidePlankK:'HyAct6eyrvg',pallof:'P1H4IzD9rbQ',pallofHold:'P1H4IzD9rbQ',mcgill:'9q0FkXGEfEM',plank:'jyrUwDGPLhM',bearHold:'6ZmgkfwzH7I',suitcase:'0onP1O_pYtY',farmer:'8RXTKE06mKc',
 catCamel:'3fZJd2Bgk-o',openBook:'1mMGw3rhf2M',thread:'6hxBYmC9J-0',crossBody:'ua8bGgPurQY',sleeper:'LjJvzfumcSw',wallSlide:'Dw4xroi0Dzw',bandPA:'qi2y-eI_kuI',wristEcc:'ap9jSCn-Res',flexbar:'tWK4T3dLfcs',hipFlexPPT:'FmBd017WLrc',couch:'LmLSAeJ3aQQ',kneeWall:'KAAVKi3v700',slantCalf:'7jOwuwNk8OM',mckenzie:'OBSwUk5SQz4',hip9090:'CVVg8haOYlQ',adductRock:'BdfcadBYq4c',tkeMob:'8Et2kaositM',bridgePPT:'OjJnGGYW21A',slBalance:'yBwEjCIy83c',worldGreatest:'qYBrq4A0LqI',childPose:'vBXalrQd92c',
-tempoSquat:'QHjGxgi7axo',squatChair:'RC9KisnOpXM',wallSit:'mDdLC-yKudY',inclinePU:'AGUJQSUceu8',kneePU:'-m9buxRuWEc',closePU:'AGUJQSUceu8',doorRow:'2AihGMH9CNA',towelRow:'2AihGMH9CNA',proneYTW:'9tMFPCXwc0A',towelCurl:'jrZUJ7Sedyo',doorCurl:'DCtBo-odSyo',bwRevLunge:'ufjvjxrGyFM',bwSplit:'58wUUPMmCKA',chairStep:'sh2imOUYhQ4',skater:'6FscHoEllmE',bwSLRDL:'MeV_WFmvBCU',slBridge:'2sg3vqnE8qE',bedThrust:'-1cAnwFNBLg',bridgeMarch:'_VPcIP3usHQ',latLunge:'MiT4XDp168I',lungeKnee:'OmbfXLkrUGc',bearCrawl:'UYfxZdd6ztE',slCalfBW:'COQjDv1wxPs',wristStretch:'nkgUZrzd2KA',bikeWU:'w73jj7Vg-00',marchWU:'75xNWCulsZM',scapPU:'N6jNuXZJn9s',bbSquat:'6LnALQ338Ws',bbDeadlift:'8np3vKDBJfc',bbBench:'0cXAp6WhSj4',bbIncline:'0UT1ZU39lPc',dbBench:'jAD1Nsuq3lM',ohp:'4LBVP2Oe7fg',pullup:'ZPG8OsHKXLw',dbOHP:'k6tzKisR3NY',bandPress:'Nm4PNUjDnpQ'};
+tempoSquat:'QHjGxgi7axo',squatChair:'RC9KisnOpXM',wallSit:'mDdLC-yKudY',inclinePU:'AGUJQSUceu8',kneePU:'-m9buxRuWEc',closePU:'AGUJQSUceu8',doorRow:'2AihGMH9CNA',towelRow:'2AihGMH9CNA',proneYTW:'9tMFPCXwc0A',towelCurl:'jrZUJ7Sedyo',doorCurl:'DCtBo-odSyo',bwRevLunge:'ufjvjxrGyFM',bwSplit:'58wUUPMmCKA',chairStep:'sh2imOUYhQ4',skater:'6FscHoEllmE',bwSLRDL:'MeV_WFmvBCU',slBridge:'2sg3vqnE8qE',bedThrust:'-1cAnwFNBLg',bridgeMarch:'_VPcIP3usHQ',latLunge:'MiT4XDp168I',lungeKnee:'OmbfXLkrUGc',bearCrawl:'UYfxZdd6ztE',slCalfBW:'COQjDv1wxPs',wristStretch:'nkgUZrzd2KA',bikeWU:'w73jj7Vg-00',marchWU:'75xNWCulsZM',scapPU:'N6jNuXZJn9s',bbSquat:'6LnALQ338Ws',bbDeadlift:'8np3vKDBJfc',bbBench:'0cXAp6WhSj4',bbIncline:'0UT1ZU39lPc',dbBench:'jAD1Nsuq3lM',ohp:'4LBVP2Oe7fg',pullup:'ZPG8OsHKXLw',dbOHP:'k6tzKisR3NY',bandPress:'Nm4PNUjDnpQ',
+frontSquat:'6PLvU0rjw18',smithSquat:'jPrzu4kp47o',gobletSq:'JO7D6GJ98wY',boxPistol:'KCtVYpSJH4M',sumoDL:'HBmLwb9IcaI',bbRDL:'2SHsk9AzdjA',goodMorning:'nWyx81AfTos',kbSwing:'bDCeXbMJVNs',kbDeadlift:'LDfnyt0Rmaw',rackPull:'Y99s0dNWpUw',smithIncline:'VXaBbUYMfIs',dips:'yN6Q1UI_xkE',pecDeck:'JYmszQs-mRs',dbFly:'eozdVDA78K0',lowCableFly:'KFl3Re5UbPo',arnold:'Z1c-W4svy-k',pikePU:'XckEEwa1BPI',chinup:'53kV7Ou7oZo',wideLat:'7JnP8dFbS14',bbRow:'ZtTwgJTBjOQ',dbRow:'PgpQ4-jHiq4',cableRow:'cAeBmvpt31A',invRow:'VO-pt_XgFho',tbarRow:'hYo72r8Ivso',meadowsRow:'G-jU1aPVhnY',dbShrug:'xiLT85G_GuU',bbCurl:'QZEqB6wUPxQ',ezCurl:'rL_5SVxXRm4',concCurl:'oPGBZHIxusU',inclineCurl:'rAx_tf13V5k',spiderCurl:'9Dd8iiEUs_Q',skull:'GaK2da6B2zM',cgBench:'DzA2xZhDGeo',ohDbExt:'a9oPnZReIRE',benchDip:'WVeZDBhZwLA',diamondPU:'K8bKxVcwjrk',walkLunge:'I34ysEkPK7w',fwdLunge:'B7VQJiVv3xw',cossack:'-_KSdnxa1nE',latStepDown:'AQ1kCW6DOKM',nordic:'_e9vFU9-tkc',gluteKick:'VSgMyiOu0uE',slHipThrust:'kpkg8r7dex4',clamshell:'hQupQ9mJZFw',sideLyingAbd:'bGtZQovM--Q',legPressCalf:'dhRz1Ns60Zg',hangLegRaise:'Nw0LOKe3_l8',abWheel:'trOxwfSlFFo',cableCrunch:'0KEP6A1deBE',woodchop:'PCQCwP1Xy0g',hollow:'0yPin8hSc8o',shoulderTap:'NV55raYCP0E',revCrunch:'XY8KzdDcMFg',legRaise:'SuIxXbKnwx4',mtnClimber:'re3dtmzGCOc',sledPush:'1PmO6kzBEc8',battleRopes:'CzxBf5jM3M4',burpee:'wGvBfVeCNko',jumpRope:'FJmRQ5iTXKE',boxJump:'3INzGHuk23U',frontRaise:'zkP0MsTcIVU',rearDbFly:'GyhFsjrn7dw',deadHang:'jBZCzK9zlxk',bandFacePull:'PYj77in44ms',bandRow:'LSkyinhmA8k',bandOHP:'956rqQ8PgH0',bandCurl:'RyWX9e7imhc',bandPushdown:'qjPN6ElNqpc',bandPullDown:'o5bXFrdw5iI',hipThrustBand:'4oRkPYWV0B8',rowErg:'Hw4pt9oXu_o',smithBench:'7FyJdsXeta8',cableCross:'hhruLxo9yZU',uprightRow:'4MvmUEHKtH8',pendlayRow:'V7Fyg9x1Kbo',bbShrug:'larn3Asl6oM',revCurl:'e0Mu2jC4nRk',dbPreacher:'lLmYH1bOIz4',cableOHExt:'AUsSlsBu5eg',dbSkull:'jO2Jl9eZpXk',gluteBridge:'cvKZXsz-QIA',standLegCurl:'CZVTv9T_Ml8',sissySq:'30_K-UpUerk',singleLegPress:'PXQGlgQJwUw',donkeyCalf:'wuI4jjPS6vg',kbPress:'X-uFqWtjpGI',kbRow:'ApvGZS9IIkM',tgu:'9wgMg4UULSY',medBallSlam:'CkO1mfSBvv4',jumpSquat:'ZxFJi9vRx4s',assaultBike:'0kzhFdDUUs0',skiErg:'WLzR1XaeaCI',russianTwist:'DF0sPfwys_g',bicycleCrunch:'VaL7XWK3MVE',vUp:'iP2fjvG0g3w',landmineRot:'HaJSDdWwb9s',declinePU:'SKPab2YC8BE',archerPU:'jiA3RnMxFU0',airSquat:'ZLJBfYF_oO0',ghr:'TzowfEB3NqI',revHyper:'Pqigpd54aL8',sumoDbSq:'ERZyI58nDas',curtsy:'6GCLb9JurOU',dbPullover:'Ydpy886udzo',machDip:'pMarNxAvHPc',zottman:'HkCxX3mQlVg',declineBench:'iVh4B5bJ5OI',stairClimber:'6eMPlQ95gXI',broadJump:'x9qlFXfQaZU',sledPull:'NaQt6IYoAgw',kbGoblet:'MWHIs0zxkCU'};
 function parseYT(u){u=String(u||'').trim();const m=u.match(/(?:youtu\.be\/|[?&]v=|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/);if(m)return m[1];return /^[A-Za-z0-9_-]{11}$/.test(u)?u:null}
 function ytId(ex){if(S.vids&&S.vids[ex]){const id=parseYT(S.vids[ex]);if(id)return id}if(ex==='rampUp'){const b=blocksFor(UI.date);return b.length?ytId(b[0].items[0].ex):null}return YT[ex]||null}
 function thumb(ex,c){const id=ytId(ex);if(!id)return'';return`<button class="thumb" style="--c:${c}" data-a="demo" data-e="${ex}" aria-label="Play ${esc(E[ex].n)} video"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy"><i>${IC.play}</i></button>`}
@@ -1919,10 +2438,34 @@ function closeSheet(){document.getElementById('sheet').classList.add('hide');UI.
 })();
 function toast(msg,undo){const el=document.getElementById('toast');el.innerHTML=esc(msg)+(undo?'<button data-a="toastundo">Undo</button>':'');el.classList.remove('hide');UI.undo=undo||null;clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.classList.add('hide'),undo?5000:2200)}
 
+/* replacement options: hand-picked first, then the same movement pattern, then close patterns. Always at least 5. */
+const PAT_NEAR={hpush:['fly','vpush','tri'],fly:['hpush'],vpush:['lat','hpush'],lat:['vpush','rear'],hpull:['vpull','rear'],vpull:['hpull','lat'],rear:['cuff','hpull'],cuff:['rear','lat'],tri:['hpush','vpush'],bi:['hpull','vpull'],
+  squat:['lunge','quad'],lunge:['squat','glute'],quad:['squat','lunge'],hinge:['ham','glute'],ham:['hinge','glute'],glute:['hinge','ham'],calf:['tib','quad'],tib:['calf'],abd:['add','glute'],add:['abd','lunge'],
+  shrug:['carry','rear'],carry:['shrug','coreLat'],coreAE:['coreFlex','coreAR'],coreFlex:['coreAE','coreAR'],coreAR:['coreLat','coreAE'],coreLat:['coreAR','carry'],cardio:['power'],power:['cardio','squat']};
+const WU_DRILLS=['bikeWU','marchWU','scapPU','bandPA','bandER','catCamel','worldGreatest','openBook','hip9090','wallSlide'];
+function altsFor(slot,base,cur){
+  const MIN=5,MAX=8,out=[];const add=x=>{if(x&&E[x]&&x!==cur&&x!=='rampUp'&&!out.includes(x))out.push(x)};
+  add(base);(E[base].a||[]).forEach(add);
+  const mb=META[base];
+  if(mb){
+    const a=S.prof&&S.prof.ans,eqs=a?eqList(a.equip):null,inj=new Set((a&&a.inj)||[]);
+    const score=id=>{const m=META[id];return(eqs&&!eqs.includes(m.eq)?4:0)+(m.av.some(j=>inj.has(j))?3:0)+Math.abs(m.lvl-mb.lvl)+(YT[id]?0:1)+(m.eq===mb.eq?-.5:0)+(!!E[id].t!==!!E[base].t?2:0)};
+    const rank=pats=>Object.keys(META).filter(id=>E[id]&&pats.includes(META[id].pat)).sort((x,y)=>score(x)-score(y));
+    for(const id of rank([mb.pat])){if(out.length>=MAX)break;add(id)}
+    if(out.length<MIN)for(const id of rank(PAT_NEAR[mb.pat]||[])){if(out.length>=MIN)break;add(id)}
+  }else{
+    const groups=Object.values(MOBPOOL).filter(g=>g.includes(base)).flat();
+    const all=[...new Set(Object.values(MOBPOOL).flat())];
+    const pool=slot[0]==='w'?[...groups,...WU_DRILLS,...all]:[...groups,...all];
+    for(const id of pool){if(out.length>=MIN)break;add(id)}
+  }
+  if(out.length<MIN)for(const id of Object.keys(META)){if(out.length>=MIN)break;add(id)}
+  return out;
+}
 function swapSheet(slot,base){
-  const d=UI.date,cur=exAt(d,slot,base);const alts=[base,...(E[base].a||[])].filter(x=>x!==cur&&E[x]);
+  const d=UI.date,cur=exAt(d,slot,base);const alts=altsFor(slot,base,cur);
   const c=slot[0]==='m'?COLORS.mob:slot[0]==='c'?COLORS.core:KCOLOR(T[tplOf(d)].k);
-  openSheet(`<h4 class="disp">Replace ${esc(E[cur].n)}</h4><p class="muted" style="font-size:14px;margin:0 0 6px">Pick an alternative that suits your joints and equipment. Choose whether it applies today only or every time this exercise appears. You can undo either.</p>
+  openSheet(`<h4 class="disp">Replace ${esc(E[cur].n)}</h4><p class="muted" style="font-size:14px;margin:0 0 6px">Pick one of these ${alts.length} alternatives that suits your joints and equipment. Choose whether it applies today only or every time this exercise appears. You can undo either.</p>
   ${alts.map(a=>`<div class="opt" style="--c:${c}"><b>${esc(E[a].n)}${a===base?' <span class="pill" style="--c:'+c+'">original</span>':''}</b><span>${esc(cueOf(E[a]))}</span>${E[a].p?`<div><span class="chipinj" style="--c:${c}">${esc(protOf(E[a]))}</span></div>`:''}<div class="row2"><button class="mini demo" style="flex:0 0 auto;--c:${c}" data-a="demo" data-e="${a}">${IC.play}</button><button data-a="doswap" data-k="${slot}" data-b="${base}" data-e="${a}" data-s="day">Today only</button><button class="p" data-a="doswap" data-k="${slot}" data-b="${base}" data-e="${a}" data-s="all">Every session</button></div></div>`).join('')}
   <button class="cta ghost" data-a="close">Cancel</button>`);
 }
@@ -1993,7 +2536,7 @@ setInterval(()=>{if(!TM||TM.paused)return;const rem=(TM.end-Date.now())/1000;
   drawTimer()},200);
 
 /* ---------- actions ---------- */
-function rerender(){HISTCACHE=null;renderTop();renderTabs();({train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,progress:renderProgress,supps:renderSupps,habits:renderHabits})[UI.tab]();}
+function rerender(){HISTCACHE=null;renderTop();renderTabs();({train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits})[UI.tab]();}
 function markStart(d){const l=L(d);if(!l._t0)l._t0=Date.now()}
 function checkComplete(d){const u=units(d);if(pctOf(u)>=1&&!S.done[d]){S.done[d]={t:Date.now()};save();rerender();finishSheet(d);return true}return false}
 function findItem(d,slot){for(const b of blocksFor(d)){for(let i=0;i<b.items.length;i++)if(b.items[i].slot===slot)return{it:b.items[i],b,idx:i}}const c=coreFor(d);for(let i=0;i<c.length;i++)if(c[i].slot===slot)return{it:c[i],b:{items:c},idx:i};return null}
@@ -2050,6 +2593,29 @@ document.addEventListener('click',ev=>{
   case'exinfo':{const x=document.getElementById('info-'+k);x&&x.classList.toggle('hide');break}
   case'pinvid':{const cur=S.vids[el.dataset.e]||'';const u=window.prompt('Paste a YouTube link for '+E[el.dataset.e].n+' (leave empty to go back to the search):',cur);if(u===null)break;if(u.trim())S.vids[el.dataset.e]=u.trim();else delete S.vids[el.dataset.e];save();rerender();break}
   case'swap':swapSheet(k,el.dataset.b);break;
+  case'lifthist':liftSheet(el.dataset.e);break;
+  case'bdpreset':{const p=BPRESETS.find(x=>x.id===el.dataset.v);if(p){UI.bd.week=p.w.slice();UI.bd.dirty=true;rerender();toast(p.l+' week loaded. Edit any day, then apply.')}break}
+  case'bdset':{const f=el.dataset.f,v=el.dataset.v;if(f==='mobmins')UI.bd.mob.mins=+v;else UI.bd[f]=(f==='cycleLen'||f==='len')?+v:v;UI.bd.dirty=true;rerender();break}
+  case'bdtog':UI.bd[el.dataset.f]=!UI.bd[el.dataset.f];UI.bd.dirty=true;rerender();break;
+  case'bdmob':UI.bd.mob.auto=el.dataset.v==='auto';if(!UI.bd.mob.auto&&!UI.bd.mob.areas.length)UI.bd.mob.areas=autoAreas(todayS(),'full').slice(0,3);UI.bd.dirty=true;rerender();break;
+  case'bdarea':{const a2=UI.bd.mob.areas,i=a2.indexOf(el.dataset.v);if(i<0)a2.push(el.dataset.v);else a2.splice(i,1);UI.bd.dirty=true;rerender();break}
+  case'bdedit':UI.bde=+k;drawBdEdit();break;
+  case'bdrep':UI.pk={mode:'rep',kind:k,j:+el.dataset.v,q:'',g:'all'};{const{tpl}=bdTpl(UI.bde);const x=k==='c'?tpl.core[+el.dataset.v]:flatOf(tpl).flat[+el.dataset.v];const m=x&&META[x[0]];if(m){const gr=PICK_GROUPS.find(q=>q[2]&&q[2].includes(m.pat));if(gr)UI.pk.g=gr[0]}}drawPicker();break;
+  case'bdadd':UI.pk={mode:'add',kind:k,q:'',g:k==='c'?'core':'all'};drawPicker();break;
+  case'pkg':UI.pk.g=el.dataset.v;drawPicker();break;
+  case'pkback':UI.pk=null;drawBdEdit();break;
+  case'bdpick':{const id=el.dataset.e,pk=UI.pk;UI.pk=null;bdMut(t=>{
+      if(pk.kind==='c'){const nx=[id,E[id].t?'coreT':'coreR'];t.core=t.core||[];if(pk.mode==='rep')t.core[pk.j]=nx;else t.core.push(nx);return}
+      const F=flatOf(t);if(pk.mode==='rep'){const x=F.flat[pk.j];x[0]=id;if(x[1]==='tw')x[2]=E[id].t?(E[id].s||30):12;rebuild(t,F.sizes,F.flags,F.flat)}
+      else{const r=roleFor(id,t);t.blocks.push({i:[r==='tw'?[id,'tw',E[id].t?(E[id].s||30):12]:[id,r]]})}});toast((pk.mode==='rep'?'Swapped in ':'Added ')+E[id].n);break}
+  case'bdmove':{const j=+el.dataset.v,dd=+el.dataset.d;bdMut(t=>{if(k==='c'){const a2=t.core;if(a2[j+dd]){const x=a2[j];a2[j]=a2[j+dd];a2[j+dd]=x}return}const F=flatOf(t);if(F.flat[j+dd]){const x=F.flat[j];F.flat[j]=F.flat[j+dd];F.flat[j+dd]=x}rebuild(t,F.sizes,F.flags,F.flat)});break}
+  case'bddel':{const j=+el.dataset.v;bdMut(t=>{if(k==='c'){t.core.splice(j,1);return}const F=flatOf(t);F.flat.splice(j,1);let acc=0;for(let b=0;b<F.sizes.length;b++){if(j<acc+F.sizes[b]){F.sizes[b]--;break}acc+=F.sizes[b]}rebuild(t,F.sizes,F.flags,F.flat)});break}
+  case'bdrevert':{const{key}=bdTpl(UI.bde);delete UI.bd.edits[key];drawBdEdit();break}
+  case'bdapply':applyBuild();break;
+  case'bdundo':undoBuild();break;
+  case'bddiscard':initBd();rerender();toast('Builder reset to your current plan');break;
+  case'alllifts':UI.allLifts=!UI.allLifts;rerender();break;
+  case'histday':closeSheet();UI.date=el.dataset.d;UI.tab='train';UI.exc={};UI.exo={};rerender();window.scrollTo(0,0);break;
   case'demo':openPlayer(el.dataset.e);break;
   case'vidchange':{const ex=el.dataset.e;const u=window.prompt('Paste a YouTube link (Shorts or normal) for '+E[ex].n+':','');if(u===null)break;const id=parseYT(u);if(!id){toast('That doesn\u2019t look like a YouTube link');break}S.vids[ex]=id;save();drawPlayer();toast('Video updated');break}
   case'vidreset':{delete S.vids[el.dataset.e];save();drawPlayer();break}
@@ -2116,13 +2682,16 @@ document.addEventListener('click',ev=>{
 document.addEventListener('input',ev=>{const el=ev.target;if(!el.dataset)return;
   if(el.dataset.in==='ob'&&UI.ob){UI.ob.a[el.dataset.f]=el.value}
   if(el.dataset.in==='sname')suppNameInput(el);
+  if(el.dataset.in==='pkq'&&UI.pk){UI.pk.q=el.value;const L2=document.getElementById('pklist');if(L2)L2.innerHTML=pickList()}
   if(el.dataset.in==='gq'){const q=el.value,pos=el.selectionStart;guideSheet(q);const n=document.getElementById('gq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}
 });
 document.addEventListener('change',ev=>{
   const el=ev.target;if(!el.dataset||!el.dataset.in)return;const t=el.dataset.in,k=el.dataset.k,d=UI.date;
   if(t==='w'||t==='r'){const[slot,i]=k.split('|');const f=findItem(d,slot);if(!f)return;const o=slotLog(d,slot,f.it.ex,f.it.rx.sets);o.sets[+i][t]=el.value.replace(',','.').trim();save();HISTCACHE=null}
-  else if(t==='map'){if(S.map[k]!==el.value){snapSched(`${DN[k]}s changed from ${T[S.map[k]].n} to ${T[el.value].n}`,[],[],true);S.map[k]=el.value;save();rerender();toast(DN[k]+' is now '+T[el.value].n,()=>{undoSched()})}}
+  else if(t==='map'){const AM=activeMap();if(AM[k]!==el.value){snapSched(`${DN[k]}s changed from ${T[AM[k]].n} to ${T[el.value].n}`,[],[],true);AM[k]=el.value;save();rerender();toast(DN[k]+' is now '+T[el.value].n,()=>{undoSched()})}}
   else if(t==='mvdate'){if(el.value){const mode=(UI.mv&&UI.mv.mode)||'move';if(doSchedule(mode,el.value)){closeSheet();UI.date=mode==='move'?el.value:UI.date;rerender();toast((mode==='move'?'Moved to ':'Copied to ')+short(el.value),()=>{undoSched()})}}}
+  else if(t==='bdday'){UI.bd.week[+k]=el.value;UI.bd.dirty=true;rerender()}
+  else if(t==='bdname'){const v2=el.value.trim();if(v2)bdMut(x=>{x.n=v2})}
   else if(t==='start'){if(el.value&&el.value<S.end){S.start=el.value;save();rerender();toast('Plan now starts '+short(el.value))}}
   else if(t==='hlk'){const v2=el.value;document.getElementById('hlrow').classList.toggle('hide',!v2);if(v2){const L=LINKS[v2];document.getElementById('hllab').textContent='Done when '+L.l.toLowerCase()+' '+L.op+(L.u?' ('+L.u+')':'');document.getElementById('hlt').value=L.def}}
   else if(t==='sday'){if(el.value&&el.value<=todayS()){UI.sday=el.value;rerender()}}
@@ -2132,7 +2701,7 @@ document.addEventListener('change',ev=>{
 function applyTheme(v){if(v==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',v)}
 try{applyTheme(localStorage.getItem(KEY+'-theme')||'auto')}catch(e){}
 (function(){const q=new URLSearchParams(location.search);const w=q.get('whoop');if(w){history.replaceState(null,'',location.pathname);if(w==='connected'){S.whoop.last=0;save();if(!S.whoop.key)setTimeout(()=>toast('WHOOP connected. Go back to the IRON app on your home screen.'),300)}else setTimeout(()=>toast('WHOOP connection failed ('+(q.get('reason')||'unknown')+')'),300)}})();
-applyProfile();UI.fresh=FRESH;
+applyProfile();applyCustom();UI.fresh=FRESH;
 autoLinkHabits();
 rerender();
 if(FRESH)setTimeout(openOnboarding,250);
