@@ -1,4 +1,4 @@
-// Returns your recent WHOOP recovery records (score, HRV, resting HR).
+// Returns your recent WHOOP recovery, sleep, cycles, workouts and body measurements.
 import { getStore } from '@netlify/blobs';
 // WHOOP app keys. The secret must live in Netlify environment variables.
 const CLIENT_ID = process.env.WHOOP_CLIENT_ID || '7cd8e320-a15a-42d9-a4e8-c913b1eff798';
@@ -28,6 +28,7 @@ export default async (req) => {
   if (!tok.at || Date.now() > tok.exp) { if (!(await doRefresh())) { await store.delete(id); return json({ connected: false }, 401); } }
   const days = Math.min(120, Math.max(1, parseInt(new URL(req.url).searchParams.get('days') || '45', 10)));
   const start = new Date(Date.now() - days * 864e5).toISOString();
+  const status = {};
   const pull = async (path, maxPages) => {
     const out = []; let next = null, pages = 0;
     do {
@@ -36,17 +37,18 @@ export default async (req) => {
       if (next) u.searchParams.set('nextToken', next);
       let r = await fetch(u, { headers: { Authorization: 'Bearer ' + tok.at } });
       if (r.status === 401 && (await doRefresh())) r = await fetch(u, { headers: { Authorization: 'Bearer ' + tok.at } });
+      if (r.status === 401 && path !== '/v2/recovery' && path.includes('workout')) { status[path] = 401; return out; }
       if (r.status === 401) { const e = new Error('auth'); e.auth = true; throw e; }
-      if (!r.ok) { if (path === '/v2/recovery') { const e = new Error('whoop_' + r.status); throw e; } return out; }
+      if (!r.ok) { if (path === '/v2/recovery') { const e = new Error('whoop_' + r.status); throw e; } status[path] = r.status; return out; }
       const j = await r.json(); (j.records || []).forEach(x => out.push(x));
       next = j.next_token; pages++;
     } while (next && pages < maxPages);
     return out;
   };
-  let rec, slp, cyc;
+  let rec, slp, cyc, wko;
   try {
     rec = await pull('/v2/recovery', 6);
-    [slp, cyc] = await Promise.all([pull('/v2/activity/sleep', 8).catch(() => []), pull('/v2/cycle', 6).catch(() => [])]);
+    [slp, cyc, wko] = await Promise.all([pull('/v2/activity/sleep', 8).catch(() => []), pull('/v2/cycle', 6).catch(() => []), pull('/v2/activity/workout', 10).catch(() => [])]);
   } catch (e) {
     if (e.auth) { await store.delete(id); return json({ connected: false }, 401); }
     return json({ connected: true, error: e.message }, 502);
@@ -66,11 +68,21 @@ export default async (req) => {
   const cycles = cyc.filter(x => x.score_state === 'SCORED' && x.score).map(x => ({ id: x.id, start: x.start, end: x.end,
     strain: x.score.strain, kj: x.score.kilojoule, ahr: x.score.average_heart_rate, mhr: x.score.max_heart_rate,
     steps: x.score.step_count != null ? x.score.step_count : (x.step_count != null ? x.step_count : null) }));
+  // Workouts: strain, heart rate and time in each heart-rate zone. Needs the read:workout permission
+  // (older connections made before it was requested must reconnect once).
+  const workoutAccess = !(status['/v2/activity/workout'] === 401 || status['/v2/activity/workout'] === 403);
+  const workouts = wko.filter(x => x.score_state === 'SCORED' && x.score).map(x => {
+    const z = x.score.zone_durations || x.score.zone_duration || {};
+    return { id: x.id, start: x.start, end: x.end, tz: x.timezone_offset, sport: x.sport_name || (x.sport_id != null ? 'sport ' + x.sport_id : 'activity'),
+      strain: x.score.strain, ahr: x.score.average_heart_rate, mhr: x.score.max_heart_rate, kj: x.score.kilojoule, pct: x.score.percent_recorded,
+      dist: x.score.distance_meter, alt: x.score.altitude_gain_meter,
+      zones: [z.zone_zero_milli, z.zone_one_milli, z.zone_two_milli, z.zone_three_milli, z.zone_four_milli, z.zone_five_milli].map(v => v || 0) };
+  });
   let body = null;
   try {
     const br = await fetch(API + '/v2/user/measurement/body', { headers: { Authorization: 'Bearer ' + tok.at } });
     if (br.ok) { const b = await br.json(); body = { height: b.height_meter, weight: b.weight_kilogram, maxhr: b.max_heart_rate }; }
   } catch (e) {}
-  return json({ connected: true, records, sleeps, cycles, body });
+  return json({ connected: true, records, sleeps, cycles, workouts, workoutAccess, body });
 };
 export const config = { path: '/api/whoop-data' };
