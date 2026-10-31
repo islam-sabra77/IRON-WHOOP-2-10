@@ -359,6 +359,8 @@ button.insight:first-of-type{border-top:0}
 .gitem summary b{font-size:15.5px}.gitem summary span{font-size:12.5px;color:var(--mu)}
 .gitem summary em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--ok)}
 .gitem[open] summary{margin-bottom:8px}
+/* supplement questionnaire */
+.sqitem .sqwhy{display:block;color:var(--ink);font-size:12.5px;margin-top:3px}.sqitem .sqc{display:block;font-size:12px;margin-top:3px}.sqitem[disabled]{opacity:.75}
 /* WHOOP workouts */
 .wkrow{display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;align-items:center;width:100%;text-align:left;border:0;border-top:1px solid var(--ln);background:none;color:inherit;font:inherit;padding:9px 0;cursor:pointer}
 .wkrow .zbar{grid-column:1/-1}.wkt b{display:block;font-size:14.5px}.wkt span{font-size:12px;color:var(--mu)}.wkt em{display:block;font-style:normal;font-size:12px;font-weight:750;color:var(--upper)}
@@ -989,8 +991,8 @@ function sideNote(e,always){if(!e.u)return'';const sd=S.prof?(S.prof.ans||{}).si
 /* =====================================================================
    WELCOME QUESTIONNAIRE + ASSESSMENT
    ===================================================================== */
-const OB_STEPS=['welcome','about','goal','exp','schedule','equip','inj','test1','test2','stack','review'];
-function obDefaults(){const p=S.prof&&S.prof.ans;return p?JSON.parse(JSON.stringify(p)):{name:'',age:'',weight:'',goal:'muscle',exp:1,days:[0,1,3,4],longDay:6,len:60,weeks:12,start:addD(sunOf(todayS()),8),equip:'gym',cardio:'walk',inj:[],side:'none',pushups:'',squats:'',plank:'',toe:2,overhead:3,deepsq:3,balL:'',balR:'',supps:UI.fresh?'empty':'keep',habits:UI.fresh?'starter':'keep'}}
+const OB_STEPS=['welcome','about','goal','exp','schedule','equip','inj','test1','test2','stack','suppq','review'];
+function obDefaults(){const p=S.prof&&S.prof.ans;return p?JSON.parse(JSON.stringify(p)):{name:'',age:'',weight:'',goal:'muscle',exp:1,days:[0,1,3,4],longDay:6,len:60,weeks:12,start:addD(sunOf(todayS()),8),equip:'gym',cardio:'walk',inj:[],side:'none',pushups:'',squats:'',plank:'',toe:2,overhead:3,deepsq:3,balL:'',balR:'',supps:UI.fresh?'quiz':'keep',habits:UI.fresh?'starter':'keep'}}
 function openOnboarding(){UI.ob={step:UI.fresh?0:1,a:obDefaults()};drawOb();document.getElementById('onb').classList.remove('hide');document.body.style.overflow='hidden'}
 function closeOnboarding(){document.getElementById('onb').classList.add('hide');document.body.style.overflow='';UI.ob=null}
 const ch=(f,v,label,sub,multi)=>{const a=UI.ob.a;const on=multi?(a[f]||[]).includes(v):a[f]==v;return`<button class="obopt ${on?'on':''}" data-a="${multi?'obtog':'obpick'}" data-f="${f}" data-v="${v}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`};
@@ -1018,13 +1020,15 @@ function drawOb(){
     <div class="obtest"><b>5. Overhead reach</b><span>Back flat against a wall, raise straight arms overhead. Do your thumbs touch the wall?</span><div class="obrow">${ch('overhead',1,'No')}${ch('overhead',2,'Almost')}${ch('overhead',3,'Yes, easily')}</div></div>
     <div class="obtest"><b>6. Deep squat</b><span>Feet shoulder-width, squat as low as you can. Do your heels stay down?</span><div class="obrow">${ch('deepsq',1,'Heels lift')}${ch('deepsq',2,'With effort')}${ch('deepsq',3,'Yes, easily')}</div></div>
     <div class="obtest"><b>7. Single-leg balance</b><span>Eyes open, hands on hips. Seconds on each leg (stop at 60).</span><div class="grid2">${inp('balL','Left','e.g. 40','number','sec')}${inp('balR','Right','e.g. 45','number','sec')}</div></div>`;
-  if(st==='stack')h=head('Supplements and habits','Start fresh, or with a simple starter set you can edit later.')+`<label class="fl2">Supplements</label>${ch('supps','empty','Start empty','Add your own from the 200-supplement guide')}${ch('supps','starter','Starter stack','Protein, creatine, vitamin D3, omega-3, magnesium')}${!UI.fresh?ch('supps','keep','Keep my current stack'):''}
+  if(st==='stack')h=head('Supplements and habits','Start fresh, or with a simple starter set you can edit later.')+`<label class="fl2">Supplements</label>${ch('supps','quiz','Build my stack from a few questions','Goals, issues, diet and medicines decide what goes in')}${ch('supps','empty','Start empty','Add your own from the 200-supplement guide')}${ch('supps','starter','Starter stack','Protein, creatine, vitamin D3, omega-3, magnesium')}${!UI.fresh?ch('supps','keep','Keep my current stack'):''}
     <label class="fl2" style="margin-top:10px">Habits</label>${ch('habits','empty','Start empty')}${ch('habits','starter','Starter habits','Water, 8,000 steps and 7h+ sleep (the last two auto-track with WHOOP)')}${!UI.fresh?ch('habits','keep','Keep my current habits'):''}`;
+  if(st==='suppq'){if(!a.sq)a.sq=sqDefaults();h=head('Your supplement stack','A few questions so IRON can build a stack that fits you. You can redo or improve it any time in the Supps tab.')+sqForm(a.sq,['obsqpick','obsqtog'])}
   if(st==='review'){const P=buildPlan(a),sc=P.sc;UI.ob.preview=P;const bar=(l,v,t)=>`<div class="obscore"><span>${l}</span><div class="bar2"><span style="width:${v/3*100}%;background:${v<1.7?'var(--bad)':v<2.5?'var(--warn)':'var(--ok)'}"></span></div><em>${t}</em></div>`;const tx=v=>v<1.7?'Needs work':v<2.5?'Average':'Good';
     h=head(`${a.name?a.name+', y':'Y'}our plan is ready`,'Here\u2019s what your answers and tests show, and the plan IRON built.')+`<div class="card"><h4 class="disp" style="font-size:22px;margin:0 0 8px">Assessment</h4>${bar('Strength',sc.st,tx(sc.st))}${bar('Core',sc.core,tx(sc.core))}${bar('Mobility',sc.mob,tx(sc.mob))}${bar('Balance',sc.bal,tx(sc.bal)+(sc.asym?', uneven sides':''))}
     <p class="muted" style="font-size:13px;margin:8px 0 0">Starting level: <b>${['','Beginner','Intermediate','Advanced'][sc.lvl]}</b>${sc.lvl<(+a.exp)?' (one step easier than your experience, to build a base first)':''}. Extra focus: ${sc.focus.length?sc.focus.map(f=>({lb:'lower back',sh:'shoulders',kn:'knees',el:'elbows',wr:'wrists',hp:'hips',an:'ankles',ham:'hamstrings',overhead:'overhead mobility',ankle:'ankles',hip:'hips',balance:'balance'})[f]||f).join(', '):'none needed'}.</p></div>
     <div class="card"><h4 class="disp" style="font-size:22px;margin:0 0 6px">Your week</h4>${DN.map((x,i)=>{const k=P.map[i];const t=k==='rest'?null:k==='long'?{n:'Long cardio',f:'Zone 2 active recovery'}:P.tpls[k];return`<div class="hrow" style="grid-template-columns:96px 1fr"><b>${x}</b><span>${t?`<b>${t.n}</b> · ${t.f}${t.blocks?`<br><span class="muted" style="font-size:12.5px">${t.blocks.map(b=>b.i.map(it=>E[it[0]].n).join(' + ')).slice(0,3).join(' · ')}…</span>`:''}`:'<span class="muted">Rest</span>'}</span></div>`}).join('')}
     <p class="muted" style="font-size:12.5px;margin:8px 0 0">${a.weeks} weeks from ${nice(a.start)}, in 6-week cycles that add reps, then weight. Every move has a video and can be replaced.</p></div>
+    ${a.supps==='quiz'&&a.sq?(()=>{const R=sqRecommend(a.sq);return`<div class="card"><h4 class="disp" style="font-size:22px;margin:0 0 6px">Your supplement stack</h4>${R.list.length?R.list.map(x=>`<div class="hrow" style="grid-template-columns:1fr auto"><span><b>${esc(x.e.n)}</b><br><span class="muted" style="font-size:12.5px">For ${esc(x.why.slice(0,2).join(', '))}</span></span><span class="muted" style="font-size:12.5px;text-align:right">${esc(x.e.s)}</span></div>`).join(''):'<p class="muted">No supplements matched your answers.</p>'}${R.blocked.length?`<p class="muted" style="font-size:12.5px;margin:6px 0 0">Left out for safety: ${R.blocked.map(x=>esc(x.e.n)).join(', ')}.</p>`:''}<p class="muted" style="font-size:12px;margin:6px 0 0">General guidance, not medical advice. Check with your doctor if you take medicine.</p></div>`})():''}
     ${!UI.fresh?'<div class="note"><b>This replaces your current program</b> from the start date. Your logs, WHOOP and history stay, and you can restore the previous plan in Settings.</div>':''}`}
   const last=UI.ob.step===n-1,first=UI.ob.step===0;
   document.getElementById('onb').innerHTML=`<div class="obwrap">${h}<div class="obnav" style="${first&&UI.fresh?'grid-template-columns:1fr':''}">${first?(UI.fresh?'':'<button class="cta ghost" data-a="obclose">Cancel</button>'):`<button class="cta ghost" data-a="obback">Back</button>`}<button class="cta" style="--c:var(--upper)" data-a="${last?'obfinish':'obnext'}">${first?'Start':last?'Build my plan':'Next'}</button></div>${first&&UI.fresh?'<button class="linkbtn" style="display:block;margin:10px auto 0" data-a="obskip">Skip and use the sample plan</button>':''}</div>`;
@@ -1036,6 +1040,7 @@ function obFinish(){
   S.prof={ans:a,plan:{tpls:P.tpls,mob:P.mob,wu:P.wu,rot:P.rot,target:P.target,cardioRange:P.cardioRange},sc:P.sc,created:todayS()};
   S.map=P.map;S.start=a.start;S.end=addD(a.start,(+a.weeks||12)*7-1);S.moves={};S.custom=null;delete S.customPrev;S.ext=[];S.hist=[];S.swaps={};S.swapsAll={};
   if(a.supps==='empty')S.supps=[];
+  if(a.supps==='quiz'&&a.sq){S.suppQ=clone(a.sq);S.supps=sqRecommend(a.sq).list.map(sqToSupp)}
   if(a.supps==='starter')S.supps=[['Creatine monohydrate','5 g','Morning'],['Whey protein','1 scoop','Post-workout'],['Vitamin D3','2,000 IU','With meals'],['Omega-3 (fish oil)','2 g EPA+DHA','With meals'],['Magnesium glycinate','300 mg','Evening']].map((x,i)=>({id:'s'+Date.now()+i,n:x[0],d:x[1],slot:x[2],note:'',c:HAB_COLORS[i%HAB_COLORS.length]}));
   if(a.habits==='empty')S.habits=[];
   if(a.habits==='starter')S.habits=[{id:'h1',n:'Drink 3 L of water',e:'💧',c:'#00A3FF'},{id:'h2',n:'8,000+ steps',e:'👟',c:'#FF6A13',link:{k:'steps',t:8000}},{id:'h3',n:'Sleep 7h or more',e:'🌙',c:'#7B4DFF',link:{k:'sleep',t:7}}];
@@ -2374,6 +2379,130 @@ function suppInfoHTML(e,c){if(!e)return'';return`<div class="sinfo" style="--c:$
   ${e.tip?`<div class="sib"><span>💡 Tip</span><p>${esc(e.tip)}</p></div>`:''}
   ${e.c?`<div class="sib warn"><span>⚠️ Good to know</span><p>${esc(e.c)}</p></div>`:''}</div>`}
 
+/* ---------- SUPPLEMENT STACK QUESTIONNAIRE ----------
+   A few questions about goals, issues, diet and medicines build a stack from the guide.
+   Used in the setup questionnaire and from the Supplements tab (new stack or improve the current one). */
+const SQ_GOALS=[['muscle','💪 Build muscle'],['strength','🏋️ Strength and power'],['endurance','🏃 Endurance'],['fatloss','🔥 Lose fat'],['energy','⚡ More energy'],['focus','🧠 Focus and memory'],['sleep','🌙 Better sleep'],['stress','🧘 Less stress'],['joints','🦴 Joint health'],['heart','❤️ Heart health'],['immunity','🛡️ Immunity'],['gut','🌿 Gut health'],['skin','✨ Skin and hair'],['hormones','⚖️ Hormone balance'],['longevity','⏳ Healthy ageing']];
+const SQ_ISSUES=[['poorsleep','Trouble sleeping'],['lowenergy','Tired or low energy'],['anxious','Stressed or anxious'],['jointpain','Joint pain or stiffness'],['soreness','Slow recovery or very sore'],['bloating','Bloating or digestion'],['colds','Catch colds often'],['lowsun','Little sun or low vitamin D'],['cramps','Muscle cramps'],['bloodsugar','High blood sugar'],['cholesterol','High cholesterol'],['bp','High blood pressure'],['migraine','Migraines'],['lowiron','Low iron or heavy periods'],['none','None of these']];
+const SQ_MEDS=[['thinners','Blood thinners'],['bpmeds','Blood pressure medicine'],['diabmeds','Diabetes medicine'],['antidep','Antidepressants'],['thyroid','Thyroid condition'],['pregnant','Pregnant or breastfeeding'],['kidney','Kidney problems'],['liver','Liver problems'],['none','None of these']];
+/* what each answer points to: [supplement id, points, reason] */
+const SQ_MAP={
+  muscle:[['creatine',3,'builds strength and muscle'],['whey',2,'helps you hit your protein target'],['citrulline',1,'better pumps and training volume']],
+  strength:[['creatine',3,'more strength and power'],['caffeine',1,'stronger training sessions'],['alphagpc',1,'power output']],
+  endurance:[['electrolytes',2,'hydration on long sessions'],['betaalanine',2,'delays fatigue on hard efforts'],['beetroot',2,'endurance and blood flow'],['caffeine',1,'better endurance'],['taurine',1,'endurance and recovery'],['carnitine',1,'fat use during long efforts']],
+  fatloss:[['greentea',2,'small boost to fat burning'],['glucomannan',1,'helps you feel full'],['fiber',1,'fullness and digestion'],['whey',1,'protein keeps muscle while dieting'],['carnitine',1,'fat metabolism']],
+  energy:[['rhodiola',2,'less fatigue'],['b12',1,'energy metabolism'],['coq10',1,'cell energy'],['caffeine',1,'alertness']],
+  focus:[['theanine',2,'calm focus'],['lionsmane',2,'focus and memory'],['bacopa',1,'memory'],['creatine',1,'brain energy'],['omega3',1,'brain health'],['citicoline',1,'attention']],
+  sleep:[['magnesium',2,'relaxation and sleep'],['glycine',2,'deeper sleep'],['tartcherry',1,'natural melatonin'],['theanine',1,'winding down']],
+  stress:[['ashwagandha',3,'lowers stress and cortisol'],['magnesium',1,'calmer nervous system'],['rhodiola',1,'stress resilience'],['theanine',1,'calm without drowsiness']],
+  joints:[['omega3',2,'joint comfort'],['collagen',2,'tendons and joints'],['curcumin',1,'joint inflammation'],['glucosamine',1,'cartilage support']],
+  heart:[['omega3',3,'heart health'],['coq10',2,'heart muscle energy'],['fiber',1,'cholesterol'],['vitk2',1,'arterial health']],
+  immunity:[['vitd',2,'immune function'],['vitc',2,'immune support'],['zinc',2,'immune defences'],['probiotic',1,'gut immunity']],
+  gut:[['probiotic',3,'gut balance'],['fiber',2,'regularity'],['prebiotic',1,'feeds good bacteria'],['glutamine',1,'gut lining']],
+  skin:[['collagen',3,'skin elasticity'],['vitc',1,'collagen production'],['biotin',1,'hair and nails'],['astaxanthin',1,'skin protection']],
+  hormones:[['zinc',2,'hormone production'],['vitd',1,'hormone health'],['magnesium',1,'hormone balance'],['ashwagandha',1,'may support testosterone']],
+  longevity:[['omega3',2,'long-term health'],['vitd',1,'long-term health'],['coq10',1,'mitochondria'],['urolithin',1,'mitochondrial renewal'],['taurine',1,'healthy ageing'],['creatine',1,'muscle and brain with age']],
+  poorsleep:[['magnesium',3,'falling and staying asleep'],['glycine',2,'sleep quality'],['melatonin',1,'falling asleep (short term)'],['theanine',1,'quieter mind at night']],
+  lowenergy:[['vitd',1,'low vitamin D causes fatigue'],['b12',2,'tiredness'],['rhodiola',1,'fatigue'],['coq10',1,'energy'],['magnesium',1,'energy and muscles']],
+  anxious:[['ashwagandha',3,'stress and anxiety'],['theanine',2,'calm'],['magnesium',2,'calmer nervous system']],
+  jointpain:[['curcumin',3,'joint pain'],['omega3',2,'inflammation'],['glucosamine',2,'knee and joint pain'],['boswellia',1,'stiffness'],['collagen',1,'connective tissue']],
+  soreness:[['tartcherry',3,'less muscle soreness'],['omega3',1,'recovery'],['creatine',1,'recovery between sessions'],['magnesium',1,'muscle relaxation']],
+  bloating:[['probiotic',2,'bloating'],['enzymes',2,'digestion of big meals'],['ginger',1,'digestion'],['peppermint',1,'IBS cramps']],
+  colds:[['vitd',3,'fewer infections'],['zinc',2,'shorter colds'],['vitc',2,'immune support'],['elderberry',1,'shorter colds']],
+  lowsun:[['vitd',4,'little sun exposure'],['vitk2',1,'pairs with vitamin D']],
+  cramps:[['magnesium',3,'muscle cramps'],['electrolytes',2,'cramps from sweating']],
+  bloodsugar:[['berberine',3,'blood sugar'],['fiber',2,'smaller sugar spikes'],['inositol',1,'insulin sensitivity'],['chromium',1,'blood sugar']],
+  cholesterol:[['fiber',2,'lowers LDL'],['sterols',2,'lowers LDL'],['omega3',2,'triglycerides'],['bergamot',1,'cholesterol']],
+  bp:[['beetroot',2,'blood pressure'],['magnesium',1,'blood pressure'],['garlic',1,'blood pressure'],['omega3',1,'heart health']],
+  migraine:[['riboflavin',3,'fewer migraines'],['magnesium',2,'fewer migraines'],['coq10',1,'migraine prevention']],
+  lowiron:[['iron',3,'low iron'],['vitc',1,'helps absorb iron']]
+};
+const SQ_BLOCK={
+  thinners:['ginkgo','nattokinase','vite','garlic','curcumin','resveratrol','pycnogenol','grapeseed','reishi','chaga','cordyceps','vitk2','ginger','fisetin','blackseed'],
+  bpmeds:['yohimbine','dgl','agmatine','oliveleaf','garlic','beetroot','hibiscus'],
+  diabmeds:['berberine','chromium','gymnema','bittermelon','cinnamon','ala','fenugreek','blackseed','holybasil','inositol','bitter'],
+  antidep:['htp','stjohns','same','tryptophan','rhodiola','ginseng','saffron'],
+  thyroid:['ashwagandha','iodine','seamoss','lemonbalm','maca'],
+  kidney:['creatine','electrolytes','magnesium','vitc','bicarb','silica','magthreonate'],
+  liver:['greentea','kava','ashwagandha','vita','niacin','redyeast'],
+  caff:['caffeine','guarana','yerbamate','greentea','paraxanthine','theacrine','yohimbine']
+};
+const SQ_PREG_OK=['folate','vitd','algaeoil','omega3','iron','choline','iodine','calcium','magnesium','probiotic','b12','multi','plantprot','whey','ginger','vitc'];
+const SQ_ANIMAL=['whey','casein','collagen','glucosamine','codliver','eggprot','beefprot','uc2','colostrum','lactoferrin','greenlipped','bonebroth','omega3'];
+const SQ_SIZE={essentials:4,balanced:7,full:10};
+const sqLabel={thinners:'blood thinners',bpmeds:'blood pressure medicine',diabmeds:'diabetes medicine',antidep:'antidepressants',thyroid:'a thyroid condition',kidney:'kidney problems',liver:'liver problems',caff:'avoiding caffeine',pregnant:'pregnancy'};
+function sqDefaults(){const p=S.suppQ||{},g=(S.prof&&S.prof.ans&&S.prof.ans.goal)||'muscle';
+  return Object.assign({goals:g==='strength'?['strength','muscle']:g==='fat'?['fatloss','energy']:g==='health'?['energy','sleep','heart']:['muscle'],issues:[],diet:'omni',fish:'no',protein:'sometimes',caff:'some',meds:[],sex:'male',size:'balanced'},clone(p))}
+function sqBlockedBy(id,a){const out=[];(a.meds||[]).forEach(m=>{if(m==='pregnant'){if(!SQ_PREG_OK.includes(id))out.push('pregnant')}else if(SQ_BLOCK[m]&&SQ_BLOCK[m].includes(id))out.push(m)});if(a.caff==='avoid'&&SQ_BLOCK.caff.includes(id))out.push('caff');return out}
+/* swap animal products for plant versions where needed */
+function sqSwap(id,a){if(a.diet==='vegan'){if(id==='whey')return'plantprot';if(id==='omega3')return'algaeoil';if(SQ_ANIMAL.includes(id))return null}if(a.diet==='veg'){if(id==='omega3')return'algaeoil';if(['collagen','glucosamine','codliver','beefprot','uc2','greenlipped','bonebroth'].includes(id))return null}return id}
+function sqRecommend(a){
+  const sc={},why={},add=(id,p,r)=>{id=sqSwap(id,a);if(!id||!SUPP_DB.find(e=>e.id===id))return;sc[id]=(sc[id]||0)+p;(why[id]=why[id]||[]);if(r&&!why[id].includes(r))why[id].push(r)};
+  (a.goals||[]).forEach(g=>(SQ_MAP[g]||[]).forEach(x=>add(...x)));
+  (a.issues||[]).forEach(g=>(SQ_MAP[g]||[]).forEach(x=>add(...x)));
+  if(a.fish==='no')add('omega3',2,'you rarely eat oily fish');
+  if(a.protein==='no')add('whey',3,'you often miss your protein target');else if(a.protein==='sometimes'&&((a.goals||[]).some(g=>['muscle','strength','fatloss'].includes(g))))add('whey',1,'helps you hit your protein target');
+  if(a.diet==='vegan'){add('b12',4,'vegan diets lack B12');add('creatine',1,'plant diets have no creatine');add('iodine',1,'often low on plant diets');add('algaeoil',1,'plant source of omega-3')}
+  if(a.diet==='veg')add('b12',3,'often low without meat');
+  if(a.caff==='love'&&(a.goals||[]).some(g=>['focus','energy','strength','endurance'].includes(g)))add('theanine',1,'smooths out caffeine');
+  if(a.caff!=='avoid'&&(a.goals||[]).some(g=>['strength','endurance','energy'].includes(g)))add('caffeine',1,'before training');
+  if((a.meds||[]).includes('pregnant')){add('folate',5,'needed in pregnancy');add('vitd',2,'pregnancy');add('choline',2,'baby brain development');add('iodine',1,'pregnancy');add(a.diet==='omni'||a.diet==='pesc'?'omega3':'algaeoil',2,'baby brain development')}
+  add('vitd',1,'most people run low');add('magnesium',1,'most people eat too little');
+  if(a.sex==='male'&&(a.goals||[]).includes('hormones'))add('tongkat',1,'male hormone support');
+  if(a.sex==='female'&&(a.goals||[]).includes('hormones'))add('inositol',1,'hormone balance');
+  const blocked=[];
+  let list=Object.keys(sc).map(id=>({id,score:sc[id],why:why[id],e:SUPP_DB.find(e=>e.id===id),block:sqBlockedBy(id,a)}));
+  list.filter(x=>x.block.length&&x.score>=2).forEach(x=>blocked.push(x));
+  list=list.filter(x=>!x.block.length&&x.score>=2).sort((x,y)=>y.score-x.score);
+  // vitamin K2 only alongside D3
+  if(!list.find(x=>x.id==='vitd'))list=list.filter(x=>x.id!=='vitk2');
+  return{list:list.slice(0,SQ_SIZE[a.size]||7),more:list.slice(SQ_SIZE[a.size]||7,(SQ_SIZE[a.size]||7)+4),blocked};
+}
+function sqToSupp(x,i){const e=x.e;return{id:'s'+Date.now()+'_'+i,n:e.n,d:e.d.replace(/ daily$/,'').replace(/\s*\(.*?\)$/,''),slot:e.s,note:'For: '+x.why.slice(0,3).join(', ')+'.',c:HAB_COLORS[i%HAB_COLORS.length]}}
+/* the question form; act = ['obpick','obtog'] in setup or ['sqpick','sqtog'] in the sheet */
+function sqForm(a,act){
+  const one=(f,v,l,sub)=>`<button class="obopt ${a[f]==v?'on':''}" data-a="${act[0]}" data-f="${f}" data-v="${v}"><b>${l}</b>${sub?`<span>${sub}</span>`:''}</button>`;
+  const many=(f,v,l)=>`<button class="obopt ${(a[f]||[]).includes(v)?'on':''}" data-a="${act[1]}" data-f="${f}" data-v="${v}"><b>${l}</b></button>`;
+  return`<label class="fl2">What do you want supplements to help with? (pick any)</label><div class="obrow wrap">${SQ_GOALS.map(([v,l])=>many('goals',v,l)).join('')}</div>
+  <label class="fl2" style="margin-top:12px">Anything bothering you lately?</label><div class="obrow wrap">${SQ_ISSUES.map(([v,l])=>many('issues',v,l)).join('')}</div>
+  <label class="fl2" style="margin-top:12px">Your diet</label><div class="obrow wrap">${one('diet','omni','Eat everything')}${one('diet','pesc','Little red meat')}${one('diet','veg','Vegetarian')}${one('diet','vegan','Vegan')}</div>
+  <label class="fl2" style="margin-top:12px">Oily fish (salmon, sardines) twice a week?</label><div class="obrow">${one('fish','yes','Yes')}${one('fish','no','Rarely')}</div>
+  <label class="fl2" style="margin-top:12px">Do you hit your protein (about 1.6 g per kg) from food?</label><div class="obrow">${one('protein','yes','Usually')}${one('protein','sometimes','Sometimes')}${one('protein','no','Rarely')}</div>
+  <label class="fl2" style="margin-top:12px">Caffeine</label><div class="obrow">${one('caff','avoid','Avoid it')}${one('caff','some','Some')}${one('caff','love','Love it')}</div>
+  <label class="fl2" style="margin-top:12px">Sex</label><div class="obrow">${one('sex','male','Male')}${one('sex','female','Female')}${one('sex','other','Prefer not to say')}</div>
+  <label class="fl2" style="margin-top:12px">Medicines or conditions (so risky ones are left out)</label><div class="obrow wrap">${SQ_MEDS.map(([v,l])=>many('meds',v,l)).join('')}</div>
+  <label class="fl2" style="margin-top:12px">How many supplements are you happy to take?</label><div class="obrow">${one('size','essentials','Essentials','Up to 4')}${one('size','balanced','Balanced','Up to 7')}${one('size','full','Full','Up to 10')}</div>`;
+}
+function sqToggle(a,f,v){const arr=a[f]=a[f]||[];const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else{if(v==='none')arr.length=0;else{const n=arr.indexOf('none');if(n>=0)arr.splice(n,1)}arr.push(v)}}
+function sqResultsHTML(R,a,sel,mode){
+  const cur=new Set(S.supps.map(s=>{const i=suppInfo(s.n);return i?i.id:null}).filter(Boolean));
+  const row=(x,i)=>{const have=mode==='improve'&&cur.has(x.id);return`<button class="obopt sqitem ${have?'':sel[x.id]?'on':''}" ${have?'disabled':''} data-a="sqsel" data-v="${x.id}"><b>${have?'✓ ':sel[x.id]?'☑ ':'☐ '}${esc(x.e.n)}${have?' <span class="pill" style="--c:var(--ok)">already taking</span>':''}</b><span>${esc(x.e.d)} · ${esc(x.e.s)}</span><span class="sqwhy">For ${esc(x.why.slice(0,3).join(', '))}.</span>${x.e.c?`<span class="sqc">⚠️ ${esc(x.e.c)}</span>`:''}</button>`};
+  let h=R.list.length?R.list.map(row).join(''):'<p class="muted">Nothing matched. Pick at least one goal or issue.</p>';
+  if(R.more.length)h+=`<label class="fl2" style="margin-top:10px">Also worth considering</label>${R.more.map(row).join('')}`;
+  if(R.blocked.length)h+=`<div class="note" style="margin-top:10px"><b>Left out for safety:</b> ${R.blocked.map(x=>`${esc(x.e.n)} (${x.block.map(b=>sqLabel[b]||b).join(', ')})`).join('; ')}.</div>`;
+  if(mode==='improve'){const warn=[];S.supps.forEach(s=>{const i=suppInfo(s.n);if(!i)return;const b=sqBlockedBy(i.id,a);if(b.length)warn.push(`${esc(s.n)} (${b.map(x=>sqLabel[x]||x).join(', ')})`)});if(warn.length)h+=`<div class="note" style="--c:var(--bad);margin-top:10px"><b>Check with your doctor:</b> ${warn.join('; ')} in your current stack.</div>`}
+  return h+`<p class="muted" style="font-size:12px;margin-top:10px">General guidance, not medical advice. Check with your doctor or pharmacist before starting supplements, especially if you take medicine.</p>`;
+}
+/* sheet from the Supplements tab */
+function sqOpen(mode){UI.sq={mode:mode||(S.supps.length?'improve':'new'),a:sqDefaults(),view:'q',sel:{}};drawSq()}
+function drawSq(){
+  const q=UI.sq,pn=document.getElementById('panel'),keep=q.keepScroll?pn.scrollTop:0;q.keepScroll=false;
+  if(q.view==='q'){openSheet(`<h4 class="disp">Build or improve my stack</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Answer a few questions and IRON picks supplements from the 200-item guide, with doses and the best time to take them.</p>
+    <div class="obrow"><button class="obopt ${q.mode==='new'?'on':''}" data-a="sqmode" data-v="new"><b>New stack</b><span>Replace my current list</span></button><button class="obopt ${q.mode==='improve'?'on':''}" data-a="sqmode" data-v="improve"><b>Improve my stack</b><span>Add what’s missing for my goals</span></button></div>
+    ${q.mode==='improve'?'<p class="muted" style="font-size:12.5px;margin:6px 0 0">Tip: to target one thing, pick just that goal or issue (for example only Better sleep).</p>':''}
+    ${sqForm(q.a,['sqpick','sqtog'])}<button class="cta" style="--c:var(--cardio)" data-a="sqgo">See my ${q.mode==='new'?'stack':'suggestions'}</button><button class="cta ghost" data-a="close">Cancel</button>`)}
+  else{const R=sqRecommend(q.a);const n=Object.keys(q.sel).filter(k=>q.sel[k]).length;
+    openSheet(`<h4 class="disp">${q.mode==='new'?'Your new stack':'Suggestions for your stack'}</h4><p class="muted" style="font-size:13.5px;margin:0 0 6px">Tap to tick or untick. ${q.mode==='new'?'Saving replaces your current list (you can undo).':'Ticked items are added to your current list.'}</p>
+    ${sqResultsHTML(R,q.a,q.sel,q.mode)}<button class="cta" style="--c:var(--cardio)" data-a="sqsave" ${n?'':'disabled'}>${q.mode==='new'?`Save as my stack (${n})`:`Add ${n} to my stack`}</button><button class="cta ghost" data-a="sqback">Change answers</button>`)}
+  if(keep)setTimeout(()=>{pn.scrollTop=keep},0);
+}
+function sqSave(){
+  const q=UI.sq,R=sqRecommend(q.a),all=[...R.list,...R.more],pick=all.filter(x=>q.sel[x.id]);if(!pick.length)return;
+  S.suppQ=clone(q.a);const prev=clone(S.supps);
+  if(q.mode==='new'){S.supps=pick.map(sqToSupp)}
+  else{const cur=new Set(S.supps.map(s=>{const i=suppInfo(s.n);return i?i.id:null}));pick.filter(x=>!cur.has(x.id)).forEach((x,i)=>S.supps.push(sqToSupp(x,S.supps.length+i)))}
+  save();closeSheet();UI.sq=null;rerender();toast(q.mode==='new'?'New stack saved: '+pick.length+' supplements':'Added '+pick.length+' to your stack',()=>{S.supps=prev});
+}
 /* ---------- SUPPLEMENTS TAB ---------- */
 const SLOTS=['Morning','Pre-workout','Post-workout','With meals','Evening'];
 function sTaken(id,d){return!!(S.suppLog[d]&&S.suppLog[d][id])}
@@ -2384,6 +2513,7 @@ function renderSupps(){
   UI.sm=UI.sm||{};const v=document.getElementById('view'),t=todayS();if(!UI.sday||UI.sday>t)UI.sday=t;const d=UI.sday,lg=S.suppLog[d]||{};
   const taken=S.supps.filter(s=>lg[s.id]).length,isT=d===t;
   let h=`<div class="phead"><h2 class="pagetitle disp">Supplements</h2><button class="addbtn" style="--c:var(--cardio)" data-a="addsupp">${IC.plus}Add</button></div>
+  <button class="obopt" style="margin:0 0 12px" data-a="sqopen"><b>✨ Build or improve my stack</b><span>Answer a few questions about goals, issues, diet and medicines</span></button>
   <div class="sdaynav"><button class="mini" data-a="sday" data-v="-1" aria-label="Previous day">‹</button><label class="sdate"><b>${isT?'Today':nice(d)}</b><span>${isT?nice(d):'Tap to pick another day'}</span><input type="date" data-in="sday" value="${d}" max="${t}" aria-label="Pick a day"></label><button class="mini" data-a="sday" data-v="1" ${isT?'disabled':''} aria-label="Next day">›</button></div>
   ${isT?'':`<div class="demo-banner"><span>Editing a past day. Tick what you took on ${nice(d)}.</span><button class="mini" data-a="stoday">Today</button></div>`}
   <div class="card"><div class="ringwrap">${ring(S.supps.length?taken/S.supps.length:0,COLORS.cardio,88,10,taken+'/'+S.supps.length)}<div><div class="disp" style="font-size:30px">${taken===S.supps.length&&taken?(isT?'All taken today':'All taken'):(isT?'Today\u2019s stack':'Stack for '+short(d))}</div><div class="muted" style="font-size:13.5px">${suppStreak()?suppStreak()+'-day streak with everything taken':'Take all of them to start a streak'}</div></div></div></div>
@@ -2402,7 +2532,7 @@ function renderSupps(){
       }
       h+=`</div>`})});
   if(!S.supps.length)h+=`<div class="card"><p style="margin:0">No supplements in your list. Tap <b>Add</b> or browse the guide.</p></div>`;
-  h+=`<div class="grid2" style="margin-top:12px"><button class="cta" style="--c:var(--cardio);margin:0" data-a="addsupp">${IC.plus} Add</button><button class="cta ghost" style="margin:0" data-a="sguide">📖 Supplement guide</button></div>
+  h+=`<div class="grid2" style="margin-top:12px"><button class="cta" style="--c:var(--cardio);margin:0" data-a="addsupp">${IC.plus} Add</button><button class="cta ghost" style="margin:0" data-a="sguide">📖 Supplement guide</button></div><button class="cta" style="--c:var(--ink);color:var(--bg)" data-a="sqopen">✨ Build or improve my stack</button>
   <p class="muted" style="font-size:12.5px;margin-top:14px">Doses and timings are general guidance for healthy adults, not medical advice. Check with your doctor before starting anything new, especially if you take medication.</p>`;
   v.innerHTML=h;
 }
@@ -2724,8 +2854,18 @@ document.addEventListener('click',ev=>{
   case'obclose':closeOnboarding();break;
   case'obskip':closeOnboarding();UI.fresh=false;save();toast('Using the sample plan. Build your own anytime in Settings.');break;
   case'obrestore':if(window.confirm('Go back to your previous plan? Your logs stay.'))restorePlan();break;
-  case'obback':UI.ob.step=Math.max(0,UI.ob.step-1);drawOb();break;
-  case'obnext':{const st=OB_STEPS[UI.ob.step];if(st==='schedule'&&UI.ob.a.days.length<2){toast('Pick at least 2 lifting days');break}UI.ob.step=Math.min(OB_STEPS.length-1,UI.ob.step+1);if(OB_STEPS[UI.ob.step]==='stack'&&!UI.fresh&&false)UI.ob.step++;drawOb();break}
+  case'obback':UI.ob.step=Math.max(0,UI.ob.step-1);if(OB_STEPS[UI.ob.step]==='suppq'&&UI.ob.a.supps!=='quiz')UI.ob.step--;drawOb();break;
+  case'obsqpick':{const f=el.dataset.f;UI.ob.a.sq[f]=el.dataset.v;const sc2=document.getElementById('onb').scrollTop;drawOb();document.getElementById('onb').scrollTop=sc2;break}
+  case'obsqtog':{sqToggle(UI.ob.a.sq,el.dataset.f,el.dataset.v);const sc2=document.getElementById('onb').scrollTop;drawOb();document.getElementById('onb').scrollTop=sc2;break}
+  case'sqopen':sqOpen();break;
+  case'sqmode':UI.sq.mode=el.dataset.v;UI.sq.keepScroll=true;drawSq();break;
+  case'sqpick':UI.sq.a[el.dataset.f]=el.dataset.v;UI.sq.keepScroll=true;drawSq();break;
+  case'sqtog':sqToggle(UI.sq.a,el.dataset.f,el.dataset.v);UI.sq.keepScroll=true;drawSq();break;
+  case'sqgo':{const q=UI.sq;if(!(q.a.goals||[]).length&&!(q.a.issues||[]).filter(x=>x!=='none').length){toast('Pick at least one goal or issue');break}const R=sqRecommend(q.a);const cur=new Set(S.supps.map(x=>{const i=suppInfo(x.n);return i?i.id:null}));q.sel={};R.list.forEach(x=>{if(!(q.mode==='improve'&&cur.has(x.id)))q.sel[x.id]=true});q.view='r';drawSq();break}
+  case'sqsel':{const v2=el.dataset.v;UI.sq.sel[v2]=!UI.sq.sel[v2];UI.sq.keepScroll=true;drawSq();break}
+  case'sqback':UI.sq.view='q';drawSq();break;
+  case'sqsave':sqSave();break;
+  case'obnext':{const st=OB_STEPS[UI.ob.step];if(st==='schedule'&&UI.ob.a.days.length<2){toast('Pick at least 2 lifting days');break}UI.ob.step=Math.min(OB_STEPS.length-1,UI.ob.step+1);if(OB_STEPS[UI.ob.step]==='suppq'&&UI.ob.a.supps!=='quiz')UI.ob.step++;drawOb();break}
   case'obpick':{const f=el.dataset.f,v=el.dataset.v;UI.ob.a[f]=isNaN(+v)?v:+v;drawOb();break}
   case'obtog':{const f=el.dataset.f,v=el.dataset.v;const arr=UI.ob.a[f]=UI.ob.a[f]||[];const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v);drawOb();break}
   case'obday':{const v=+el.dataset.v,a2=UI.ob.a;const i=a2.days.indexOf(v);if(i>=0)a2.days.splice(i,1);else{if(a2.days.length>=6){toast('Six lifting days is the maximum');break}a2.days.push(v)}if(a2.days.includes(+a2.longDay))a2.longDay=-1;drawOb();break}
