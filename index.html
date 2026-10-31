@@ -359,6 +359,15 @@ button.insight:first-of-type{border-top:0}
 .gitem summary b{font-size:15.5px}.gitem summary span{font-size:12.5px;color:var(--mu)}
 .gitem summary em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--ok)}
 .gitem[open] summary{margin-bottom:8px}
+/* WHOOP workouts */
+.wkrow{display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;align-items:center;width:100%;text-align:left;border:0;border-top:1px solid var(--ln);background:none;color:inherit;font:inherit;padding:9px 0;cursor:pointer}
+.wkrow .zbar{grid-column:1/-1}.wkt b{display:block;font-size:14.5px}.wkt span{font-size:12px;color:var(--mu)}.wkt em{display:block;font-style:normal;font-size:12px;font-weight:750;color:var(--upper)}
+.wks{text-align:right}.wks b{display:block;font-size:15px}.wks span{font-size:11px;color:var(--mu)}
+.zbar{display:flex;border-radius:99px;overflow:hidden;background:var(--sf2);margin:6px 0}.zbar i{display:block;height:100%}
+.zrow{display:grid;grid-template-columns:12px 1fr auto 44px;gap:8px;align-items:center;font-size:13px;padding:3px 0}.zrow i{width:12px;height:12px;border-radius:4px}.zrow em{font-style:normal;color:var(--mu);text-align:right}
+.wkex{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid var(--ln);font-size:13px}.wkex span{color:var(--mu);text-align:right}
+.wkchip{display:block;width:100%;text-align:left;border:0;color:inherit;font:inherit;cursor:pointer}
+.wklink{border:0;background:none;padding:0;font:inherit;font-weight:750;color:var(--ink);text-align:left;cursor:pointer}
 /* plan builder */
 .bdday{border-top:1px solid var(--ln);padding:6px 0 8px;border-left:4px solid var(--c);padding-left:10px;margin-left:-2px}
 .bdday .srow{padding:2px 0}.bdsum{font-size:12.5px;color:var(--mu);margin:2px 0 6px}
@@ -898,6 +907,8 @@ const SPEC={
   gFC:{n:'Full body C',f:'Single leg, push and pull',k:'full',b:[[1,'main',[['main',['lunge','glute']]]],[2,'sec',[['sec',['hpush']],['sec',['hpull']]]],[3,'acc',[['acc',['ham','hinge','glute']],['acc',['lat']]]],[4,'arm',[['arm',['bi']],['arm',['tri']]]],[5,'pre',[['pre',['abd','add']]]]]},
   gPu:{n:'Push',f:'Chest, shoulders and triceps',k:'upper',b:[[1,'main',[['main',['hpush']]]],[2,'sec',[['sec',['vpush']],['acc',['lat']]]],[3,'acc',[['acc',['fly','hpush']],['arm',['tri']]]],[4,'arm',[['arm',['tri']]]],[5,'pre',[['pre',['cuff']]]]]},
   gPl:{n:'Pull',f:'Back, rear delts and biceps',k:'upper',b:[[1,'main',[['main',['vpull']]]],[2,'sec',[['sec',['hpull']],['acc',['rear']]]],[3,'acc',[['arm',['bi']],['acc',['shrug','rear']]]],[4,'arm',[['arm',['bi']]]],[5,'pre',[['pre',['cuff']]]]]},
+  gPuL:{n:'Push',f:'Chest, shoulders, triceps, deadlift, hamstrings and calves',k:'full',b:[[1,'main',[['main',['hpush']]]],[1,'main',[['main',['hinge']]]],[2,'sec',[['sec',['vpush','hpush']],['acc',['ham']]]],[3,'acc',[['acc',['fly','lat']],['acc',['calf']]]],[3,'arm',[['arm',['tri']]]],[5,'pre',[['pre',['cuff']]]]]},
+  gPlL:{n:'Pull',f:'Back, rear delts, biceps, squat and quads',k:'full',b:[[1,'main',[['main',['vpull']]]],[1,'main',[['main',['squat']]]],[2,'sec',[['sec',['hpull']],['acc',['quad','lunge']]]],[3,'acc',[['acc',['rear']],['acc',['quad','squat']]]],[3,'arm',[['arm',['bi']]]],[5,'pre',[['pre',['tib','abd']]]]]},
   gLg:{n:'Legs',f:'Squat, hinge and single leg',k:'lower',b:[[1,'main',[['main',['squat']]]],[2,'sec',[['sec',['hinge']],['sec',['lunge']]]],[3,'acc',[['acc',['quad']],['acc',['ham','hinge']]]],[4,'pre',[['acc',['calf']],['pre',['abd','add']]]]]}
 };
 const SPLITS={2:['gFA','gFB'],3:['gFA','gFB','gFC'],4:['gUA','gLA','gUB','gLB'],5:['gUA','gLA','gUB','gLB','gUC'],6:['gPu','gPl','gLg','gPu','gPl','gLg']};
@@ -1129,12 +1140,15 @@ function cycleReview(c){
   const h=hist();let up=0,tracked=0;Object.keys(h).forEach(ex=>{const a=h[ex].filter(x=>x.d>=ps&&x.d<=pe&&!phaseOf(x.d).deload);if(a.length<2)return;tracked++;const be=x=>Math.max(...x.sets.map(q=>e1rm(+q.w,+q.r)));const f=be(a[0]),l=Math.max(...a.slice(-2).map(be));if(l>f*1.01)up++});
   const prog=tracked>=2?up/tracked:null;
   const rv=[];for(let d=ps;d<=pe;d=addD(d,1)){const x=S.wdata&&S.wdata[d];if(x&&x.rec!=null&&!x.cal)rv.push(+x.rec)}const rec=rv.length>=7?rv.reduce((a,b)=>a+b,0)/rv.length:null;
+  const wks=Object.values(S.wwk||{}).filter(w=>w.d>=ps&&w.d<=pe&&w.strain!=null),pwk=Object.values(S.wwk||{}).filter(w=>w.d>=addD(ps,-(diffD(ps,pe)+1))&&w.d<ps&&w.strain!=null);
+  const ws2=wks.length>=3?wks.reduce((a,w)=>a+w.strain,0)/wks.length:null,pws=pwk.length>=3?pwk.reduce((a,w)=>a+w.strain,0)/pwk.length:null;
   const prev=phaseForCycle(c-1),pc=v=>Math.round(v*100)+'%';
-  const stats={adh,prog,rec,tracked};
+  const stats={adh,prog,rec,tracked,strain:ws2,prevStrain:pws};
+  if(ws2!=null&&pws!=null&&ws2>pws*1.25&&rec!=null&&rec<55)return{s:prev,vol:-1,stats,why:`Workout strain rose from ${pws.toFixed(1)} to ${ws2.toFixed(1)} while recovery averaged ${Math.round(rec)}%. Same rep ranges and one set fewer on accessories so recovery can catch up.`};
   if(adh!==null&&adh<0.6)return{s:prev,vol:-1,stats,why:`You finished ${pc(adh)} of last cycle's sessions, so this cycle keeps the same rep ranges and trims one accessory set. Shorter sessions are easier to show up for.`};
   if(rec!==null&&rec<45)return{s:prev,vol:-1,stats,why:`WHOOP recovery averaged ${Math.round(rec)}% last cycle. Same rep ranges, one set fewer on accessories, so you can recover and keep progressing.`};
   if(prog!==null&&prog<0.3){const s2=prev==='F'?'H':'F';return{s:s2,vol:0,stats,why:`Only ${pc(prog)} of your lifts went up last cycle. Switching to ${SCH[s2].name.toLowerCase()} rep ranges for a fresh stimulus.`}}
-  if(prog!==null&&prog>=0.6&&(adh===null||adh>=0.8)&&(rec===null||rec>=60)){const s2=nextPhase(prev);return{s:s2,vol:1,stats,why:`Strong cycle: ${pc(prog)} of lifts went up${adh!==null?', '+pc(adh)+' attendance':''}${rec!==null?', recovery '+Math.round(rec)+'%':''}. Moving to ${SCH[s2].name.toLowerCase()} with one extra accessory set.`}}
+  if(prog!==null&&prog>=0.6&&(adh===null||adh>=0.8)&&(rec===null||rec>=60)){const s2=nextPhase(prev);return{s:s2,vol:1,stats,why:`Strong cycle: ${pc(prog)} of lifts went up${adh!==null?', '+pc(adh)+' attendance':''}${rec!==null?', recovery '+Math.round(rec)+'%':''}. Moving to ${SCH[s2].name.toLowerCase()} with one extra accessory set.${ws2!=null?' Average workout strain was '+ws2.toFixed(1)+'.':''}`}}
   const s2=nextPhase(prev);return{s:s2,vol:0,stats,why:prog===null?`Not enough logged lifts to judge last cycle, so the plan follows the standard progression to ${SCH[s2].name.toLowerCase()}.`:`Steady progress (${pc(prog)} of lifts up). Moving on to ${SCH[s2].name.toLowerCase()}.`};
 }
 let DECIDING=false;
@@ -1146,14 +1160,37 @@ function cycleDecision(c){
   DECIDING=true;let r;try{r=cycleReview(c)}finally{DECIDING=false}
   r.at=todayS();C.cycles=C.cycles||{};C.cycles[c]=r;setTimeout(save,0);return r;
 }
-/* WHOOP weekly intensity: last week's recovery sets this week's volume */
+/* Weekly intensity. Compares last week with the 3 weeks before it using
+   WHOOP recovery, WHOOP workout strain and hard-zone minutes, your logged lift progress and attendance. */
+let WICACHE={};
+function weekSignals(ws){
+  const last=[addD(ws,-7),addD(ws,-1)],base=[addD(ws,-28),addD(ws,-8)];
+  const vals=[];let reds=0;for(let i=1;i<=7;i++){const x=S.wdata&&S.wdata[addD(ws,-i)];if(x&&x.rec!=null&&!x.cal){vals.push(+x.rec);if(+x.rec<34)reds++}}
+  const rec=vals.length>=4?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+  const wl=Object.values(S.wwk||{}).filter(w=>w.d>=last[0]&&w.d<=last[1]&&w.strain!=null),wb=Object.values(S.wwk||{}).filter(w=>w.d>=base[0]&&w.d<=base[1]&&w.strain!=null);
+  const avg=a=>a.reduce((x,y)=>x+y,0)/a.length,hard=a=>a.reduce((x,w)=>x+((w.zones||[])[4]||0)+((w.zones||[])[5]||0),0)/6e4;
+  const strain=wl.length?avg(wl.map(w=>w.strain)):null,strainBase=wb.length>=2?avg(wb.map(w=>w.strain)):null;
+  const hardMin=wl.length?hard(wl):null,hardBase=wb.length>=2?hard(wb)/3:null;
+  const h=hist(),be=x=>Math.max(...x.sets.map(q=>e1rm(+q.w,+q.r)));let up=0,down=0,tracked=0;
+  Object.keys(h).forEach(ex=>{const r=h[ex].filter(x=>x.d>=addD(ws,-14)&&x.d<ws),o=h[ex].filter(x=>x.d>=addD(ws,-42)&&x.d<addD(ws,-14));if(!r.length||!o.length)return;tracked++;const a=Math.max(...r.map(be)),b=Math.max(...o.map(be));if(a>b*1.01)up++;else if(a<b*0.97)down++});
+  const sched=[];for(let d=last[0];d<=last[1];d=addD(d,1))if(inPlan(d)&&isTraining(tplOf(d))&&T[tplOf(d)].k!=='long')sched.push(d);
+  const adh=sched.length>=2?sched.filter(d=>S.done[d]).length/sched.length:null;
+  return{rec,reds,strain,strainBase,hardMin,hardBase,workouts:wl.length,up,down,tracked,lift:tracked>=2?up/tracked:null,adh};
+}
 function weekInt(d){
-  if(!S.custom||S.custom.whoopWeekly===false||!S.whoop||!S.whoop.connected)return null;
-  const ws=sunOf(d),vals=[];let reds=0;for(let i=1;i<=7;i++){const x=S.wdata&&S.wdata[addD(ws,-i)];if(x&&x.rec!=null&&!x.cal){vals.push(+x.rec);if(+x.rec<34)reds++}}
-  if(vals.length<4)return null;const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
-  if(avg<45||reds>=3)return{lvl:'ease',avg,reds,why:`Recovery averaged ${Math.round(avg)}% last week${reds?' with '+reds+' red day'+(reds>1?'s':''):''}. One set fewer on secondary and accessory moves, 1 more rep in reserve, HIIT becomes Zone 2.`};
-  if(avg>=70&&reds===0)return{lvl:'push',avg,reds,why:`Recovery averaged ${Math.round(avg)}% last week with no red days. One extra set on main and secondary lifts this week.`};
-  return{lvl:'normal',avg,reds,why:`Recovery averaged ${Math.round(avg)}% last week. Normal volume.`};
+  if(!S.whoop||!S.whoop.connected)return null;if(S.custom?S.custom.whoopWeekly===false:S.whoop.auto===false)return null;
+  const ws=sunOf(d);if(WICACHE[ws]!==undefined)return WICACHE[ws];
+  const g=weekSignals(ws);if(g.rec==null&&g.workouts<2&&g.lift==null)return WICACHE[ws]=null;
+  let sc=0;const why=[];
+  if(g.rec!=null){if(g.rec>=70)sc+=2;else if(g.rec>=55)sc+=1;else if(g.rec<45)sc-=2;why.push(`recovery averaged ${Math.round(g.rec)}%`)}
+  if(g.reds>=3){sc-=2;why.push(`${g.reds} red days`)}
+  if(g.lift!=null){if(g.lift>=0.6)sc+=1;else if(g.down>g.up&&g.down>=2)sc-=1;why.push(g.down>g.up?`${g.down} of ${g.tracked} lifts dipped`:`${g.up} of ${g.tracked} lifts went up`)}
+  if(g.strain!=null&&g.strainBase!=null){const r=g.strain/g.strainBase;if(r>1.25&&(g.rec==null||g.rec<60))sc-=1;else if(r<0.85&&(g.rec==null||g.rec>=60))sc+=1;why.push(`workout strain ${g.strain.toFixed(1)} vs usual ${g.strainBase.toFixed(1)}`)}
+  if(g.hardMin!=null&&g.hardBase!=null&&g.hardBase>5&&g.hardMin>g.hardBase*1.6&&(g.rec==null||g.rec<60)){sc-=1;why.push(`${Math.round(g.hardMin)} min in zones 4–5 vs usual ${Math.round(g.hardBase)}`)}
+  if(g.adh!=null){if(g.adh<0.6)sc-=1;why.push(`${Math.round(g.adh*100)}% of sessions done`)}
+  const lvl=sc>=3?'push':sc<=-2?'ease':'normal';
+  const act=lvl==='push'?' One extra set on main and secondary lifts this week.':lvl==='ease'?' One set fewer on secondary and accessory moves, 1 more rep in reserve, and HIIT becomes Zone 2.':' Normal volume this week.';
+  return WICACHE[ws]={lvl,score:sc,sig:g,avg:g.rec,reds:g.reds,why:'Last week: '+why.join(', ')+'.'+act};
 }
 /* every other cycle, accessories and arm moves rotate to a sister exercise; main lifts stay so strength keeps building */
 const ROT={incMach:'incDB',incDB:'incMach',csRow:'sealRow',sealRow:'csRow',lmPress:'saDBPress',saDBPress:'machShoulder',cLat:'machLat',dbLat:'cLat',ropePush:'vbarPush',vbarPush:'ropePush',hammer:'crossHammer',ropeHammer:'hammer',saCableRow:'machRow',machChest:'floorPress',revPec:'cRearFly',cRearFly:'revPec',preacherM:'cableCurl',cableCurl:'dbCurl',crossExt:'kickback',rfess:'revLunge',seatHam:'lyingHam',legPress:'hackSq',standCalf:'slCalf',dbRDL:'slRDL',stepUp:'splitSq',legExt:'spanishSq',seatCalf:'standCalf',backExt45:'pullThrough'};
@@ -1209,6 +1246,8 @@ async function whoopSync(force){
       S.wdata[isoToLocal(x.created_at)]={rec:x.rec,hrv:x.hrv!=null?Math.round(x.hrv*10)/10:null,rhr:x.rhr,spo2:x.spo2!=null?Math.round(x.spo2*10)/10:null,skin:x.skin!=null?Math.round(x.skin*10)/10:null,cal:!!x.calibrating,
         sleep:sl?{perf:sl.perf,eff:sl.eff!=null?Math.round(sl.eff):null,cons:sl.cons,rr:sl.rr!=null?Math.round(sl.rr*10)/10:null,dur:hrs(asleep),light:hrs(sl.light),deep:hrs(sl.deep),rem:hrs(sl.rem),awake:hrs(sl.awake),need:hrs(sl.need),dist:sl.dist,bed:sl.start,wake:sl.end}:null,
         strain:cy&&cy.strain!=null?Math.round(cy.strain*10)/10:null,kcal:cy&&cy.kj!=null?Math.round(cy.kj/4.184):null,ahr:cy?cy.ahr:null,mhr:cy?cy.mhr:null,steps:cy&&cy.steps!=null?cy.steps:null}});
+    if(Array.isArray(j.workouts)){S.wwk=S.wwk||{};const cut=addD(todayS(),-120);j.workouts.forEach(x=>{const d=isoToLocal(x.start);if(d>=cut)S.wwk[x.id]=Object.assign({},x,{d,strain:x.strain!=null?Math.round(x.strain*10)/10:null,ahr:x.ahr!=null?Math.round(x.ahr):null,mhr:x.mhr!=null?Math.round(x.mhr):null})});Object.keys(S.wwk).forEach(k=>{if(S.wwk[k].d<cut)delete S.wwk[k]})}
+    if(j.workoutAccess!=null)S.whoop.wkAccess=!!j.workoutAccess;
     whoopAfterSync(j);
     save();rerender();if(force)toast('WHOOP synced');
   }catch(e){if(force)toast('Couldn\u2019t reach WHOOP')}
@@ -1409,6 +1448,7 @@ function renderTrain(){
     <div class="seglab">${segs.map(s=>`<span style="flex:${Math.max(s[1],10)}">${s[1]>=20?s[0]+' ':''}${Math.round(s[1])}′</span>`).join('')}</div>
     <div class="hero-actions"><button class="hbtn solid" data-a="colall">${SECS.every(isCol)?'Expand all':'Compact view'}</button><button class="hbtn" data-a="move">Move or copy</button>${(S.hist||[]).length?'<button class="hbtn" data-a="undosched" title="'+esc(S.hist[S.hist.length-1].label)+'">↶ Undo</button>':''}</div>
   </section>`;
+  {const wk=S.whoop.connected?wkForDay(d):null;if(wk)h+=`<button class="note wkchip" data-a="wkopen" data-v="${wk.id}"><b>WHOOP ${esc(sportName(wk.sport).toLowerCase())}:</b> strain ${wk.strain!=null?wk.strain.toFixed(1):'–'}, avg ${wk.ahr||'–'} bpm, ${wkMins(wk)} min. Tap for heart-rate zones ›</button>`}
   if(t.blocks){
     const r=readyOf(d);h+=whoopCard(d);
     h+=`<div class="ready"><span>${S.whoop.connected&&!S.ready[d]&&whoopDay(d)&&S.whoop.auto?'From WHOOP':'Recovery'}</span>
@@ -1620,6 +1660,57 @@ function mval(key,d){const M=MET[key];if(!M)return null;if(key==='lean')return l
 function mavg(key,d,n,skip){let a=[];for(let i=skip?1:0;i<(skip?n+1:n);i++){const v=mval(key,addD(d,-i));if(v!=null)a.push(v)}return a.length?a.reduce((p,q)=>p+q,0)/a.length:null}
 function lastVal(key,d,max){for(let i=0;i<(max||400);i++){const dd=addD(d,-i),v=mval(key,dd);if(v!=null)return{d:dd,v}}return null}
 function latestDay(){const t=todayS();for(let i=0;i<14;i++){const d=addD(t,-i);if(W(d)&&W(d).rec!=null)return d}return t}
+/* ---------- WHOOP workouts ----------
+   WHOOP sends strain, heart rate and time in each heart-rate zone for every activity.
+   It does not send sets or weights, so lifting details come from your IRON log for the same day. */
+const ZONE_C=['#C8CDEA','#9DB8FF','#12B76A','#E8A900','#FF6A13','#EF3B55'],ZONE_L=['Zone 0 (under 50%)','Zone 1 (50–60%)','Zone 2 (60–70%)','Zone 3 (70–80%)','Zone 4 (80–90%)','Zone 5 (90–100%)'];
+let DEMOWK=null;
+function demoWorkouts(){if(DEMOWK)return DEMOWK;DEMOWK={};let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};const t=todayS();
+  for(let i=27;i>=0;i--){const d=addD(t,-i);if(dow(d)===5)continue;const run=dow(d)===6,hi=dow(d)===2;const mins=run?50:hi?35:62;const st=new Date(pd(d).getTime()+(run?8:18)*36e5);
+    const z=run?[2,8,30,9,1,0]:hi?[3,6,8,8,7,3]:[8,22,20,9,3,0];const sc=mins/z.reduce((a,b)=>a+b,0);
+    DEMOWK['demo'+i]={id:'demo'+i,d,start:st.toISOString(),end:new Date(st.getTime()+mins*6e4).toISOString(),sport:run?'running':hi?'hiit':'weightlifting',strain:+((run?11:hi?13:9.5)+rnd()*3).toFixed(1),ahr:Math.round((run?142:hi?150:118)+rnd()*10),mhr:Math.round((run?168:hi?182:158)+rnd()*10),kj:Math.round((run?2400:hi?1900:1500)+rnd()*500),pct:100,dist:run?8200+Math.round(rnd()*1500):null,zones:z.map(m=>Math.round(m*sc*6e4))}}
+  return DEMOWK}
+function wkAll(){return UI.wdemo?demoWorkouts():(S.wwk||{})}
+function wkList(from,to){return Object.values(wkAll()).filter(w=>w.d>=from&&w.d<=to).sort((a,b)=>a.start<b.start?1:-1)}
+const sportName=s=>{const x=String(s||'Activity').replace(/[-_]/g,' ');return x.charAt(0).toUpperCase()+x.slice(1)};
+const LIFTY=/weight|lift|strength|functional|crossfit|hiit|training|power|body ?build/i;
+function wkForDay(d){const l=wkList(d,d);if(!l.length)return null;return l.find(w=>LIFTY.test(w.sport))||l.sort((a,b)=>new Date(b.end)-new Date(b.start)-(new Date(a.end)-new Date(a.start)))[0]}
+function wkMins(w){return Math.round((new Date(w.end)-new Date(w.start))/6e4)}
+function zoneBar(z,h){const tot=z.reduce((a,b)=>a+b,0)||1;return`<div class="zbar" style="height:${h||8}px">${z.map((v,i)=>`<i style="width:${v/tot*100}%;background:${ZONE_C[i]}"></i>`).join('')}</div>`}
+function sessionSummary(d){
+  const k=tplOf(d),t=k&&T[k];const l=S.logs[d]||{};const ex=[];let sets=0,vol=0;
+  Object.keys(l).forEach(s=>{if(s[0]==='_')return;const o=l[s];if(!o||!o.ex||!E[o.ex])return;const ds2=(o.sets||[]).filter(q=>q.d);if(!ds2.length)return;ds2.forEach(q=>{sets++;vol+=(+q.w||0)*(+q.r||0)});ex.push({ex:o.ex,sets:ds2})});
+  return{k,t,ex,sets,vol,done:!!S.done[d],cardio:isChk(d,'cardio')};
+}
+function wkCard(){
+  const t=todayS(),list=wkList(addD(t,-27),t);let h=`<div class="card" style="--c:${WC.strain}"><h4 class="disp" style="margin:0 0 4px">Workouts</h4>`;
+  if(!UI.wdemo&&S.whoop.wkAccess===false)h+=`<div class="note">WHOOP needs permission to share workouts. Reconnect once to load them.${WH_ON?' <button class="mini" data-a="wconnect">Reconnect WHOOP</button>':''}</div>`;
+  if(!list.length){h+=`<p class="muted" style="font-size:13.5px;margin:0">No workouts from WHOOP in the last 4 weeks yet. Workouts appear here after WHOOP scores them.</p></div>`;return h}
+  h+=`<p class="muted" style="font-size:13px;margin:0 0 4px">Last 4 weeks. Tap one for heart-rate zones and what you lifted.</p>`;
+  const show=UI.wkAll?list:list.slice(0,6);
+  show.forEach(w=>{const s=sessionSummary(w.d),st=new Date(w.start);
+    h+=`<button class="wkrow" data-a="wkopen" data-v="${w.id}"><div class="wkt"><b>${esc(sportName(w.sport))}</b><span class="num">${short(w.d)} · ${st.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${wkMins(w)} min</span>${s.t&&(s.sets||s.done)?`<em>${esc(s.t.n)}${s.sets?' · '+s.sets+' sets':''}</em>`:''}</div>
+    <div class="wks"><b class="num">${w.strain!=null?w.strain.toFixed(1):'–'}</b><span>strain</span></div><div class="wks"><b class="num">${w.ahr||'–'}</b><span>avg bpm</span></div>${zoneBar(w.zones,6)}</button>`});
+  if(list.length>6)h+=`<button class="cta ghost" data-a="wkall">${UI.wkAll?'Show fewer':'Show all '+list.length}</button>`;
+  return h+`</div>`;
+}
+function wkSheet(id){
+  const w=wkAll()[id];if(!w)return;const s=sessionSummary(w.d),st=new Date(w.start),en=new Date(w.end),tot=w.zones.reduce((a,b)=>a+b,0)||1;
+  const same=Object.values(wkAll()).filter(x=>x.sport===w.sport&&x.id!==w.id&&x.d<w.d&&x.d>=addD(w.d,-28)&&x.strain!=null);const avgS=same.length?same.reduce((a,x)=>a+x.strain,0)/same.length:null;
+  const hi=(w.zones[4]+w.zones[5])/6e4;
+  let h=`<h4 class="disp">${esc(sportName(w.sport))}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">${nice(w.d)} · ${st.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}–${en.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${wkMins(w)} min${w.pct!=null&&w.pct<95?' · '+Math.round(w.pct)+'% recorded':''}</p>
+  <div class="grid2"><div class="stat"><b class="disp num">${w.strain!=null?w.strain.toFixed(1):'–'}</b><span>Strain${avgS!=null?` (usual ${avgS.toFixed(1)})`:''}</span></div><div class="stat"><b class="disp num">${w.kj!=null?Math.round(w.kj/4.184):'–'}</b><span>Calories</span></div><div class="stat"><b class="disp num">${w.ahr||'–'}</b><span>Average heart rate</span></div><div class="stat"><b class="disp num">${w.mhr||'–'}</b><span>Max heart rate</span></div>${w.dist?`<div class="stat"><b class="disp num">${(w.dist/1000).toFixed(2)} km</b><span>Distance</span></div>`:''}<div class="stat"><b class="disp num">${Math.round(hi)} min</b><span>Zones 4–5 (hard)</span></div></div>
+  <div class="card" style="margin-top:10px"><b>Heart-rate zones</b><span class="muted" style="font-size:12.5px"> · % of max heart rate</span>${zoneBar(w.zones,12)}
+  ${w.zones.map((v,i)=>`<div class="zrow"><i style="background:${ZONE_C[i]}"></i><span>${ZONE_L[i]}</span><b class="num">${Math.round(v/6e4)} min</b><em class="num">${Math.round(v/tot*100)}%</em></div>`).join('')}</div>`;
+  h+=`<div class="card"><b>Your IRON session that day</b>`;
+  if(!s.t)h+=`<p class="muted" style="font-size:13.5px;margin:4px 0 0">No IRON session on this day.</p>`;
+  else{h+=`<div class="muted" style="font-size:13px;margin:2px 0 6px">${esc(s.t.n)}${s.done?' · finished':''}${s.sets?` · ${s.sets} sets · ${Math.round(s.vol).toLocaleString()} kg volume`:''}${s.cardio?' · cardio done':''}</div>`;
+    if(s.ex.length)h+=s.ex.map(x=>`<div class="wkex"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><span class="num">${x.sets.map(q=>(q.w!==''&&q.w!=null?q.w+' kg × ':'')+(q.r||'–')).join(', ')}</span></div>`).join('');
+    else h+=`<p class="muted" style="font-size:13.5px;margin:0">No sets logged in IRON for this day.</p>`;
+    h+=`<button class="mini" style="margin-top:8px" data-a="histday" data-d="${w.d}">Open this day →</button>`}
+  h+=`</div><p class="muted" style="font-size:12px">WHOOP shares heart rate and strain. Sets and weights come from what you log in IRON.</p><button class="cta ghost" data-a="close">Close</button>`;
+  openSheet(h);
+}
 function whoopAfterSync(j){
   const t=todayS();
   if(j.body){S.wbody=j.body;const lw=lastVal('weight',t);if(j.body.weight&&(!lw||Math.abs(lw.v-j.body.weight)>=0.05)){S.body[t]=Object.assign({},S.body[t],{weight:Math.round(j.body.weight*10)/10,src:'whoop'})}}
@@ -1700,6 +1791,8 @@ function renderWhoop(){
     h+=`<div class="card" style="--c:${WC.strain}"><button class="linkhead wide" data-a="metric" data-v="strain" style="justify-content:flex-start;gap:12px"><svg viewBox="0 0 160 92" style="width:150px;flex:0 0 150px"><path d="${arc(0,21)}" fill="none" stroke="var(--sf2)" stroke-width="14" stroke-linecap="round"/>${lvl?`<path d="${arc(band[0]+.01,band[1])}" fill="none" stroke="${rc}" stroke-opacity=".35" stroke-width="14"/>`:''}${sv!=null?`<path class="arc" d="${arc(0,Math.max(.2,Math.min(21,sw)))}" fill="none" stroke="${WC.strain}" stroke-width="14" stroke-linecap="round"/><circle cx="${nd[0].toFixed(1)}" cy="${nd[1].toFixed(1)}" r="6" fill="#fff" stroke="${WC.strain}" stroke-width="3"/>`:''}<text x="80" y="78" text-anchor="middle" font-size="30" font-weight="850" fill="var(--ink)" style="font-stretch:68%">${sv!=null?sv.toFixed(1):'–'}</text></svg>
     <div><h4 class="disp" style="margin:0">Strain ›</h4><div style="font-size:13.5px">${lvl?`Target for a ${{g:'green',y:'yellow',r:'red'}[lvl]} day: <b>${band[0]}–${band[1]}</b>.`:''} ${sv!=null&&lvl?(sv>band[1]?'You went over, so prioritise sleep tonight.':sv>=band[0]?'Right in the zone.':d===t?'Room to build as the day goes on.':'Lighter than the target.'):''}</div></div></button>
     <div class="kv" style="grid-template-columns:repeat(3,1fr)"><button data-a="metric" data-v="kcal"><b class="disp num">${x.kcal!=null?x.kcal.toLocaleString():'–'}</b><span>Calories ›</span></button><button data-a="metric" data-v="ahr"><b class="disp num">${x.ahr||'–'}</b><span>Avg HR ›</span></button><div><b class="disp num">${x.mhr||'–'}</b><span>Max HR</span></div></div></div>`}
+  {const wi=UI.wdemo?null:weekInt(t);if(wi)h+=`<div class="card" style="--c:${wi.lvl==='push'?'var(--ok)':wi.lvl==='ease'?'var(--bad)':'var(--upper)'}"><h4 class="disp" style="margin:0 0 4px">Training intensity this week: ${wi.lvl==='push'?'push':wi.lvl==='ease'?'ease off':'normal'}</h4><p style="font-size:13.5px;margin:0">${esc(wi.why)}</p></div>`}
+  h+=wkCard();
   h+=bodyCard();
   const mk=UI.wmet||'rec',rg=UI.wrange||30,M=MET[mk];
   h+=`<div class="card" style="--c:${M.c}"><h4 class="disp" style="margin:0">Trends</h4><div class="chipsrow">${['rec','hrv','rhr','sleep','strain','steps','weight','fat','lean'].map(kk=>`<button class="mchip ${kk===mk?'on':''}" style="--c:${MET[kk].c}" data-a="wmet" data-v="${kk}">${MET[kk].l}</button>`).join('')}</div>
@@ -1847,11 +1940,11 @@ function spark(pts){const W=110,H=34;if(pts.length<2)return`<span class="pill" s
    cycle length, WHOOP intensity and mobility focus. Changes apply from a
    chosen day onward; earlier weeks and logs stay as they were.
    ===================================================================== */
-const BT={push:{l:'Push',k:'upper',spec:['gPu']},pull:{l:'Pull',k:'upper',spec:['gPl']},legs:{l:'Legs',k:'lower',spec:['gLg']},upper:{l:'Upper',k:'upper',spec:['gUA','gUB','gUC']},lower:{l:'Lower',k:'lower',spec:['gLA','gLB']},full:{l:'Full body',k:'full',spec:['gFA','gFB','gFC']},hiit:{l:'HIIT',k:'hiit'},long:{l:'Long cardio',k:'long'},rest:{l:'Rest',k:'rest'}};
+const BT={push:{l:'Push + legs',k:'full',spec:['gPuL']},pull:{l:'Pull + legs',k:'full',spec:['gPlL']},push0:{l:'Push (upper only)',k:'upper',spec:['gPu']},pull0:{l:'Pull (upper only)',k:'upper',spec:['gPl']},legs:{l:'Legs',k:'lower',spec:['gLg']},upper:{l:'Upper',k:'upper',spec:['gUA','gUB','gUC']},lower:{l:'Lower',k:'lower',spec:['gLA','gLB']},full:{l:'Full body',k:'full',spec:['gFA','gFB','gFC']},hiit:{l:'HIIT',k:'hiit'},long:{l:'Long cardio',k:'long'},rest:{l:'Rest',k:'rest'}};
 const BPRESETS=[
-  {id:'pp',l:'Push / Pull',s:'Push and pull days alternate, HIIT in the middle, long cardio at the weekend',w:['push','pull','hiit','push','pull','rest','long']},
-  {id:'ppl',l:'Push / Pull / Legs',s:'Six lifting days and one rest day',w:['push','pull','legs','rest','push','pull','legs']},
-  {id:'ppl5',l:'Push / Pull / Legs + HIIT',s:'Five lifting days, a HIIT day and long cardio',w:['push','pull','legs','hiit','upper','lower','long']},
+  {id:'pp',l:'Push / Pull (with legs)',s:'Push days add deadlifts, hamstrings and calves; pull days add squats and quads. HIIT in the middle, long cardio at the weekend.',w:['push','pull','hiit','push','pull','rest','long']},
+  {id:'ppl',l:'Push / Pull / Legs',s:'Six lifting days and one rest day',w:['push0','pull0','legs','rest','push0','pull0','legs']},
+  {id:'ppl5',l:'Push / Pull / Legs + HIIT',s:'Five lifting days, a HIIT day and long cardio',w:['push0','pull0','legs','hiit','upper','lower','long']},
   {id:'ul',l:'Upper / Lower',s:'Four lifting days, HIIT and long cardio',w:['upper','lower','hiit','upper','lower','rest','long']},
   {id:'fb',l:'Full body',s:'Three full-body days, HIIT and long cardio',w:['full','rest','full','hiit','full','rest','long']}
 ];
@@ -1909,7 +2002,7 @@ function genDraft(bd){
   const keys=split.map((sk,i)=>split.indexOf(sk)===i?sk:sk+'2');
   const tpls={},mob=Object.assign({},P.mob),wu=Object.assign({},P.wu),map={};let hn=0;
   bd.week.forEach((ty,i)=>{
-    if(BT[ty]&&BT[ty].spec){const k=keys[idx[i]];map[i]=k;tpls[k]=bd.edits[k]||clone(P.tpls[k]);if(BT[ty].l!==SPEC[split[idx[i]]].n&&!bd.edits[k])tpls[k].n=BT[ty].l+(k.endsWith('2')?' (B)':'')}
+    if(BT[ty]&&BT[ty].spec){const k=keys[idx[i]];map[i]=k;tpls[k]=bd.edits[k]||clone(P.tpls[k]);if(!bd.edits[k]){const nm=BT[ty].l.replace(' (upper only)','');if(nm!==SPEC[split[idx[i]]].n)tpls[k].n=nm+(k.endsWith('2')?' (B)':'')}}
     else if(ty==='hiit'){const k=hn?'hiit2':'hiit';map[i]=k;if(!tpls[k])tpls[k]=bd.edits[k]||genHiit(a,hn);hn++}
     else if(ty==='long'||ty==='rest')map[i]=ty;
     else if(ty.slice(0,2)==='k:'){const k=ty.slice(2);map[i]=k;if(bd.edits[k])tpls[k]=bd.edits[k]}
@@ -1986,10 +2079,10 @@ function renderBuild(){
   }
   h+=`</div>`;
   // WHOOP
-  const wi=S.custom?weekInt(t0):null;
+  const wi=weekInt(t0);
   h+=`<div class="card">${cardHead('bwhoop','WHOOP intensity')}`;
-  if(!isCol('bwhoop')){h+=bdToggle('whoopWeekly',bd.whoopWeekly,'Let last week’s recovery set this week’s volume','High recovery adds a set to main and secondary lifts. Low recovery removes a set from accessories, adds a rep in reserve and turns HIIT into Zone 2. Daily Green/Yellow/Red still applies on top.');
-    h+=!S.whoop.connected?`<div class="note">Connect WHOOP in Settings to use this.</div>`:wi?`<div class="note" style="--c:${wi.lvl==='push'?'var(--ok)':wi.lvl==='ease'?'var(--bad)':'var(--upper)'}"><b>This week: ${wi.lvl==='push'?'Push':wi.lvl==='ease'?'Ease off':'Normal'}.</b> ${esc(wi.why)}</div>`:S.custom?`<div class="note">Needs at least 4 days of WHOOP data from last week.</div>`:`<div class="note">Starts working once you apply a plan from the builder.</div>`}
+  if(!isCol('bwhoop')){h+=bdToggle('whoopWeekly',bd.whoopWeekly,'Let WHOOP and my progress set each week’s intensity','Uses last week’s recovery, WHOOP workout strain and hard-zone minutes, whether your lifts went up, and how many sessions you finished. Pushing adds a set to main and secondary lifts; easing off removes a set from accessories, adds a rep in reserve and turns HIIT into Zone 2. Daily Green/Yellow/Red still applies on top.');
+    h+=!S.whoop.connected?`<div class="note">Connect WHOOP in Settings to use this.</div>`:wi?`<div class="note" style="--c:${wi.lvl==='push'?'var(--ok)':wi.lvl==='ease'?'var(--bad)':'var(--upper)'}"><b>This week: ${wi.lvl==='push'?'Push':wi.lvl==='ease'?'Ease off':'Normal'}.</b> ${esc(wi.why)}</div>`:`<div class="note">Needs a few days of WHOOP data or logged lifts from last week.</div>`}
   h+=`</div>`;
   // mobility
   h+=`<div class="card">${cardHead('bmob','Mobility focus')}`;
@@ -2536,7 +2629,7 @@ setInterval(()=>{if(!TM||TM.paused)return;const rem=(TM.end-Date.now())/1000;
   drawTimer()},200);
 
 /* ---------- actions ---------- */
-function rerender(){HISTCACHE=null;renderTop();renderTabs();({train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits})[UI.tab]();}
+function rerender(){HISTCACHE=null;WICACHE={};renderTop();renderTabs();({train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits})[UI.tab]();}
 function markStart(d){const l=L(d);if(!l._t0)l._t0=Date.now()}
 function checkComplete(d){const u=units(d);if(pctOf(u)>=1&&!S.done[d]){S.done[d]={t:Date.now()};save();rerender();finishSheet(d);return true}return false}
 function findItem(d,slot){for(const b of blocksFor(d)){for(let i=0;i<b.items.length;i++)if(b.items[i].slot===slot)return{it:b.items[i],b,idx:i}}const c=coreFor(d);for(let i=0;i<c.length;i++)if(c[i].slot===slot)return{it:c[i],b:{items:c},idx:i};return null}
@@ -2594,6 +2687,8 @@ document.addEventListener('click',ev=>{
   case'pinvid':{const cur=S.vids[el.dataset.e]||'';const u=window.prompt('Paste a YouTube link for '+E[el.dataset.e].n+' (leave empty to go back to the search):',cur);if(u===null)break;if(u.trim())S.vids[el.dataset.e]=u.trim();else delete S.vids[el.dataset.e];save();rerender();break}
   case'swap':swapSheet(k,el.dataset.b);break;
   case'lifthist':liftSheet(el.dataset.e);break;
+  case'wkopen':wkSheet(el.dataset.v);break;
+  case'wkall':UI.wkAll=!UI.wkAll;rerender();break;
   case'bdpreset':{const p=BPRESETS.find(x=>x.id===el.dataset.v);if(p){UI.bd.week=p.w.slice();UI.bd.dirty=true;rerender();toast(p.l+' week loaded. Edit any day, then apply.')}break}
   case'bdset':{const f=el.dataset.f,v=el.dataset.v;if(f==='mobmins')UI.bd.mob.mins=+v;else UI.bd[f]=(f==='cycleLen'||f==='len')?+v:v;UI.bd.dirty=true;rerender();break}
   case'bdtog':UI.bd[el.dataset.f]=!UI.bd[el.dataset.f];UI.bd.dirty=true;rerender();break;
