@@ -361,6 +361,17 @@ button.insight:first-of-type{border-top:0}
 .gitem[open] summary{margin-bottom:8px}
 .synccode{font-size:17px;font-weight:800;letter-spacing:.04em;background:var(--sf2);border-radius:12px;padding:10px 12px;word-break:break-all;line-height:1.5}
 .setlink{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+/* gym-floor helpers */
+.pcrow{display:flex;gap:8px;align-items:center;margin-top:6px}.pcrow .fld{flex:1;height:56px}.pcrow .fld input{font-size:24px;font-weight:800}.mini.big{height:56px;min-width:56px;font-size:24px}
+.pcbar{display:flex;align-items:center;gap:3px;min-height:130px;margin-top:10px;padding:0 6px;position:relative}.pcbar b{flex:1;height:10px;background:#9AA3C7;border-radius:4px}
+.plate{display:flex;align-items:center;justify-content:center;width:22px;border-radius:5px;background:var(--c);border:1px solid rgba(0,0,0,.15)}.plate span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:900;color:#fff;text-shadow:0 0 3px #000,0 0 1px #000}
+.rperow{display:flex;align-items:center;gap:5px;margin:2px 0 6px 32px;font-size:12px;color:var(--mu);flex-wrap:wrap}.rperow button{border:1.5px solid var(--ln);background:var(--sf);border-radius:9px;min-width:34px;height:32px;font-weight:800;font-size:13px;color:var(--ink)}.rperow button.on{background:var(--upper);color:#fff;border-color:var(--upper)}.rperow .rpex{min-width:28px;color:var(--mu)}
+.rpel{display:block;font-size:10px;color:var(--upper)}
+.fxwrap{display:flex;flex-direction:column;gap:12px;min-height:72vh}.fxtop{display:flex;justify-content:space-between;align-items:center}.fxname{font-size:32px;line-height:1.05}
+.fxctl{display:grid;grid-template-columns:70px 64px 1fr 64px;align-items:center;gap:8px}.fxctl span{font-size:13px;font-weight:800;color:var(--mu)}.fxctl button{height:64px;border-radius:18px;border:0;background:var(--sf2);font-size:30px;font-weight:800;color:var(--ink)}.fxctl b{text-align:center;font-size:44px;font-weight:900}.fxctl b small{font-size:15px;color:var(--mu);margin-left:3px}
+.fxdone{height:84px;border:0;border-radius:24px;background:var(--ok);color:#fff;font-size:26px;font-weight:900;margin-top:4px}
+.fxrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.fxtimer{text-align:center}.fxtimer span{display:block;font-size:13px;color:var(--mu)}.fxtimer b{font-size:56px}
+.fxrpe .rperow{margin:0}
 /* InBody */
 .ibgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
 .ibf{display:grid;grid-template-columns:1fr 64px auto;align-items:center;gap:4px;font-size:12.5px;border-bottom:1px solid var(--ln);padding:3px 0}.ibf input{height:34px;padding:0 6px;text-align:right}.ibf em{font-style:normal;color:var(--mu);font-size:11.5px;min-width:22px}
@@ -1406,6 +1417,8 @@ function suggest(it,d){
     const best=Math.max(...(recent.length?recent:[lp]).flatMap(x=>x.sets.map(s=>e1rm(+s.w,+s.r))));
     w=roundTo(best/(1+(tgt+(+ph.rir||2))/30),step);why=`New cycle: set from your strength for ${tgt} reps`}
   else if(ph.fi===3&&lph.w<ph.w&&lph.fi!==3){w=top+inc;why='Week '+ph.cw+': add weight, reps reset'}
+  else if(lp.sets.some(q=>+q.e>=9.5)&&reps.some(r=>r<tgt)){w=top;why='Last time was a max effort, same weight'}
+  else if(lp.sets.filter(q=>q.e).length&&lp.sets.filter(q=>q.e).every(q=>+q.e<=7)&&reps.every(r=>r>=tgt)){w=top+inc;why='You rated it easy (RPE 7 or less), add weight'}
   else if(reps.every(r=>r>=tgt+2)){w=top+inc;why='That was easy, add weight'}
   else if(reps.filter(r=>r<tgt-2).length>=2){w=roundTo(top*0.95,step);why='Missed the target twice, trim a little'}
   else why=`Same weight, aim for ${tgt} reps`;
@@ -1589,7 +1602,7 @@ function renderTrain(){
     <div class="tags"><span class="tag">About ${mins(est.total)}</span><span class="tag">Cycle ${ph.c+1}, week ${ph.cw} of ${ph.CL}</span>${t.blocks?`<span class="tag">${ph.name}${ph.deload?'':', RIR '+ph.rir}</span>`:''}${moved?'<span class="tag">Rescheduled</span>':''}${S.done[d]?'<span class="tag">Complete</span>':''}</div>
     <div class="seg">${segs.map(s=>`<div style="flex:${Math.max(s[1],10)}"><span style="width:${s[2][1]?s[2][0]/s[2][1]*100:0}%"></span></div>`).join('')}</div>
     <div class="seglab">${segs.map(s=>`<span style="flex:${Math.max(s[1],10)}">${s[1]>=20?s[0]+' ':''}${Math.round(s[1])}′</span>`).join('')}</div>
-    <div class="hero-actions"><button class="hbtn solid" data-a="colall">${SECS.every(isCol)?'Expand all':'Compact view'}</button><button class="hbtn" data-a="move">Move or copy</button>${t.k!=='rest'?'<button class="hbtn" data-a="wshare">📸 Share</button>':''}${(S.hist||[]).length?'<button class="hbtn" data-a="undosched" title="'+esc(S.hist[S.hist.length-1].label)+'">↶ Undo</button>':''}</div>
+    <div class="hero-actions"><button class="hbtn solid" data-a="colall">${SECS.every(isCol)?'Expand all':'Compact view'}</button>${blocksFor(d).length?'<button class="hbtn solid" data-a="focus">▶ Focus mode</button>':''}<button class="hbtn" data-a="move">Move or copy</button>${t.k!=='rest'?'<button class="hbtn" data-a="wshare">📸 Share</button>':''}${(S.hist||[]).length?'<button class="hbtn" data-a="undosched" title="'+esc(S.hist[S.hist.length-1].label)+'">↶ Undo</button>':''}</div>
   </section>`;
   {const wk=S.whoop.connected?wkForDay(d):null;if(wk)h+=`<button class="note wkchip" data-a="wkopen" data-v="${wk.id}"><b>WHOOP ${esc(sportName(wk.sport).toLowerCase())}:</b> strain ${wk.strain!=null?wk.strain.toFixed(1):'–'}, avg ${wk.ahr||'–'} bpm, ${wkMins(wk)} min. Tap for heart-rate zones ›</button>`}
   if(t.blocks){
@@ -1684,9 +1697,10 @@ function exCard(d,it,o){
     const s=log.sets[i]||{w:'',r:'',d:0},k=it.slot+'|'+i;
     if(e.t){const sec=secsOf(it);hh+=`<div class="set t ${s.d?'done':''}"><span class="sn">${i+1}</span><button class="tbtn" data-a="tset" data-k="${k}">${IC.play} ${sec} s${e.u?' each side':''}</button><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
     else if(e.bw){hh+=`<div class="set bw ${s.d?'done':''}"><span class="sn">${i+1}</span><label class="fld"><input inputmode="numeric" data-in="r" data-k="${k}" value="${esc(s.r)}" placeholder="${rangeOf(it.rx.reps)[1]}"><em>reps</em></label><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
-    else{hh+=`<div class="set ${s.d?'done':''}"><span class="sn">${i+1}</span><label class="fld"><input inputmode="decimal" data-in="w" data-k="${k}" value="${esc(s.w)}" placeholder="${sug?sug.w:'–'}"><em>kg</em></label><label class="fld"><input inputmode="numeric" data-in="r" data-k="${k}" value="${esc(s.r)}" placeholder="${rangeOf(it.rx.reps)[1]}"><em>reps</em></label><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
+    else{hh+=`<div class="set ${s.d?'done':''}"><span class="sn">${i+1}${s.d&&s.e?`<small class="rpel">@${s.e}</small>`:''}</span><label class="fld"><input inputmode="decimal" data-in="w" data-k="${k}" value="${esc(s.w)}" placeholder="${sug?sug.w:'–'}"><em>kg</em></label><label class="fld"><input inputmode="numeric" data-in="r" data-k="${k}" value="${esc(s.r)}" placeholder="${rangeOf(it.rx.reps)[1]}"><em>reps</em></label><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
+    if(prefs().rpe&&s.d&&s.e==null&&!e.t&&UI.rpeAsk===k)hh+=rpeRow(k,s);
   }
-  hh+=`</div><div class="tools"><button class="mini demo" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button><button class="mini" data-a="swap" data-k="${it.slot}" data-b="${it.base}">${IC.swap} Replace</button><button class="mini" data-a="exinfo" data-k="${it.slot}">${IC.info} Form</button>${!e.bw&&!e.t&&(hist()[it.ex]||[]).length?`<button class="mini" data-a="lifthist" data-e="${it.ex}">History</button>`:''}</div>
+  hh+=`</div><div class="tools"><button class="mini demo" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button><button class="mini" data-a="swap" data-k="${it.slot}" data-b="${it.base}">${IC.swap} Replace</button><button class="mini" data-a="exinfo" data-k="${it.slot}">${IC.info} Form</button>${isBarbell(it.ex)?`<button class="mini" data-a="plates" data-e="${it.ex}" data-w="${(log.sets.find(q=>q.w!=='')||{}).w||(sug?sug.w:'')}">🏋️ Plates</button>`:''}${!e.bw&&!e.t&&(hist()[it.ex]||[]).length?`<button class="mini" data-a="lifthist" data-e="${it.ex}">History</button>`:''}</div>
   <div class="info hide" id="info-${it.slot}">${esc(cueOf(e))}${sideNote(e,1)}${e.p?`<div><span class="chipinj" style="--c:${o.c}">Protects: ${esc(protOf(e))}</span></div>`:''}</div>
   </article>`;
   return hh;
@@ -2857,7 +2871,7 @@ function drawPlayer(){
 /* ---------- sheets ---------- */
 function resetPanelDrag(){const pn=document.getElementById('panel'),sc=document.querySelector('#sheet .scrim');pn.style.transition='';pn.style.transform='';if(sc){sc.style.transition='';sc.style.opacity=''}}
 function openSheet(html){resetPanelDrag();const pn=document.getElementById('panel');pn.innerHTML='<div class="grab"></div>'+html;document.getElementById('sheet').classList.remove('hide');pn.scrollTop=0}
-function closeSheet(){document.getElementById('sheet').classList.add('hide');UI.pl=null;document.getElementById('panel').innerHTML='';resetPanelDrag()}
+function closeSheet(){document.getElementById('sheet').classList.add('hide');UI.pl=null;if(UI.fx){UI.fx=null;setTimeout(rerender,0)}document.getElementById('panel').innerHTML='';resetPanelDrag()}
 (function sheetDrag(){
   const sheet=document.getElementById('sheet'),pn=document.getElementById('panel'),sc=sheet.querySelector('.scrim');
   let sy=0,sx=0,lock=null,dy=0,mouse=false;
@@ -2996,6 +3010,9 @@ function settingsSheet(){
   <div class="srow"><b>Auto-adjust</b><button class="cta ${S.whoop.auto?'':'ghost'}" style="--c:var(--ok);margin:0;height:44px" data-a="wauto">${S.whoop.auto?'On: workouts follow WHOOP':'Off: I choose manually'}</button></div>
   <div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="wsync">Sync now</button><button class="cta ghost" style="margin:0;color:var(--bad)" data-a="wdisconnect">Disconnect</button></div>`:`${S.whoop.pending?`<p style="font-size:13.5px;margin:0 0 8px"><b>Waiting for WHOOP approval.</b> If the login finished in Safari, come back here and tap Check connection.</p><button class="cta ghost" style="margin:0 0 8px" data-a="wsync">Check connection</button>`:''}<p class="muted" style="font-size:13.5px;margin:0 0 8px">Pull your recovery, HRV and resting heart rate every morning and adjust each workout automatically.</p><button class="cta" style="--c:var(--ink);color:var(--bg);margin:0" data-a="wconnect">Connect WHOOP</button>`}
   <p class="muted" style="font-size:12.5px;margin:8px 0 0">Green 67%+ full session. Yellow 34–66% lighter. Red 33% or less recovery only. HRV 10%+ below your 30-day average, or resting HR 5+ bpm above it, drops the day one level.</p></div>
+  <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Workouts</h4>
+  ${[['rpe','Ask how hard each set felt (RPE)','Rate sets 6–10; weight suggestions use it'],['wake','Keep the screen on during a session','So the timer and sets stay visible'],['alerts','Alert me when rest is over','Sound, vibration and a notification if the app is in the background']].map(([f,l,sub])=>`<button class="obopt ${prefs()[f]?'on':''}" data-a="preftog" data-f="${f}"><b>${prefs()[f]?'✓ ':''}${l}</b><span>${sub}</span></button>`).join('')}
+  <button class="cta ghost" data-a="plates" data-e="">🏋️ Plate calculator</button></div>
   <button class="card setlink" style="margin-top:12px" data-a="syncopen"><h4 class="disp" style="font-size:22px;margin:0">☁️ Cloud backup ›</h4><span class="muted" style="font-size:13.5px">${syncOn()?'On'+(S.sync.at?' · last backup '+new Date(S.sync.at).toLocaleString([],{weekday:'short',hour:'2-digit',minute:'2-digit'}):''):'Off. Turn it on so you never lose your logs.'}</span></button>
   <button class="cta ghost" style="color:var(--bad)" data-a="reset">Reset everything</button>`);
 }
@@ -3034,19 +3051,80 @@ function drawTimer(){
 }
 setInterval(()=>{if(!TM||TM.paused)return;const rem=(TM.end-Date.now())/1000;
   if(rem<=3.05&&rem>0&&Math.ceil(rem)!==TM.lastBeep){TM.lastBeep=Math.ceil(rem);beep(520,.07,1)}
-  if(rem<=0){if(TM.i<TM.phases.length-1){TM.i++;TM.end=Date.now()+TM.phases[TM.i].s*1000;TM.lastBeep=null;beep(880,.25,2)}else{const f=TM.done;TM=null;beep(990,.3,3);drawTimer();f&&f();return}}
+  if(rem<=0){if(TM.i<TM.phases.length-1){TM.i++;TM.end=Date.now()+TM.phases[TM.i].s*1000;TM.lastBeep=null;beep(880,.25,2)}else{const f=TM.done,tl=TM.title,pl=TM.phases[TM.i].l;TM=null;beep(990,.3,3);if(document.hidden)restAlert(tl+' is over',pl);drawTimer();if(UI.fx)fxTimer();f&&f();return}}
   drawTimer()},200);
+
+/* =====================================================================
+   GYM-FLOOR HELPERS: plate calculator, screen-on rest timer with alerts,
+   RPE per set, and one-thumb focus mode.
+   ===================================================================== */
+function prefs(){S.prefs=S.prefs||{};const p=S.prefs;if(p.bar==null)p.bar=20;if(!p.plates)p.plates=[25,20,15,10,5,2.5,1.25];if(p.rpe==null)p.rpe=true;if(p.wake==null)p.wake=true;if(p.alerts==null)p.alerts=true;return p}
+const PLATE_ALL=[25,20,15,10,5,2.5,2,1.25,1,0.5];
+const PLATE_C={25:'#E5484D',20:'#2F5BFF',15:'#E8A900',10:'#12B76A',5:'#F4F5FA',2.5:'#191A4A',2:'#7B4DFF',1.25:'#8E97BF',1:'#00A3FF',0.5:'#FF6A13'};
+const isBarbell=ex=>META[ex]&&META[ex].eq==='bb';
+function platesFor(total,bar,plates){const side=(total-bar)/2;if(side<0)return{side:null,list:[],rest:0};let r=Math.round(side*100)/100;const list=[];plates.slice().sort((a,b)=>b-a).forEach(p=>{while(r>=p-1e-9){list.push(p);r=Math.round((r-p)*100)/100}});return{side,list,rest:r}}
+function plateSheet(ex,w){
+  const p=prefs();UI.pl8={ex,w:w!=null&&w!==''?+w:(UI.pl8&&UI.pl8.w)||p.bar+20};drawPlates();
+}
+function drawPlates(){
+  const p=prefs(),q=UI.pl8,res=platesFor(q.w,p.bar,p.plates),made=q.w-2*res.rest;
+  const stack=res.list.map(x=>`<i class="plate" style="--c:${PLATE_C[x]||'#888'};height:${40+x*3.2}px" title="${x} kg"><span>${x}</span></i>`).join('');
+  openSheet(`<h4 class="disp">Plate calculator</h4>${q.ex&&E[q.ex]?`<p class="muted" style="font-size:13.5px;margin:0 0 6px">${esc(E[q.ex].n)}</p>`:''}
+  <div class="pcrow"><button class="mini big" data-a="pl8w" data-v="-2.5" aria-label="Less weight">−</button><label class="fld pcw"><input inputmode="decimal" id="pl8in" data-in="pl8" value="${q.w}" aria-label="Total weight"><em>kg total</em></label><button class="mini big" data-a="pl8w" data-v="2.5" aria-label="More weight">＋</button></div>
+  ${res.side==null?`<div class="note">That's lighter than the bar (${p.bar} kg).</div>`:`<div class="pcbar" aria-label="Plates on each side">${stack||'<span class="muted">Empty bar</span>'}<b></b></div>
+  <p style="font-size:15px;margin:8px 0 0"><b>Each side:</b> ${res.list.length?res.list.join(' + ')+' kg':'nothing'}${res.rest>0?`<br><span class="muted">Closest you can load: ${made} kg (${res.rest} kg per side missing).</span>`:''}</p>`}
+  <label class="fl2" style="margin-top:12px">Bar</label><div class="chipsrow">${[20,15,10,7,0].map(b=>`<button class="mini ${p.bar===b?'on':''}" data-a="pl8bar" data-v="${b}">${b?b+' kg':'No bar'}</button>`).join('')}</div>
+  <label class="fl2" style="margin-top:10px">Plates your gym has</label><div class="chipsrow">${PLATE_ALL.map(x=>`<button class="mini ${p.plates.includes(x)?'on':''}" data-a="pl8p" data-v="${x}">${x}</button>`).join('')}</div>
+  <button class="cta ghost" data-a="close">Done</button>`);
+}
+/* keep the screen on during a session, and alert when rest ends even if the app is in the background */
+let WAKE=null;
+async function wakeOn(){if(!prefs().wake||!('wakeLock' in navigator)||document.hidden)return;try{if(!WAKE){WAKE=await navigator.wakeLock.request('screen');WAKE.addEventListener('release',()=>{WAKE=null})}}catch(e){}}
+function wakeOff(){try{WAKE&&WAKE.release()}catch(e){}WAKE=null}
+function askAlerts(){if(prefs().alerts&&'Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}}
+function restAlert(title,body){if(!prefs().alerts)return;try{if('Notification' in window&&Notification.permission==='granted'){if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:'iron-rest',renotify:true,vibrate:[200,100,200],icon:'icon-512.png'}));else new Notification(title,{body,tag:'iron-rest'})}}catch(e){}}
+let BGT=null;
+document.addEventListener('visibilitychange',()=>{clearTimeout(BGT);if(document.hidden&&TM&&!TM.paused){const ms=TM.end-Date.now(),ph=TM.phases[TM.i];if(ms>0)BGT=setTimeout(()=>restAlert(TM?TM.title+' is over':'Time is up',ph&&ph.l||''),ms)}if(!document.hidden&&(TM||(S.logs[todayS()]&&S.logs[todayS()]._t0&&!S.done[todayS()])))wakeOn()});
+/* RPE: how hard the set felt, 6 (easy) to 10 (nothing left) */
+const RPE_L={6:'Easy, 4+ left',7:'3 left',8:'2 left',9:'1 left',10:'Max'};
+function rpeRow(k,s){return`<div class="rperow" role="group" aria-label="How hard was that set?"><span>How hard?</span>${[6,7,8,9,10].map(v=>`<button class="${+s.e===v?'on':''}" data-a="rpe" data-k="${k}" data-v="${v}" title="${RPE_L[v]}">${v}</button>`).join('')}<button class="rpex" data-a="rpe" data-k="${k}" data-v="0" aria-label="Skip">✕</button></div>`}
+/* focus mode: the next set, big controls */
+function nextSet(d){
+  const groups=blocksFor(d).map(b=>b.items).concat(coreFor(d).length?[coreFor(d)]:[]);
+  for(const items of groups){const max=Math.max(...items.map(i=>i.rx.sets));for(let r=0;r<max;r++)for(const it of items){if(r>=it.rx.sets)continue;const l=S.logs[d]&&S.logs[d][it.slot];const s=l&&l.ex===it.ex?l.sets[r]:null;if(!s||!s.d)return{it,r,items}}}
+  return null;
+}
+function focusOpen(){const d=UI.date;UI.fx={d};wakeOn();askAlerts();drawFocus()}
+function drawFocus(){
+  const q=UI.fx;if(!q)return;const d=q.d,n=nextSet(d);
+  if(!n){openSheet(`<div class="fxwrap"><div class="disp" style="font-size:34px">All sets done 💪</div><p class="muted">Finish the core and cardio from the Train tab, or share the workout.</p><button class="cta" style="--c:var(--upper)" data-a="wshare" data-d="${d}">📸 Share workout</button><button class="cta ghost" data-a="close">Close</button></div>`);return}
+  const it=n.it,e=E[it.ex],k=it.slot+'|'+n.r,o=slotLog(d,it.slot,it.ex,it.rx.sets),s=o.sets[n.r],sg=e.bw||e.t?null:suggest(it,d);
+  if(q.k!==k){q.k=k;q.w=s.w!==''?+s.w:(sg?sg.w:(o.sets.slice(0,n.r).reverse().find(x=>x.w!=='')||{}).w||'');q.r=s.r!==''?+s.r:(e.t?secsOf(it):rangeOf(it.rx.reps)[1])}
+  const step=isBarbell(it.ex)?2.5:(['acc','arm','pre'].includes(it.role)?1:2);
+  const tot=groupsTotal(d),done=tot.done;
+  openSheet(`<div class="fxwrap"><div class="fxtop"><span class="pill" style="--c:var(--upper)">${done} of ${tot.all} sets</span><button class="mini" data-a="close" aria-label="Exit focus mode">Exit</button></div>
+  <div class="fxname disp">${esc(e.n)}</div><div class="muted" style="font-size:14px">Set ${n.r+1} of ${it.rx.sets} · target ${repTxt(it)}${it.rx.rir!=null&&!/^core/.test(it.role)?' · RIR '+it.rx.rir:''}</div>
+  ${sg?`<div class="sugg" style="margin-top:6px">${esc(sg.why)}. Suggested <b>${sg.w} kg</b>.</div>`:''}
+  ${!e.bw&&!e.t?`<div class="fxctl"><span>Weight</span><button data-a="fxadj" data-f="w" data-v="${-step}" aria-label="Less weight">−</button><b class="num">${q.w===''?'–':q.w}<small>kg</small></b><button data-a="fxadj" data-f="w" data-v="${step}" aria-label="More weight">＋</button></div>`:''}
+  <div class="fxctl"><span>${e.t?'Seconds':'Reps'}</span><button data-a="fxadj" data-f="r" data-v="${e.t?-5:-1}" aria-label="Less">−</button><b class="num">${q.r}<small>${e.t?'s':''}</small></b><button data-a="fxadj" data-f="r" data-v="${e.t?5:1}" aria-label="More">＋</button></div>
+  <button class="fxdone" data-a="fxdone">✓ Set done</button>
+  <div class="fxrow"><button class="mini" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button>${isBarbell(it.ex)?`<button class="mini" data-a="plates" data-e="${it.ex}" data-w="${q.w}">🏋️ Plates</button>`:''}<button class="mini" data-a="fxskip">Skip set</button></div>
+  <div id="fxtimer" class="fxtimer"></div></div>`);fxTimer();
+}
+function groupsTotal(d){let all=0,done=0;blocksFor(d).forEach(b=>b.items.forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)}));coreFor(d).forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)});return{all,done}}
+function fxTimer(){const el=document.getElementById('fxtimer');if(!el)return;if(!TM){el.innerHTML='';return}const rem=Math.max(0,Math.ceil((TM.end-Date.now())/1000));el.innerHTML=`<span>${esc(TM.phases[TM.i].l)}</span><b class="disp num">${fmtT(rem)}</b>`}
+setInterval(()=>{if(UI.fx)fxTimer();if(TM&&!TM.paused){document.title=fmtT(Math.max(0,(TM.end-Date.now())/1000))+' · '+TM.title+' · IRON'}else if(document.title!=='IRON')document.title='IRON'},500);
 
 /* ---------- actions ---------- */
 function rerender(){HISTCACHE=null;WICACHE={};renderTop();renderTabs();({home:renderHome,train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits})[UI.tab]();}
-function markStart(d){const l=L(d);if(!l._t0)l._t0=Date.now()}
-function checkComplete(d){const u=units(d);if(pctOf(u)>=1&&!S.done[d]){S.done[d]={t:Date.now()};save();rerender();finishSheet(d);return true}return false}
+function markStart(d){const l=L(d);if(!l._t0){l._t0=Date.now();askAlerts()}if(d===todayS())wakeOn()}
+function checkComplete(d){const u=units(d);if(pctOf(u)>=1&&!S.done[d]){S.done[d]={t:Date.now()};save();wakeOff();UI.fx=null;rerender();finishSheet(d);return true}return false}
 function findItem(d,slot){for(const b of blocksFor(d)){for(let i=0;i<b.items.length;i++)if(b.items[i].slot===slot)return{it:b.items[i],b,idx:i}}const c=coreFor(d);for(let i=0;i<c.length;i++)if(c[i].slot===slot)return{it:c[i],b:{items:c},idx:i};return null}
 function toggleSet(d,k,forceOn){
   const[slot,i]=k.split('|');const f=findItem(d,slot);if(!f)return;const it=f.it,e=E[it.ex];
   const o=slotLog(d,slot,it.ex,it.rx.sets),s=o.sets[+i];const on=forceOn?true:!s.d;
   if(on){const sg=suggest(it,d);if(!e.t){if(s.r==='')s.r=String(rangeOf(it.rx.reps)[1]);if(!e.bw&&s.w===''&&sg)s.w=String(sg.w)}if(e.t&&s.r==='')s.r=String(secsOf(it))}
-  s.d=on?1:0;markStart(d);save();delete UI.exo[slot];
+  s.d=on?1:0;markStart(d);save();delete UI.exo[slot];UI.rpeAsk=on&&!e.t?k:null;
   if(on&&!checkComplete(d)){
     const last=f.idx===f.b.items.length-1;
     if(last){const rest=Math.max(...f.b.items.map(x=>x.rx.rest));const more=+i<it.rx.sets-1;startTimer('Rest',[{l:more?'Set '+(+i+2)+' is next':'Next exercise is up',s:rest,c:COLORS.upper}])}
@@ -3167,6 +3245,17 @@ document.addEventListener('click',ev=>{
   case'tadj':if(TM){const dv=+el.dataset.v;if(TM.paused)TM.left=Math.max(1,TM.left+dv);else TM.end=Math.max(Date.now()+1000,TM.end+dv*1000);drawTimer()}break;
   case'tpause':if(TM){if(TM.paused){TM.end=Date.now()+TM.left*1000;TM.paused=false}else{TM.left=(TM.end-Date.now())/1000;TM.paused=true}drawTimer()}break;
   case'tstop':TM=null;drawTimer();break;
+  case'preftog':{const p2=prefs(),f2=el.dataset.f;p2[f2]=!p2[f2];if(f2==='alerts'&&p2.alerts)askAlerts();if(f2==='wake'&&!p2.wake)wakeOff();save();settingsSheet();break}
+  case'plates':plateSheet(el.dataset.e,el.dataset.w);break;
+  case'pl8w':UI.pl8.w=Math.max(0,Math.round((+UI.pl8.w+ +el.dataset.v)*100)/100);drawPlates();break;
+  case'pl8bar':prefs().bar=+el.dataset.v;save();drawPlates();break;
+  case'pl8p':{const p2=prefs(),v2=+el.dataset.v,i2=p2.plates.indexOf(v2);if(i2>=0)p2.plates.splice(i2,1);else p2.plates.push(v2);save();drawPlates();break}
+  case'rpe':{const[slot,i]=k.split('|');const f=findItem(d,slot);if(!f)break;const o=slotLog(d,slot,f.it.ex,f.it.rx.sets);const v2=+el.dataset.v;if(v2)o.sets[+i].e=v2;else o.sets[+i].e=0;UI.rpeAsk=null;save();rerender();break}
+  case'focus':focusOpen();break;
+  case'fxadj':{const f2=el.dataset.f;UI.fx[f2]=Math.max(0,Math.round(((+UI.fx[f2]||0)+ +el.dataset.v)*100)/100);drawFocus();break}
+  case'fxdone':{const q=UI.fx,n=nextSet(q.d);if(!n)break;const o=slotLog(q.d,n.it.slot,n.it.ex,n.it.rx.sets),s2=o.sets[n.r];if(q.w!==''&&q.w!=null)s2.w=String(q.w);s2.r=String(q.r);toggleSet(q.d,n.it.slot+'|'+n.r,true);if(UI.fx){UI.fx.k=null;if(prefs().rpe&&!E[n.it.ex].t){UI.fx.askRpe=n.it.slot+'|'+n.r}drawFocus();if(UI.fx&&UI.fx.askRpe){const box=document.querySelector('.fxwrap');if(box){const kk=UI.fx.askRpe;box.insertAdjacentHTML('afterbegin',`<div class="fxrpe">Last set: ${rpeRow(kk,{}).replace(/data-a="rpe"/g,'data-a="fxrpe"')}</div>`)}}}break}
+  case'fxrpe':{const[slot,i]=k.split('|');const f=findItem(UI.fx.d,slot);if(f){const o=slotLog(UI.fx.d,slot,f.it.ex,f.it.rx.sets);o.sets[+i].e=+el.dataset.v||0;save()}UI.fx.askRpe=null;const r2=document.querySelector('.fxrpe');r2&&r2.remove();break}
+  case'fxskip':{const q=UI.fx,n=nextSet(q.d);if(!n)break;toggleSet(q.d,n.it.slot+'|'+n.r,true);TM=null;drawTimer();UI.fx.k=null;drawFocus();break}
   case'extend':{const ne=document.getElementById('extEnd').value;if(!ne||ne<=S.end){toast('Pick a date after '+short(S.end));break}const r=analyze().rec;S.ext.push({from:addD(S.end,1),to:ne,vol:r.vol,extra:r.extra,trim:r.trim});S.end=ne;save();rerender();toast('Plan extended to '+short(ne));break}
   case'unextend':{const x=S.ext.pop();if(x){S.end=addD(x.from,-1);save();rerender();toast('Extension removed')}break}
   case'supp':{const dd=UI.sday||todayS();S.suppLog[dd]=S.suppLog[dd]||{};if(S.suppLog[dd][k])delete S.suppLog[dd][k];else S.suppLog[dd][k]=1;if(!Object.keys(S.suppLog[dd]).length)delete S.suppLog[dd];save();rerender();break}
@@ -3224,6 +3313,7 @@ document.addEventListener('change',ev=>{
     save();HISTCACHE=null}
   else if(t==='map'){const AM=activeMap();if(AM[k]!==el.value){snapSched(`${DN[k]}s changed from ${T[AM[k]].n} to ${T[el.value].n}`,[],[],true);AM[k]=el.value;save();rerender();toast(DN[k]+' is now '+T[el.value].n,()=>{undoSched()})}}
   else if(t==='mvdate'){if(el.value){const mode=(UI.mv&&UI.mv.mode)||'move';if(doSchedule(mode,el.value)){closeSheet();UI.date=mode==='move'?el.value:UI.date;rerender();toast((mode==='move'?'Moved to ':'Copied to ')+short(el.value),()=>{undoSched()})}}}
+  else if(t==='pl8'){const v2=parseFloat(el.value.replace(',','.'));if(!isNaN(v2)){UI.pl8.w=v2;drawPlates()}}
   else if(t==='bdday'){UI.bd.week[+k]=el.value;UI.bd.dirty=true;rerender()}
   else if(t==='bdname'){const v2=el.value.trim();if(v2)bdMut(x=>{x.n=v2})}
   else if(t==='start'){if(el.value&&el.value<S.end){S.start=el.value;save();rerender();toast('Plan now starts '+short(el.value))}}
