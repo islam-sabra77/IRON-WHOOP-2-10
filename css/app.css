@@ -572,3 +572,7 @@ html[dir="rtl"] .backlink svg{transform:scaleX(-1)}
 @keyframes burst{to{transform:rotate(var(--a)) translateY(-170px);opacity:0}}@keyframes prin{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
 .prburst.out .prcard{transition:opacity .4s,transform .4s;opacity:0;transform:scale(.9)}
 @media (prefers-reduced-motion:reduce){#view.fadein,.set.pop,.prcard,.prburst i{animation:none!important}}
+/* goals and nutrition */
+.goal .gnums{display:flex;align-items:baseline;gap:10px;margin:8px 0 6px}.goal .gnums b{font-size:30px}.goal .gnums span{color:var(--mu);font-size:15px;font-weight:700}
+.frings{display:flex;gap:14px;align-items:center}.frings>div{display:flex;flex-direction:column;gap:2px}
+.fbars{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:84px}.fbar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;border:0;background:none;font:inherit;color:var(--mu);font-size:11px;font-weight:800;cursor:pointer;height:100%}.fbar i{width:70%;border-radius:6px}.fbar.on span{color:var(--ink)}

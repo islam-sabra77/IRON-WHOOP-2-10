@@ -333,7 +333,7 @@ function moveSheet(){
    Enter the same code on another phone to bring everything across;
    both devices then stay in step. Changes on two devices are merged day by day.
    ===================================================================== */
-const SYNC_DICTS=['logs','done','rcheck','ready','moves','swaps','suppLog','habitLog','body','inbody','wdata','wwk','habOv','vids','clips','col'];
+const SYNC_DICTS=['logs','done','rcheck','food','ready','moves','swaps','suppLog','habitLog','body','inbody','wdata','wwk','habOv','vids','clips','col'];
 let SYNC_T=null,SYNC_BUSY=false;
 function syncOn(){return!!(S.sync&&S.sync.on&&S.sync.key)}
 function newSyncKey(){const a=new Uint8Array(32);crypto.getRandomValues(a);return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('')}

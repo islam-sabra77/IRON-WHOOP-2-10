@@ -311,8 +311,8 @@ function pickList(){
 
 /* ---------- per-move weight history ---------- */
 function liftStats(x){const sets=x.sets.map(q=>({w:+q.w,r:+q.r}));const top=Math.max(...sets.map(q=>q.w));const vol=sets.reduce((a,q)=>a+q.w*q.r,0);const best=Math.max(...sets.map(q=>e1rm(q.w,q.r)));return{sets,top,vol,best,reps:sets.reduce((a,q)=>a+q.r,0)}}
-function bigChart(pts,c){const W=320,H=120;if(pts.length<2)return'';const mn=Math.min(...pts),mx=Math.max(...pts),rg=mx-mn||1;const xy=pts.map((v,i)=>[(i/(pts.length-1)*(W-16)+8),(H-10-(v-mn)/rg*(H-28))]);
-  return`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;margin:6px 0 2px"><polyline points="${xy.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${xy.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="${c}"/>`).join('')}<text x="8" y="12" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mx)} kg</text><text x="8" y="${H-1}" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mn)} kg</text></svg>`}
+function bigChart(pts,c,u){u=u||'kg';const W=320,H=120;if(pts.length<2)return'';const mn=Math.min(...pts),mx=Math.max(...pts),rg=mx-mn||1;const xy=pts.map((v,i)=>[(i/(pts.length-1)*(W-16)+8),(H-10-(v-mn)/rg*(H-28))]);
+  return`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;margin:6px 0 2px"><polyline points="${xy.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${xy.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="${c}"/>`).join('')}<text x="8" y="12" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mx)} ${u}</text><text x="8" y="${H-1}" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mn)} ${u}</text></svg>`}
 /* =====================================================================
    COACHING: plateau detection, weekly report, readiness check
    ===================================================================== */
@@ -341,7 +341,8 @@ function weekData(ws){
   const supTot=S.supps.length*7,supDone=days.reduce((a,d)=>a+S.supps.filter(s=>S.suppLog[d]&&S.suppLog[d][s.id]).length,0);
   const hb=S.habits||[],habTot=hb.length*7,habOk=days.reduce((a,d)=>a+hb.filter(x=>habDone(x.id,d)).length,0);
   const w0=lastVal('weight',addD(ws,-1)),w1=lastVal('weight',we);
-  return{ws,we,sched,done,v,pv,prs:prs.sort((a,b)=>b.up-a.up),rec,slp,str,wks,sup:supTot?supDone/supTot:null,hab:habTot?habOk/habTot:null,w0,w1};
+  const fd=days.map(d=>(S.food||{})[d]).filter(l=>l&&l.length),prot=fd.length?fd.reduce((a,l)=>a+l.reduce((b,x)=>b+(+x.p||0),0),0)/fd.length:null;
+  return{prot,ws,we,sched,done,v,pv,prs:prs.sort((a,b)=>b.up-a.up),rec,slp,str,wks,sup:supTot?supDone/supTot:null,hab:habTot?habOk/habTot:null,w0,w1};
 }
 function nextFocus(ws){const nd=addD(ws,8),ph=phaseOf(nd),wi=weekInt(nd);const pl=plateaus();
   if(ph.deload)return'Deload week: lighter loads, 2 sets each, sleep well. The next cycle starts stronger.';
@@ -357,7 +358,7 @@ function reportSheet(ws){
   <div class="stat"><b class="disp num">${r.prs.length}</b><span>Personal records</span></div><div class="stat"><b class="disp num">${r.v.sets}</b><span>Sets logged</span></div>
   ${r.rec!=null?`<div class="stat"><b class="disp num" style="color:${recCol(r.rec)}">${Math.round(r.rec)}%</b><span>Avg recovery</span></div>`:''}${r.slp!=null?`<div class="stat"><b class="disp num">${hm(r.slp)}</b><span>Avg sleep</span></div>`:''}
   ${r.str!=null?`<div class="stat"><b class="disp num">${r.str.toFixed(1)}</b><span>Avg day strain</span></div>`:''}${r.wks.length?`<div class="stat"><b class="disp num">${r.wks.length}</b><span>WHOOP workouts</span></div>`:''}
-  <div class="stat"><b class="disp num">${pct(r.sup)}</b><span>Supplements taken</span></div><div class="stat"><b class="disp num">${pct(r.hab)}</b><span>Habits done</span></div>
+  ${r.prot!=null?`<div class="stat"><b class="disp num">${Math.round(r.prot)} g</b><span>Avg protein (days logged)</span></div>`:''}<div class="stat"><b class="disp num">${pct(r.sup)}</b><span>Supplements taken</span></div><div class="stat"><b class="disp num">${pct(r.hab)}</b><span>Habits done</span></div>
   ${r.w1&&r.w0?`<div class="stat"><b class="disp num">${(r.w1.v-r.w0.v>=0?'+':'')+(r.w1.v-r.w0.v).toFixed(1)} kg</b><span>Body weight change</span></div>`:''}</div>
   ${r.prs.length?`<div class="card" style="margin-top:10px"><b>${IC.trophy} Personal records</b>${r.prs.slice(0,6).map(x=>`<div class="hrow" style="grid-template-columns:1fr auto"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><b class="num">${x.e1} kg e1RM <span style="color:var(--ok)">+${x.up}</span></b></div>`).join('')}</div>`:''}
   ${pl.length?`<div class="card"><b>${IC.pause} Stalled lifts</b>${pl.slice(0,4).map(x=>`<div style="padding:6px 0;border-top:1px solid var(--ln)"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><div class="muted" style="font-size:13px">${esc(x.fixes[0])}</div></div>`).join('')}</div>`:''}

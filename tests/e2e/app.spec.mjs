@@ -3,7 +3,7 @@ import { openApp, noErrors, liftingDay, openDay } from './helpers.mjs';
 
 test('every tab renders without errors', async ({ page }) => {
   await openApp(page);
-  for (const t of ['home', 'train', 'plan', 'build', 'whoop', 'progress', 'supps', 'habits', 'travel', 'more']) {
+  for (const t of ['home', 'train', 'plan', 'build', 'whoop', 'progress', 'supps', 'habits', 'travel', 'more', 'goals', 'food']) {
     await page.evaluate((t) => { UI.tab = t; rerender(); }, t);
     await expect(page.locator('#view')).not.toBeEmpty();
   }

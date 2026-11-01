@@ -71,6 +71,9 @@ function renderHome(){
   // habits
   const hb=(S.habits||[]),hd=hb.filter(x=>habDone(x.id,t)).length;
   h+=`<button class="htile" style="--c:#7B4DFF" data-a="hgo" data-v="habits">${ring(hb.length?hd/hb.length:0,'#7B4DFF',64,8,hd+'/'+hb.length)}<span class="hlab">Habits</span><span class="hsub">${hb.length?hb.slice(0,3).map(x=>`<span class="${habDone(x.id,t)?'hok':''}">${x.e}</span>`).join(' '):'Add a habit'}</span></button>`;
+  // goal and nutrition
+  {const g=goalList()[0];if(g){const st=goalStatus(g);h+=`<button class="htile" style="--c:var(--upper)" data-a="tab" data-v="goals"><span class="hlab">Goal · ${esc(goalName(g))}</span><b class="disp hval num">${Math.round(st.pct*100)}%</b><div class="hbar"><i style="width:${Math.round(st.pct*100)}%"></i></div><span class="hsub">${st.done?'Reached':st.eta?'Around '+short(st.eta):'Keep logging'}</span></button>`}else h+=`<button class="htile" style="--c:var(--upper)" data-a="tab" data-v="goals"><span class="hlab">Goals</span><b class="disp hval">Set one</b><span class="hsub">A lift or body target with a projected date</span></button>`}
+  {const n=nutDay(t),tg=nutTargets(t);h+=`<button class="htile" style="--c:#12B76A" data-a="tab" data-v="food">${ring(Math.min(1,n.p/tg.prot),'#12B76A',64,8,Math.round(n.p)+'g')}<span class="hlab">Protein</span><span class="hsub">${Math.round(n.c)} / ${tg.kcal} kcal</span></button>`}
   // weekly report
   {const lw=addD(ws,-7),wd=weekData(lw);h+=`<button class="htile" style="--c:#00A3FF" data-a="report" data-v="${lw}"><span class="hlab">Weekly report${S.seenReport!==lw?' · new':''}</span><b class="disp hval num">${wd.done}/${wd.sched}</b><span class="hsub">sessions last week · ${wd.prs.length} PR${wd.prs.length===1?'':'s'}</span></button>`}
   // streak
