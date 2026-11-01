@@ -58,7 +58,7 @@ export default async (req) => {
   const client = new Anthropic();
   try {
     const r = await client.messages.parse({
-      model: 'claude-opus-5-5',
+      model: 'claude-haiku-5-5',
       max_tokens: 8000,
       output_config: { effort: 'low', format: zodOutputFormat(Report) },
       messages: [{ role: 'user', content: [block, { type: 'text', text: PROMPT }] }],
