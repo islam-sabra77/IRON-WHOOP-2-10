@@ -361,6 +361,10 @@ button.insight:first-of-type{border-top:0}
 .gitem[open] summary{margin-bottom:8px}
 .synccode{font-size:17px;font-weight:800;letter-spacing:.04em;background:var(--sf2);border-radius:12px;padding:10px 12px;word-break:break-all;line-height:1.5}
 .setlink{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+/* coaching */
+.plat ul{margin:6px 0 6px 18px;padding:0;font-size:13.5px}.plat .mini{margin-top:4px}
+.rcprompt{display:block;width:100%;text-align:left;border:0;color:inherit;font:inherit;cursor:pointer;border-left:4px solid var(--c,var(--upper))}
+.rcscore{display:flex;gap:14px;align-items:center;margin-top:12px;background:var(--sf);border:1px solid var(--ln);border-radius:18px;padding:12px}
 /* gym-floor helpers */
 .pcrow{display:flex;gap:8px;align-items:center;margin-top:6px}.pcrow .fld{flex:1;height:56px}.pcrow .fld input{font-size:24px;font-weight:800}.mini.big{height:56px;min-width:56px;font-size:24px}
 .pcbar{display:flex;align-items:center;gap:3px;min-height:130px;margin-top:10px;padding:0 6px;position:relative}.pcbar b{flex:1;height:10px;background:#9AA3C7;border-radius:4px}
@@ -1411,7 +1415,9 @@ function suggest(it,d){
   const lower=['main','sec'].includes(it.role)&&T[tplOf(d)]&&T[tplOf(d)].k==='lower';
   const inc=lower?5:(['acc','arm','pre'].includes(it.role)?1:2.5),step=inc>=2.5?2.5:1;
   let w=top,why;
+  const pl=plateauOf(it.ex,d);
   if(ph.deload){w=roundTo(top*0.85,step);why='Deload: about 15% lighter, crisp reps'}
+  else if(pl&&pl.heavy&&lph.c===ph.c){w=roundTo(top*0.9,step);why='Stalled for 3 sessions: reset about 10% lighter and build back up'}
   else if(lph.c!==ph.c||lph.deload){
     const recent=(hist()[it.ex]||[]).filter(x=>x.d<d&&diffD(x.d,d)<=49&&!phaseOf(x.d).deload);
     const best=Math.max(...(recent.length?recent:[lp]).flatMap(x=>x.sets.map(s=>e1rm(+s.w,+s.r))));
@@ -1515,6 +1521,8 @@ function renderHome(){
   // habits
   const hb=(S.habits||[]),hd=hb.filter(x=>habDone(x.id,t)).length;
   h+=`<button class="htile" style="--c:#7B4DFF" data-a="hgo" data-v="habits">${ring(hb.length?hd/hb.length:0,'#7B4DFF',64,8,hd+'/'+hb.length)}<span class="hlab">Habits</span><span class="hsub">${hb.length?hb.slice(0,3).map(x=>`<span class="${habDone(x.id,t)?'hok':''}">${x.e}</span>`).join(' '):'Add a habit'}</span></button>`;
+  // weekly report
+  {const lw=addD(ws,-7),wd=weekData(lw);h+=`<button class="htile" style="--c:#00A3FF" data-a="report" data-v="${lw}"><span class="hlab">Weekly report${S.seenReport!==lw?' · new':''}</span><b class="disp hval num">${wd.done}/${wd.sched}</b><span class="hsub">sessions last week · ${wd.prs.length} PR${wd.prs.length===1?'':'s'}</span></button>`}
   // streak
   h+=`<button class="htile" style="--c:var(--ok)" data-a="hgo" data-v="progress"><span class="hlab">Streaks</span><b class="disp hval num">${weekStreak()} wk</b><span class="hsub">4+ sessions a week · supps ${suppStreak()} days</span></button>`;
   // body
@@ -1607,6 +1615,7 @@ function renderTrain(){
   {const wk=S.whoop.connected?wkForDay(d):null;if(wk)h+=`<button class="note wkchip" data-a="wkopen" data-v="${wk.id}"><b>WHOOP ${esc(sportName(wk.sport).toLowerCase())}:</b> strain ${wk.strain!=null?wk.strain.toFixed(1):'–'}, avg ${wk.ahr||'–'} bpm, ${wkMins(wk)} min. Tap for heart-rate zones ›</button>`}
   if(t.blocks){
     const r=readyOf(d);h+=whoopCard(d);
+    {const rc=(S.rcheck||{})[d];if(d===todayS()&&!rc&&!S.done[d])h+=`<button class="note rcprompt" data-a="rcopen"><b>⚡ Quick readiness check</b> How sore and how energetic are you? 10 seconds, and today\u2019s session adjusts. ›</button>`;else if(rc)h+=`<button class="note rcprompt" data-a="rcopen" style="--c:${{g:'var(--ok)',y:'var(--warn)',r:'var(--bad)'}[rc.lvl]}"><b>Readiness ${rc.score}</b> · soreness ${rc.sore}/5 · energy ${rc.energy}/5. Tap to redo ›</button>`}
     h+=`<div class="ready"><span>${S.whoop.connected&&!S.ready[d]&&whoopDay(d)&&S.whoop.auto?'From WHOOP':'Recovery'}</span>
       <button class="rbtn ${r==='g'?'on':''}" data-a="ready" data-v="g">Green<small>full session</small></button>
       <button class="rbtn ${r==='y'?'on':''}" data-a="ready" data-v="y">Yellow<small>lighter day</small></button>
@@ -1690,6 +1699,7 @@ function exCard(d,it,o){
   if(shut)return hh+'</article>';
   hh+=`<div style="overflow:hidden;margin-top:8px">${thumb(it.ex,o.c)}<div class="cue" style="font-size:13.5px">${esc(cueOf(e))}${sideNote(e)}</div></div>`;
   if(it.ex!==it.base){const scope=S.swaps[d]&&S.swaps[d][it.slot]?'today':'in every session';hh+=`<div class="swapped"><span>Replaces ${esc(E[it.base].n)} ${scope}</span><button data-a="undoswap" data-k="${it.slot}" data-b="${it.base}">Undo</button></div>`}
+  {const plt=!e.bw&&!e.t?plateauOf(it.ex,d):null;if(plt&&!phaseOf(d).deload)hh+=plateauHTML(plt,true)}
   if(sug)hh+=`<div class="sugg num tap" data-a="lifthist" data-e="${it.ex}" role="button">Last (${short(sug.lp.d)}): ${sug.lp.sets.map(s=>s.w+'×'+s.r).join(', ')}. Try <b>${sug.w} kg</b>. <span class="muted">${sug.why}.</span> <u>History ›</u></div>`;
   else if(!e.bw&&!e.t&&!isCore)hh+=`<div class="sugg">First time: pick a load you could lift ${Number(String(it.rx.rir)[0])+0||2} more reps with. The app suggests next time.</div>`;
   hh+=`<div class="sets">`;
@@ -2141,6 +2151,8 @@ function renderProgress(){
   if(lifts.length)h+=`<p class="tapnote" style="margin:6px 0 0">Tap any lift to see every session and set.</p>`;
   if(liftsAll.length>10)h+=`<button class="cta ghost" data-a="alllifts">${UI.allLifts?'Show top 10':'Show all '+liftsAll.length+' lifts'}</button>`;
   h+=`</div>`;
+  {const pl=plateaus();if(pl.length)h+=`<div class="card"><h4 class="disp">Stalled lifts</h4><p class="muted" style="font-size:13.5px;margin:0 0 6px">No new best in the last 3 sessions. Tap one for ways to break through.</p>${pl.map(x=>`<button class="lh" data-a="lifthist" data-e="${x.ex}"><div class="lhr"><div style="flex:1"><b style="font-size:14.5px">${esc(E[x.ex].n)}</b><div class="muted" style="font-size:12.5px">Best ${x.best} kg e1RM · ${esc(x.fixes[0])}</div></div><span class="lhgo">›</span></div></button>`).join('')}</div>`}
+  h+=`<button class="card setlink" data-a="report"><h4 class="disp" style="margin:0">📊 Weekly report ›</h4><span class="muted" style="font-size:13.5px">Sessions, volume, records, recovery and next week\u2019s focus</span></button>`;
   h+=ibCard();
   // extend
   const r=A.rec;
@@ -2377,6 +2389,70 @@ function pickList(){
 function liftStats(x){const sets=x.sets.map(q=>({w:+q.w,r:+q.r}));const top=Math.max(...sets.map(q=>q.w));const vol=sets.reduce((a,q)=>a+q.w*q.r,0);const best=Math.max(...sets.map(q=>e1rm(q.w,q.r)));return{sets,top,vol,best,reps:sets.reduce((a,q)=>a+q.r,0)}}
 function bigChart(pts,c){const W=320,H=120;if(pts.length<2)return'';const mn=Math.min(...pts),mx=Math.max(...pts),rg=mx-mn||1;const xy=pts.map((v,i)=>[(i/(pts.length-1)*(W-16)+8),(H-10-(v-mn)/rg*(H-28))]);
   return`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;margin:6px 0 2px"><polyline points="${xy.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${xy.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="${c}"/>`).join('')}<text x="8" y="12" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mx)} kg</text><text x="8" y="${H-1}" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mn)} kg</text></svg>`}
+/* =====================================================================
+   COACHING: plateau detection, weekly report, readiness check
+   ===================================================================== */
+/* a lift is stalled when its last 3 non-deload sessions set no new best estimated 1RM */
+function plateauOf(ex,before){
+  const h=(hist()[ex]||[]).filter(x=>(!before||x.d<before)&&!phaseOf(x.d).deload);if(h.length<4||!E[ex]||E[ex].bw||E[ex].t)return null;
+  const be=x=>Math.max(...x.sets.map(q=>e1rm(+q.w,+q.r))),last3=h.slice(-3),prior=h.slice(0,-3);
+  const bestPrior=Math.max(...prior.map(be)),bestRecent=Math.max(...last3.map(be));if(bestRecent>bestPrior*1.005)return null;
+  if(diffD(last3[0].d,h[h.length-1].d)>56)return null;
+  const topEver=Math.max(...h.map(x=>Math.max(...x.sets.map(q=>+q.w)))),lastTop=Math.max(...last3[2].sets.map(q=>+q.w));
+  const alt=ROT[ex]||(E[ex].a||[]).find(a=>E[a]&&META[a]&&META[ex]&&META[a].pat===META[ex].pat);
+  return{ex,sessions:3,best:Math.round(bestPrior),since:last3[0].d,heavy:lastTop>=topEver*0.97,alt,
+    fixes:['Reset about 10% lighter and build back up over 2–3 sessions',`Change the rep range for a cycle (${phaseOf(todayS()).s==='S'?'higher reps, 8–12':'lower reps, 4–6'})`,'Add one back-off set at 80% for 8–10 reps',alt?`Swap to ${E[alt].n} for a cycle`:null].filter(Boolean)};
+}
+function plateaus(){return Object.keys(hist()).map(ex=>plateauOf(ex)).filter(Boolean)}
+function plateauHTML(pl,compact){return`<div class="note plat" style="--c:var(--warn)"><b>Stalled for ${pl.sessions} sessions.</b> ${compact?esc(pl.fixes[0])+'.':''}${compact?'':`Try one of these:<ul>${pl.fixes.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`}${pl.alt?`<button class="mini" data-a="platswap" data-e="${pl.ex}" data-v="${pl.alt}">Swap to ${esc(E[pl.alt].n)}</button>`:''}</div>`}
+/* ---------- weekly report: the last finished week, Sunday to Saturday ---------- */
+function weekData(ws){
+  const we=addD(ws,6),days=[...Array(7).keys()].map(i=>addD(ws,i));let sched=0,done=0;
+  days.forEach(d=>{const k=tplOf(d);if(isTraining(k)){sched++;if(S.done[d])done++}});
+  const v=weekVol(ws),pv=weekVol(addD(ws,-7));
+  const h=hist(),prs=[];Object.keys(h).forEach(ex=>{if(!E[ex]||E[ex].bw||E[ex].t)return;const inW=h[ex].filter(x=>x.d>=ws&&x.d<=we),before=h[ex].filter(x=>x.d<ws);if(!inW.length||!before.length)return;const be=x=>Math.max(...x.sets.map(q=>e1rm(+q.w,+q.r)));const a=Math.max(...inW.map(be)),b=Math.max(...before.map(be));if(a>b*1.005)prs.push({ex,e1:Math.round(a),up:Math.round(a-b)})});
+  const wv=days.map(d=>(S.wdata||{})[d]).filter(Boolean),avg=(a,f)=>{const x=a.map(f).filter(q=>q!=null);return x.length?x.reduce((p,q)=>p+q,0)/x.length:null};
+  const rec=avg(wv,x=>x.rec),slp=avg(wv,x=>x.sleep&&x.sleep.dur),str=avg(wv,x=>x.strain);
+  const wks=Object.values(S.wwk||{}).filter(w=>w.d>=ws&&w.d<=we);
+  const supTot=S.supps.length*7,supDone=days.reduce((a,d)=>a+S.supps.filter(s=>S.suppLog[d]&&S.suppLog[d][s.id]).length,0);
+  const hb=S.habits||[],habTot=hb.length*7,habOk=days.reduce((a,d)=>a+hb.filter(x=>habDone(x.id,d)).length,0);
+  const w0=lastVal('weight',addD(ws,-1)),w1=lastVal('weight',we);
+  return{ws,we,sched,done,v,pv,prs:prs.sort((a,b)=>b.up-a.up),rec,slp,str,wks,sup:supTot?supDone/supTot:null,hab:habTot?habOk/habTot:null,w0,w1};
+}
+function nextFocus(ws){const nd=addD(ws,8),ph=phaseOf(nd),wi=weekInt(nd);const pl=plateaus();
+  if(ph.deload)return'Deload week: lighter loads, 2 sets each, sleep well. The next cycle starts stronger.';
+  if(wi&&wi.lvl==='ease')return'Recovery is behind. Keep sessions shorter, prioritise sleep, and hold your weights.';
+  if(pl.length)return`Break the stall on ${E[pl[0].ex].n}: ${pl[0].fixes[0].toLowerCase()}.`;
+  if(wi&&wi.lvl==='push')return'You’re recovering well. Push the main lifts: the plan adds a set this week.';
+  return`${ph.focus}. Hit every planned session.`}
+function reportSheet(ws){
+  const t=todayS();ws=ws||addD(sunOf(t),-7);const r=weekData(ws);S.seenReport=ws;save();
+  const pct=v=>v==null?'–':Math.round(v*100)+'%',dv=r.pv.vol?(r.v.vol-r.pv.vol)/r.pv.vol:null,pl=plateaus();
+  openSheet(`<h4 class="disp">Week of ${short(r.ws)}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">${short(r.ws)} – ${short(r.we)}</p>
+  <div class="grid2"><div class="stat"><b class="disp num">${r.done}/${r.sched}</b><span>Sessions done</span></div><div class="stat"><b class="disp num">${r.v.vol>=1000?(r.v.vol/1000).toFixed(1)+'t':Math.round(r.v.vol)+' kg'}</b><span>Volume${dv!=null?` (${dv>=0?'+':''}${Math.round(dv*100)}%)`:''}</span></div>
+  <div class="stat"><b class="disp num">${r.prs.length}</b><span>Personal records</span></div><div class="stat"><b class="disp num">${r.v.sets}</b><span>Sets logged</span></div>
+  ${r.rec!=null?`<div class="stat"><b class="disp num" style="color:${recCol(r.rec)}">${Math.round(r.rec)}%</b><span>Avg recovery</span></div>`:''}${r.slp!=null?`<div class="stat"><b class="disp num">${hm(r.slp)}</b><span>Avg sleep</span></div>`:''}
+  ${r.str!=null?`<div class="stat"><b class="disp num">${r.str.toFixed(1)}</b><span>Avg day strain</span></div>`:''}${r.wks.length?`<div class="stat"><b class="disp num">${r.wks.length}</b><span>WHOOP workouts</span></div>`:''}
+  <div class="stat"><b class="disp num">${pct(r.sup)}</b><span>Supplements taken</span></div><div class="stat"><b class="disp num">${pct(r.hab)}</b><span>Habits done</span></div>
+  ${r.w1&&r.w0?`<div class="stat"><b class="disp num">${(r.w1.v-r.w0.v>=0?'+':'')+(r.w1.v-r.w0.v).toFixed(1)} kg</b><span>Body weight change</span></div>`:''}</div>
+  ${r.prs.length?`<div class="card" style="margin-top:10px"><b>🏆 Personal records</b>${r.prs.slice(0,6).map(x=>`<div class="hrow" style="grid-template-columns:1fr auto"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><b class="num">${x.e1} kg e1RM <span style="color:var(--ok)">+${x.up}</span></b></div>`).join('')}</div>`:''}
+  ${pl.length?`<div class="card"><b>⏸ Stalled lifts</b>${pl.slice(0,4).map(x=>`<div style="padding:6px 0;border-top:1px solid var(--ln)"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><div class="muted" style="font-size:12.5px">${esc(x.fixes[0])}</div></div>`).join('')}</div>`:''}
+  <div class="note" style="--c:var(--upper)"><b>Focus for next week:</b> ${esc(nextFocus(ws))}</div>
+  <div class="grid2"><button class="cta ghost" style="margin:0" data-a="report" data-v="${addD(ws,-7)}">‹ Previous week</button>${addD(ws,7)<=addD(sunOf(t),-7)?`<button class="cta ghost" style="margin:0" data-a="report" data-v="${addD(ws,7)}">Next week ›</button>`:`<button class="cta ghost" style="margin:0" data-a="report" data-v="${sunOf(t)}">This week so far</button>`}</div>
+  <button class="cta ghost" data-a="close">Close</button>`);
+}
+/* ---------- readiness check: WHOOP + how you feel, before training ---------- */
+function readinessScore(d,sore,energy){const w=whoopDay(d),x=(S.wdata||{})[d]||{};let sc=w&&x.rec!=null?x.rec:65;const why=[];if(w&&x.rec!=null)why.push(`WHOOP recovery ${Math.round(x.rec)}%`);
+  sc+={1:5,2:0,3:-8,4:-18,5:-30}[sore]||0;if(sore>=4)why.push('very sore');else if(sore===3)why.push('a bit sore');
+  sc+={1:-20,2:-10,3:0,4:5,5:10}[energy]||0;if(energy<=2)why.push('low energy');else if(energy>=4)why.push('good energy');
+  if(x.sleep&&x.sleep.perf!=null&&x.sleep.perf<70){sc-=10;why.push(`sleep ${Math.round(x.sleep.perf)}%`)}
+  sc=Math.max(0,Math.min(100,Math.round(sc)));return{score:sc,lvl:sc>=67?'g':sc>=34?'y':'r',why}}
+function readinessSheet(d){const q=UI.rc=UI.rc&&UI.rc.d===d?UI.rc:Object.assign({d,sore:2,energy:3},(S.rcheck||{})[d]||{});const r=readinessScore(d,q.sore,q.energy),c={g:'var(--ok)',y:'var(--warn)',r:'var(--bad)'}[r.lvl];
+  const row=(f,l,labels)=>`<label class="fl2">${l}</label><div class="obrow">${[1,2,3,4,5].map(v=>`<button class="obopt ${q[f]===v?'on':''}" data-a="rcset" data-f="${f}" data-v="${v}"><b>${v}</b><span>${labels[v-1]}</span></button>`).join('')}</div>`;
+  openSheet(`<h4 class="disp">Readiness check</h4><p class="muted" style="font-size:13.5px;margin:0 0 6px">10 seconds before you train. Combined with WHOOP, it sets today’s session.</p>
+  ${row('sore','Muscle soreness',['None','Slight','Some','Sore','Very'])}${row('energy','Energy',['Drained','Low','OK','Good','Great'])}
+  <div class="rcscore" style="--c:${c}">${ring(r.score/100,c,96,11,r.score)}<div><b class="disp" style="font-size:24px">${{g:'Ready to push',y:'Train lighter',r:'Recovery day'}[r.lvl]}</b><p style="font-size:13.5px;margin:4px 0 0">${r.why.length?esc(r.why.join(', '))+'. ':''}${{g:'Full session as planned.',y:'One set fewer on accessories and arms, main lifts stop 2 reps short, cardio stays easy.',r:'Lifting is off today: mobility, core and an easy 30-minute walk or ride.'}[r.lvl]}</p></div></div>
+  <button class="cta" style="--c:${c}" data-a="rcsave">Use this for today</button><button class="cta ghost" data-a="close">Not now</button>`)}
 function liftSheet(ex){
   const e=E[ex];if(!e)return;const all=(hist()[ex]||[]).slice(),c=COLORS.upper;
   if(!all.length){openSheet(`<h4 class="disp">${esc(e.n)}</h4><p class="muted" style="font-size:14px">No weights logged for this move yet. Log a set with a weight and it shows up here.</p><button class="cta ghost" data-a="close">Close</button>`);return}
@@ -2388,7 +2464,8 @@ function liftSheet(ex){
     <div class="lhsets num"><span class="hd">Set</span><span class="hd">Weight</span><span class="hd">Reps</span><span class="hd">Est. 1RM</span>${s2.sets.map((q,j)=>`<span>${j+1}</span><b>${q.w} kg</b><span>${q.r}</span><span>${Math.round(e1rm(q.w,q.r))} kg</span>`).join('')}</div>
     <div class="lhmeta num"><span>Volume <b>${Math.round(s2.vol).toLocaleString()} kg</b></span><span>Total reps <b>${s2.reps}</b></span><span>Best e1RM <b>${Math.round(s2.best)} kg</b></span>${tn?`<span>Session <b>${esc(tn)}</b></span>`:''}</div>
     <button class="mini" style="margin-top:8px" data-a="histday" data-d="${x.d}">Open this day →</button></details>`}
-  openSheet(`<h4 class="disp">${esc(e.n)}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Every session you logged, newest first. Tap a session to see each set.</p>
+  const plt=plateauOf(ex);
+  openSheet(`<h4 class="disp">${esc(e.n)}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Every session you logged, newest first. Tap a session to see each set.</p>${plt?plateauHTML(plt):''}
   <div class="grid2" style="margin-bottom:6px"><div class="stat"><b class="disp num">${bestW} kg</b><span>Heaviest set</span></div><div class="stat"><b class="disp num">${Math.round(bestE)} kg</b><span>Best est. 1RM</span></div><div class="stat"><b class="disp num">${all.length}</b><span>Sessions logged</span></div><div class="stat"><b class="disp num">${totV>=1000?(totV/1000).toFixed(1)+'t':Math.round(totV)+'kg'}</b><span>Total volume</span></div></div>
   ${all.length>1?`<div class="card" style="margin:8px 0"><b style="font-size:13.5px">Estimated 1RM by session</b> <span class="muted num" style="font-size:12.5px">${chg>=0?'+':''}${Math.round(chg*100)}% since ${short(all[0].d)}</span>${bigChart(st.map(x=>x.best),c)}</div>`:''}
   ${rows}<button class="cta ghost" data-a="close">Close</button>`);
@@ -2942,7 +3019,7 @@ function moveSheet(){
    Enter the same code on another phone to bring everything across;
    both devices then stay in step. Changes on two devices are merged day by day.
    ===================================================================== */
-const SYNC_DICTS=['logs','done','ready','moves','swaps','suppLog','habitLog','body','inbody','wdata','wwk','habOv','vids','clips','col'];
+const SYNC_DICTS=['logs','done','rcheck','ready','moves','swaps','suppLog','habitLog','body','inbody','wdata','wwk','habOv','vids','clips','col'];
 let SYNC_T=null,SYNC_BUSY=false;
 function syncOn(){return!!(S.sync&&S.sync.on&&S.sync.key)}
 function newSyncKey(){const a=new Uint8Array(32);crypto.getRandomValues(a);return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('')}
@@ -3252,6 +3329,11 @@ document.addEventListener('click',ev=>{
   case'pl8p':{const p2=prefs(),v2=+el.dataset.v,i2=p2.plates.indexOf(v2);if(i2>=0)p2.plates.splice(i2,1);else p2.plates.push(v2);save();drawPlates();break}
   case'rpe':{const[slot,i]=k.split('|');const f=findItem(d,slot);if(!f)break;const o=slotLog(d,slot,f.it.ex,f.it.rx.sets);const v2=+el.dataset.v;if(v2)o.sets[+i].e=v2;else o.sets[+i].e=0;UI.rpeAsk=null;save();rerender();break}
   case'focus':focusOpen();break;
+  case'report':reportSheet(el.dataset.v);break;
+  case'platswap':{const from=el.dataset.e,to=el.dataset.v;S.swapsAll[from]=to;save();closeSheet();rerender();toast('Swapped to '+E[to].n+' in every session',()=>{delete S.swapsAll[from]});break}
+  case'rcopen':UI.rc=null;readinessSheet(d===todayS()?d:todayS());break;
+  case'rcset':UI.rc[el.dataset.f]=+el.dataset.v;readinessSheet(UI.rc.d);break;
+  case'rcsave':{const q=UI.rc,r=readinessScore(q.d,q.sore,q.energy);S.rcheck=S.rcheck||{};S.rcheck[q.d]={sore:q.sore,energy:q.energy,score:r.score,lvl:r.lvl};S.ready[q.d]=r.lvl;save();closeSheet();rerender();toast('Today set to '+{g:'Green: full session',y:'Yellow: lighter day',r:'Red: recovery only'}[r.lvl]);break}
   case'fxadj':{const f2=el.dataset.f;UI.fx[f2]=Math.max(0,Math.round(((+UI.fx[f2]||0)+ +el.dataset.v)*100)/100);drawFocus();break}
   case'fxdone':{const q=UI.fx,n=nextSet(q.d);if(!n)break;const o=slotLog(q.d,n.it.slot,n.it.ex,n.it.rx.sets),s2=o.sets[n.r];if(q.w!==''&&q.w!=null)s2.w=String(q.w);s2.r=String(q.r);toggleSet(q.d,n.it.slot+'|'+n.r,true);if(UI.fx){UI.fx.k=null;if(prefs().rpe&&!E[n.it.ex].t){UI.fx.askRpe=n.it.slot+'|'+n.r}drawFocus();if(UI.fx&&UI.fx.askRpe){const box=document.querySelector('.fxwrap');if(box){const kk=UI.fx.askRpe;box.insertAdjacentHTML('afterbegin',`<div class="fxrpe">Last set: ${rpeRow(kk,{}).replace(/data-a="rpe"/g,'data-a="fxrpe"')}</div>`)}}}break}
   case'fxrpe':{const[slot,i]=k.split('|');const f=findItem(UI.fx.d,slot);if(f){const o=slotLog(UI.fx.d,slot,f.it.ex,f.it.rx.sets);o.sets[+i].e=+el.dataset.v||0;save()}UI.fx.askRpe=null;const r2=document.querySelector('.fxrpe');r2&&r2.remove();break}
