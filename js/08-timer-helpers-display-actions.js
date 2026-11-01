@@ -333,6 +333,8 @@ document.addEventListener('click',ev=>{
   case'syncoff':if(window.confirm('Turn off cloud backup on this device? Your cloud copy stays until you reuse the code.')){S.sync.on=false;save();syncSheet()}break;
   case'syncnow':syncNow(true).then(()=>syncSheet());break;
   case'synccopy':{const c=fmtCode(S.sync.key);(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(()=>toast('Sync code copied')).catch(()=>window.prompt('Your sync code:',c));break}
+  case'pkreg':passkeyRegister();break;
+  case'pksignin':passkeySignIn();break;
   case'synclink':syncLink(document.getElementById('synclink').value);break;
   case'bkfile':bkDownload();break;
   case'bkload':bkLoad();break;

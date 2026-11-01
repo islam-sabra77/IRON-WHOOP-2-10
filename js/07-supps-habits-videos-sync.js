@@ -346,46 +346,103 @@ function mergeState(local,remote){
   SYNC_DICTS.forEach(k=>{if(older[k]||newer[k]){const o=older[k]||{},n=newer[k]||{};out[k]=Object.assign({},o,n);if(k==='logs'){Object.keys(o).forEach(d=>{if(n[d]&&o[d]){const m=Object.assign({},o[d],n[d]);out[k][d]=m}})}}});
   out._u=Math.max(local._u||0,remote._u||0);out.sync=local.sync;return out;
 }
+/* ---------- end-to-end encryption ----------
+   From the sync code the phone derives two separate keys: an AES-GCM key that encrypts your data,
+   and an access token the server stores it under. The server never sees the code or the AES key. */
+const TXT=new TextEncoder(),hex2u8=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16))),u82hex=u=>Array.from(new Uint8Array(u)).map(b=>b.toString(16).padStart(2,'0')).join('');
+const u82b64=u=>{let s='';new Uint8Array(u).forEach(b=>s+=String.fromCharCode(b));return btoa(s)},b642u8=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const KEYCACHE={};
+async function syncKeys(code){if(KEYCACHE[code])return KEYCACHE[code];const ikm=await crypto.subtle.importKey('raw',hex2u8(code),'HKDF',false,['deriveKey','deriveBits']);
+  const p=info=>({name:'HKDF',hash:'SHA-256',salt:TXT.encode('iron-sync-v2'),info:TXT.encode(info)});
+  const aes=await crypto.subtle.deriveKey(p('aes'),ikm,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+  const token=u82hex(await crypto.subtle.deriveBits(p('auth'),ikm,256));return KEYCACHE[code]={aes,token}}
+async function gz(u8,dir){if(typeof CompressionStream==='undefined')return u8;const s=new Blob([u8]).stream().pipeThrough(dir?new CompressionStream('gzip'):new DecompressionStream('gzip'));return new Uint8Array(await new Response(s).arrayBuffer())}
+async function sealState(obj,key){const raw=TXT.encode(JSON.stringify(obj)),z=typeof CompressionStream!=='undefined';const data=z?await gz(raw,true):raw;const iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data);return{v:2,z,iv:u82b64(iv),ct:u82b64(ct)}}
+async function openState(enc,key){const pt=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b642u8(enc.iv)},key,b642u8(enc.ct)));return JSON.parse(new TextDecoder().decode(enc.z?await gz(pt,false):pt))}
+/* fetch the stored copy for a code: encrypted (new) or plain under the raw code (older backups) */
+async function syncFetch(code){const{aes,token}=await syncKeys(code);
+  let r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':token}});
+  if(r.ok){const j=await r.json();return{updated:j.updated,state:j.enc?await openState(j.enc,aes):j.state,legacy:false}}
+  if(r.status!==404)throw new Error('get '+r.status);
+  r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':code}});
+  if(r.ok){const j=await r.json();return{updated:j.updated,state:j.state,legacy:true}}
+  if(r.status!==404)throw new Error('get '+r.status);return null}
 function syncSoon(){if(!syncOn()||!navigator.onLine)return;clearTimeout(SYNC_T);SYNC_T=setTimeout(()=>syncNow(false),4000)}
 async function syncNow(manual){
   if(!syncOn()||SYNC_BUSY)return;SYNC_BUSY=true;const key=S.sync.key;
   try{
-    const r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':key}});
-    let remote=null;if(r.ok)remote=(await r.json());else if(r.status!==404)throw new Error('get '+r.status);
+    const{aes,token}=await syncKeys(key);const remote=await syncFetch(key);
     let changed=false;
     if(remote&&remote.state&&(remote.updated||0)>(S.sync.last||0)){
       const merged=mergeState(S,remote.state);changed=JSON.stringify(merged)!==JSON.stringify(S);
       if(changed){Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,defaults(),merged)}
     }
     const upd=Math.max(S._u||Date.now(),(remote&&remote.updated)||0);S._u=upd;
-    const body=JSON.stringify({updated:upd,state:Object.assign({},S,{sync:{on:true,key}})});
-    const p=await fetch('/api/sync',{method:'PUT',headers:{'Content-Type':'application/json','x-iron-sync':key},body});
+    const enc=await sealState(Object.assign({},S,{sync:{on:true,key}}),aes);
+    const p=await fetch('/api/sync',{method:'PUT',headers:{'Content-Type':'application/json','x-iron-sync':token},body:JSON.stringify({updated:upd,enc})});
     if(p.status===409&&!manual){SYNC_BUSY=false;return syncNow(true)}
     if(!p.ok)throw new Error('put '+p.status);
-    S.sync.last=upd;S.sync.at=Date.now();S.sync.err=null;localStorage.setItem(KEY,JSON.stringify(S));
-    if(changed){applyCustom&&applyCustom();rerender();if(manual)toast('Synced. Changes from your other device are in.')}else if(manual)toast('Backed up');
+    if(remote&&remote.legacy)fetch('/api/sync',{method:'DELETE',headers:{'x-iron-sync':key}}).catch(()=>{});
+    S.sync.last=upd;S.sync.at=Date.now();S.sync.err=null;S.sync.e2e=true;localStorage.setItem(KEY,JSON.stringify(S));
+    if(changed){applyCustom&&applyCustom();rerender();if(manual)toast('Synced. Changes from your other device are in.')}else if(manual)toast('Backed up (encrypted)');
   }catch(e){S.sync.err=String(e&&e.message||e);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(_){}if(manual)toast(location.protocol==='file:'?'Cloud backup works on your Netlify site':'Backup failed. It retries automatically.')}
   finally{SYNC_BUSY=false}
 }
 function syncTurnOn(){S.sync=Object.assign({on:true,key:S.sync&&S.sync.key||newSyncKey(),last:0},S.sync,{on:true});save();syncNow(true);syncSheet()}
-async function syncLink(code){
+async function syncLink(code,skipConfirm){
   const key=cleanCode(code);if(key.length<48){toast('That code looks incomplete');return}
-  try{const r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':key}});
-    if(r.status===404){toast('No backup found for that code');return}if(!r.ok)throw 0;const j=await r.json();
-    if(!window.confirm('Replace the data on this device with the backup from '+new Date(j.updated).toLocaleString()+'?'))return;
-    const st=Object.assign(defaults(),j.state,{sync:{on:true,key,last:j.updated,at:Date.now()}});localStorage.setItem(KEY,JSON.stringify(st));location.reload();
-  }catch(e){toast('Couldn’t reach the backup. Check your connection.')}
+  try{const j=await syncFetch(key);if(!j){toast('No backup found for that code');return}
+    if(!skipConfirm&&!window.confirm('Replace the data on this device with the backup from '+new Date(j.updated).toLocaleString()+'?'))return;
+    const st=Object.assign(defaults(),j.state,{sync:{on:true,key,last:j.legacy?0:j.updated,at:Date.now()}});localStorage.setItem(KEY,JSON.stringify(st));location.reload();
+  }catch(e){toast(e&&e.name==='OperationError'?'That code doesn’t match this backup':'Couldn’t reach the backup. Check your connection.')}
+}
+/* ---------- passkeys ----------
+   The passkey signs you in on a new phone. The sync code is stored on the server only after being
+   encrypted with a key that comes from the passkey itself (WebAuthn PRF), so only your passkey can unlock it. */
+const b64u=u=>u82b64(u).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''),unb64u=s=>b642u8(s.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((s.length+3)%4));
+let PRF_SALT=null;async function prfSalt(){return PRF_SALT||(PRF_SALT=new Uint8Array(await crypto.subtle.digest('SHA-256',TXT.encode('iron-passkey-prf-v1'))))}
+const pkSupported=()=>!!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext);
+async function prfKey(out){const ikm=await crypto.subtle.importKey('raw',out,'HKDF',false,['deriveKey']);return crypto.subtle.deriveKey({name:'HKDF',hash:'SHA-256',salt:TXT.encode('iron-wrap-v1'),info:TXT.encode('wrap')},ikm,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function wrapCode(out,code){const k=await prfKey(out),iv=crypto.getRandomValues(new Uint8Array(12));return{iv:u82b64(iv),ct:u82b64(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,TXT.encode(code)))}}
+async function unwrapCode(out,w){const k=await prfKey(out);return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b642u8(w.iv)},k,b642u8(w.ct)))}
+async function pkPost(step,body){const r=await fetch('/api/passkey?step='+step,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.error||('http '+r.status)),{code:j.error});return j}
+function credJSON(c){const r=c.response,o={id:c.id,rawId:b64u(c.rawId),type:c.type,clientExtensionResults:{},authenticatorAttachment:c.authenticatorAttachment||undefined,response:{clientDataJSON:b64u(r.clientDataJSON)}};
+  if(r.attestationObject){o.response.attestationObject=b64u(r.attestationObject);o.response.transports=r.getTransports?r.getTransports():[]}
+  else{o.response.authenticatorData=b64u(r.authenticatorData);o.response.signature=b64u(r.signature);if(r.userHandle)o.response.userHandle=b64u(r.userHandle)}return o}
+async function pkAssert(extraWrapped){const{options:o}=await pkPost('auth-options');const salt=await prfSalt();
+  const c=await navigator.credentials.get({publicKey:{challenge:unb64u(o.challenge),rpId:o.rpId,timeout:o.timeout,userVerification:o.userVerification||'preferred',allowCredentials:[],extensions:{prf:{eval:{first:salt}}}}});
+  const ext=c.getClientExtensionResults?c.getClientExtensionResults():{},out=ext.prf&&ext.prf.results&&ext.prf.results.first;
+  return{c,out}}
+async function passkeyRegister(){
+  if(!pkSupported()){toast('Passkeys aren’t supported in this browser');return}if(!syncOn()){toast('Turn on cloud backup first');return}
+  try{const{options:o}=await pkPost('reg-options');const salt=await prfSalt();
+    const c=await navigator.credentials.create({publicKey:{challenge:unb64u(o.challenge),rp:o.rp,user:{id:unb64u(o.user.id),name:o.user.name,displayName:o.user.displayName},pubKeyCredParams:o.pubKeyCredParams,timeout:o.timeout,attestation:'none',authenticatorSelection:o.authenticatorSelection,excludeCredentials:[],extensions:{prf:{eval:{first:salt}}}}});
+    const ext=c.getClientExtensionResults?c.getClientExtensionResults():{};let out=ext.prf&&ext.prf.results&&ext.prf.results.first;
+    const wrapped=out?await wrapCode(out,S.sync.key):null;await pkPost('reg-verify',{response:credJSON(c),wrapped});
+    if(!out&&ext.prf&&ext.prf.enabled){toast('One more tap to finish setting up the passkey');const a=await pkAssert();if(a.out){await pkPost('auth-verify',{response:credJSON(a.c),wrapped:await wrapCode(a.out,S.sync.key)});out=a.out}}
+    S.sync.pk={at:Date.now(),prf:!!out};save();syncSheet();toast(out?'Passkey ready. Use it to sign in on a new phone.':'Passkey saved, but this device can’t lock the code to it. Keep your sync code too.');
+  }catch(e){if(e&&e.name==='NotAllowedError')return;toast('Couldn’t create the passkey'+(e&&e.code?' ('+e.code+')':''))}
+}
+async function passkeySignIn(){
+  if(!pkSupported()){toast('Passkeys aren’t supported in this browser');return}
+  try{const a=await pkAssert();const j=await pkPost('auth-verify',{response:credJSON(a.c)});
+    if(!a.out||!j.wrapped){toast('This passkey can’t unlock your backup on this device. Enter your sync code instead.');return}
+    const code=await unwrapCode(a.out,j.wrapped);await syncLink(code,false);
+  }catch(e){if(e&&e.name==='NotAllowedError')return;toast(e&&e.code==='unknown_passkey'?'That passkey isn’t linked to a backup':'Passkey sign-in failed')}
 }
 function syncSheet(){
   const on=syncOn(),sy=S.sync||{};
   openSheet(`<h4 class="disp">Cloud backup</h4>
   ${on?`<div class="note" style="--c:var(--ok)"><b>On.</b> Every change is saved to the cloud a few seconds after you make it${sy.at?`. Last backup: ${new Date(sy.at).toLocaleString([],{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:''}.${sy.err?' <b>Last attempt failed</b>; it retries when you’re online.':''}</div>
   <label class="fl2">Your private sync code</label><div class="synccode num" aria-label="Sync code">${fmtCode(sy.key)}</div>
-  <p class="muted" style="font-size:13px;margin:4px 0 0">Anyone with this code can read your data. Keep it private, like a password. Enter it on another phone to bring everything across.</p>
+  <p class="muted" style="font-size:13px;margin:4px 0 0">Keep this code private, like a password: it is the key to your encrypted backup. Enter it on another phone to bring everything across.</p>
   <div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="synccopy">Copy code</button><button class="cta ghost" style="margin:0" data-a="syncnow">Back up now</button></div>
   <button class="cta ghost" style="color:var(--bad)" data-a="syncoff">Turn off cloud backup</button>`
   :`<p style="font-size:14px">Your training lives only in this browser. Turn on cloud backup so a lost phone or cleared browser never costs you your logs.</p><button class="cta" style="--c:var(--ok)" data-a="syncon">Turn on cloud backup</button>`}
-  <label class="fl2" style="margin-top:14px">Bring data from another device</label><input type="text" id="synclink" placeholder="Paste the sync code from your other phone" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="cta ghost" data-a="synclink">Link this device</button>
+  ${on&&pkSupported()?`<label class="fl2" style="margin-top:14px">Passkey</label>${sy.pk?`<div class="note" style="--c:var(--ok)"><b>Passkey added ${short(ds(new Date(sy.pk.at)))}.</b> ${sy.pk.prf?'On a new phone, tap Sign in with passkey: Face ID or your fingerprint unlocks everything.':'This device can’t lock the code to the passkey, so keep your sync code as well.'}</div>`:`<p class="muted" style="font-size:13px;margin:0 0 6px">Sign in on a new phone with Face ID or your fingerprint instead of typing the code.</p>`}<button class="cta ghost" data-a="pkreg">${sy.pk?'Add another passkey':'Create a passkey'}</button>`:''}
+  ${on?`<p class="muted" style="font-size:12px;margin:8px 0 0">${IC.check} Encrypted on this phone before upload. The server can’t read your data.</p>`:''}
+  <label class="fl2" style="margin-top:14px">Bring data from another device</label>${pkSupported()?'<button class="cta ghost" style="margin-top:0" data-a="pksignin">Sign in with passkey</button>':''}<input type="text" id="synclink" placeholder="Paste the sync code from your other phone" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="cta ghost" data-a="synclink">Link this device</button>
   <label class="fl2" style="margin-top:14px">Backup file</label><div class="grid2"><button class="cta ghost" style="margin:0" data-a="bkfile">Download backup</button><button class="cta ghost" style="margin:0" data-a="bkload">Restore from file</button></div>
   <button class="cta ghost" data-a="settings">Back to settings</button>`);
 }
