@@ -361,6 +361,13 @@ button.insight:first-of-type{border-top:0}
 .gitem[open] summary{margin-bottom:8px}
 .synccode{font-size:17px;font-weight:800;letter-spacing:.04em;background:var(--sf2);border-radius:12px;padding:10px 12px;word-break:break-all;line-height:1.5}
 .setlink{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+/* accessibility and language */
+:focus-visible{outline:3px solid var(--upper);outline-offset:2px;border-radius:8px}
+html[data-ts="l"] body{zoom:1.12}html[data-ts="xl"] body{zoom:1.25}
+html[dir="rtl"] body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+html[dir="rtl"] .chev,html[dir="rtl"] .lhgo{transform:scaleX(-1)}
+html[dir="rtl"] :is(span,b,small,em,p,h2,h3,h4,h5,label,strong){unicode-bidi:plaintext}
+html[dir="rtl"] .htile,html[dir="rtl"] .opt,html[dir="rtl"] .obopt,html[dir="rtl"] .lh,html[dir="rtl"] .wkrow,html[dir="rtl"] .setlink,html[dir="rtl"] .rcprompt,html[dir="rtl"] .wkchip{text-align:right}
 /* coaching */
 .plat ul{margin:6px 0 6px 18px;padding:0;font-size:13.5px}.plat .mini{margin-top:4px}
 .rcprompt{display:block;width:100%;text-align:left;border:0;color:inherit;font:inherit;cursor:pointer;border-left:4px solid var(--c,var(--upper))}
@@ -1510,7 +1517,7 @@ function renderHome(){
   h+=`<button class="htile" style="--c:${PH_COLOR[ph.s]}" data-a="hgo" data-v="build"><span class="hlab">Cycle ${ph.c+1} · week ${ph.cw}/${ph.CL}</span><b class="disp hval">${ph.name}</b><div class="hbar"><i style="width:${ph.cw/ph.CL*100}%"></i></div><span class="hsub">${wi?'Intensity: '+(wi.lvl==='push'?'push':wi.lvl==='ease'?'ease off':'normal'):ph.focus}</span></button>`;
   // volume
   const tw=weekVol(ws),lw=weekVol(addD(ws,-7)),dv=lw.vol?(tw.vol-lw.vol)/lw.vol:null;
-  h+=`<button class="htile" style="--c:var(--lower)" data-a="hgo" data-v="progress"><span class="hlab">Volume this week</span><b class="disp hval num">${tw.vol>=1000?(tw.vol/1000).toFixed(1)+'t':Math.round(tw.vol)+' kg'}</b><span class="hsub">${tw.sets} sets${dv!=null?` · <b style="color:${dv>=0?'var(--ok)':'var(--bad)'}">${dv>=0?'+':''}${Math.round(dv*100)}%</b> vs last week`:''}</span></button>`;
+  h+=`<button class="htile" style="--c:var(--lower)" data-a="hgo" data-v="progress"><span class="hlab">Volume this week</span><b class="disp hval num">${fvol(tw.vol)}</b><span class="hsub">${tw.sets} sets${dv!=null?` · <b style="color:${dv>=0?'var(--ok)':'var(--bad)'}">${dv>=0?'+':''}${Math.round(dv*100)}%</b> vs last week`:''}</span></button>`;
   // top lift
   const hs=hist(),top=Object.keys(hs).filter(e=>E[e]&&!E[e].bw&&!E[e].t).sort((a,b)=>hs[b].length-hs[a].length)[0];
   if(top){const pts=hs[top].map(q=>Math.max(...q.sets.map(s=>e1rm(+s.w,+s.r))));h+=`<button class="htile" style="--c:var(--upper)" data-a="lifthist" data-e="${top}"><span class="hlab">Top lift</span><b class="hval2">${esc(E[top].n)}</b>${spark(pts)}<span class="hsub">Best ${Math.round(Math.max(...pts))} kg est. 1RM</span></button>`}
@@ -1572,7 +1579,7 @@ function workoutCanvas(w){
   const gr=x.createLinearGradient(0,0,W2,head);gr.addColorStop(0,w.c);gr.addColorStop(1,'#191A4A');x.fillStyle=gr;x.fillRect(0,0,W2,head-40);
   x.fillStyle='#fff';x.font='900 34px '+F;x.fillText('IRON',P,80);x.font='600 30px '+F;x.globalAlpha=.85;x.fillText(nice(w.d),P,128);x.globalAlpha=1;
   x.font='900 64px '+F;x.fillText(w.title,P,205);x.font='500 28px '+F;x.globalAlpha=.85;x.fillText((w.focus||'').slice(0,60),P,248);x.globalAlpha=1;
-  const stats=[[w.dur?w.dur+' min':'–','Duration'],[String(w.sets),'Sets'],[w.vol?(w.vol>=1000?(w.vol/1000).toFixed(1)+' t':Math.round(w.vol)+' kg'):'–','Volume'],[w.wk&&w.wk.strain!=null?w.wk.strain.toFixed(1):(w.reps?String(w.reps):'–'),w.wk?'WHOOP strain':'Reps']];
+  const stats=[[w.dur?w.dur+' min':'–','Duration'],[String(w.sets),'Sets'],[w.vol?fvol(w.vol):'–','Volume'],[w.wk&&w.wk.strain!=null?w.wk.strain.toFixed(1):(w.reps?String(w.reps):'–'),w.wk?'WHOOP strain':'Reps']];
   const bw=(W2-2*P-3*20)/4;stats.forEach((s2,i)=>{const bx=P+i*(bw+20),by=head-145;x.fillStyle='#fff';x.beginPath();x.roundRect?x.roundRect(bx,by,bw,120,24):x.rect(bx,by,bw,120);x.fill();x.fillStyle='#191A4A';x.font='900 40px '+F;x.fillText(s2[0],bx+22,by+58);x.fillStyle='#6B7399';x.font='600 22px '+F;x.fillText(s2[1],bx+22,by+96)});
   let y=head+30;
   if(w.wk){const z=w.wk.zones||[],tot=z.reduce((a,b)=>a+b,0)||1;let zx=P;x.fillStyle='#6B7399';x.font='600 24px '+F;x.fillText(`WHOOP · avg ${w.wk.ahr||'–'} bpm · max ${w.wk.mhr||'–'} bpm · heart-rate zones`,P,y);y+=20;z.forEach((v,i)=>{const ww=(W2-2*P)*v/tot;x.fillStyle=ZONE_C[i];x.fillRect(zx,y,ww,22);zx+=ww});y+=70}
@@ -1948,13 +1955,13 @@ async function ibRead(f){
 function drawIbReview(){
   const q=UI.ib,r=q.r,d=r.test_date&&/^\d{4}-\d\d-\d\d$/.test(r.test_date)?r.test_date:todayS();
   const fld=(k,l,u)=>`<label class="ibf"><span>${l}</span><input inputmode="decimal" data-ib="${k}" value="${r[k]!=null?r[k]:''}" placeholder="–"><em>${u}</em></label>`;
-  openSheet(`<h4 class="disp">${q.auto?'Check your InBody numbers':'Enter your InBody numbers'}</h4>
+  openSheet(`<div data-raw><h4 class="disp">${q.auto?'Check your InBody numbers':'Enter your InBody numbers'}</h4>
   ${q.msg?`<div class="note">${esc(q.msg)} You can type the numbers in below.</div>`:'<p class="muted" style="font-size:13.5px;margin:0 0 8px">IRON read these from your sheet. Fix anything that looks wrong, then save.</p>'}
   <label class="fl2">Test date</label><input type="date" id="ibdate" value="${d}" max="${todayS()}">
   <div class="ibgrid">${IB_FIELDS.map(x=>fld(...x)).join('')}</div>
   <label class="fl2" style="margin-top:10px">Segmental lean (kg)</label><div class="ibgrid">${IB_SEG.map(([s,l])=>`<label class="ibf"><span>${l}</span><input inputmode="decimal" data-ib="segmental_lean_kg.${s}" value="${(r.segmental_lean_kg||{})[s]??''}" placeholder="–"><em>kg</em></label>`).join('')}</div>
   <label class="fl2" style="margin-top:10px">Segmental fat (kg)</label><div class="ibgrid">${IB_SEG.map(([s,l])=>`<label class="ibf"><span>${l}</span><input inputmode="decimal" data-ib="segmental_fat_kg.${s}" value="${(r.segmental_fat_kg||{})[s]??''}" placeholder="–"><em>kg</em></label>`).join('')}</div>
-  <button class="cta" style="--c:${WC.body}" data-a="ibsave">Save InBody result</button><button class="cta ghost" data-a="close">Cancel</button>`);
+  <button class="cta" style="--c:${WC.body}" data-a="ibsave">Save InBody result</button><button class="cta ghost" data-a="close">Cancel</button></div>`);
 }
 function ibSave(){
   const q=UI.ib;if(!q)return;const r=clone(q.r);
@@ -2135,7 +2142,7 @@ function renderProgress(){
   const pct=all?dn/all:0;
   let h=`<h2 class="pagetitle disp">Progress</h2><p class="sub">Everything here updates as you log.</p>
   <div class="card"><div class="ringwrap">${ring(pct,COLORS.upper,96,11,Math.round(pct*100)+'%')}<div><div class="disp" style="font-size:32px">${dn} of ${all} sessions</div><div class="muted" style="font-size:14px">done across the whole plan</div></div></div></div>
-  <div class="grid2" style="margin-bottom:12px"><div class="stat"><b class="disp num">${A.adh===null?'–':Math.round(A.adh*100)+'%'}</b><span>Lifting attendance so far</span></div><div class="stat"><b class="disp num">${weekStreak()}</b><span>Week streak (4+ sessions)</span></div><div class="stat"><b class="disp num">${sets}</b><span>Sets logged</span></div><div class="stat"><b class="disp num">${vol>=1000?(vol/1000).toFixed(1)+'t':Math.round(vol)+'kg'}</b><span>Total volume lifted</span></div></div>`;
+  <div class="grid2" style="margin-bottom:12px"><div class="stat"><b class="disp num">${A.adh===null?'–':Math.round(A.adh*100)+'%'}</b><span>Lifting attendance so far</span></div><div class="stat"><b class="disp num">${weekStreak()}</b><span>Week streak (4+ sessions)</span></div><div class="stat"><b class="disp num">${sets}</b><span>Sets logged</span></div><div class="stat"><b class="disp num">${fvol(vol)}</b><span>Total volume lifted</span></div></div>`;
   // weekly bars
   const W=totalWeeks();let bars='';const bw=Math.max(8,Math.floor(300/W)-4);
   for(let w=1;w<=W;w++){const s=addD(sunOf(S.start),(w-1)*7);let sch=0,don=0;for(let i=0;i<7;i++){const d=addD(s,i);if(isTraining(tplOf(d))){sch++;if(S.done[d])don++}}
@@ -2429,7 +2436,7 @@ function reportSheet(ws){
   const t=todayS();ws=ws||addD(sunOf(t),-7);const r=weekData(ws);S.seenReport=ws;save();
   const pct=v=>v==null?'–':Math.round(v*100)+'%',dv=r.pv.vol?(r.v.vol-r.pv.vol)/r.pv.vol:null,pl=plateaus();
   openSheet(`<h4 class="disp">Week of ${short(r.ws)}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">${short(r.ws)} – ${short(r.we)}</p>
-  <div class="grid2"><div class="stat"><b class="disp num">${r.done}/${r.sched}</b><span>Sessions done</span></div><div class="stat"><b class="disp num">${r.v.vol>=1000?(r.v.vol/1000).toFixed(1)+'t':Math.round(r.v.vol)+' kg'}</b><span>Volume${dv!=null?` (${dv>=0?'+':''}${Math.round(dv*100)}%)`:''}</span></div>
+  <div class="grid2"><div class="stat"><b class="disp num">${r.done}/${r.sched}</b><span>Sessions done</span></div><div class="stat"><b class="disp num">${fvol(r.v.vol)}</b><span>Volume${dv!=null?` (${dv>=0?'+':''}${Math.round(dv*100)}%)`:''}</span></div>
   <div class="stat"><b class="disp num">${r.prs.length}</b><span>Personal records</span></div><div class="stat"><b class="disp num">${r.v.sets}</b><span>Sets logged</span></div>
   ${r.rec!=null?`<div class="stat"><b class="disp num" style="color:${recCol(r.rec)}">${Math.round(r.rec)}%</b><span>Avg recovery</span></div>`:''}${r.slp!=null?`<div class="stat"><b class="disp num">${hm(r.slp)}</b><span>Avg sleep</span></div>`:''}
   ${r.str!=null?`<div class="stat"><b class="disp num">${r.str.toFixed(1)}</b><span>Avg day strain</span></div>`:''}${r.wks.length?`<div class="stat"><b class="disp num">${r.wks.length}</b><span>WHOOP workouts</span></div>`:''}
@@ -2466,7 +2473,7 @@ function liftSheet(ex){
     <button class="mini" style="margin-top:8px" data-a="histday" data-d="${x.d}">Open this day →</button></details>`}
   const plt=plateauOf(ex);
   openSheet(`<h4 class="disp">${esc(e.n)}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Every session you logged, newest first. Tap a session to see each set.</p>${plt?plateauHTML(plt):''}
-  <div class="grid2" style="margin-bottom:6px"><div class="stat"><b class="disp num">${bestW} kg</b><span>Heaviest set</span></div><div class="stat"><b class="disp num">${Math.round(bestE)} kg</b><span>Best est. 1RM</span></div><div class="stat"><b class="disp num">${all.length}</b><span>Sessions logged</span></div><div class="stat"><b class="disp num">${totV>=1000?(totV/1000).toFixed(1)+'t':Math.round(totV)+'kg'}</b><span>Total volume</span></div></div>
+  <div class="grid2" style="margin-bottom:6px"><div class="stat"><b class="disp num">${bestW} kg</b><span>Heaviest set</span></div><div class="stat"><b class="disp num">${Math.round(bestE)} kg</b><span>Best est. 1RM</span></div><div class="stat"><b class="disp num">${all.length}</b><span>Sessions logged</span></div><div class="stat"><b class="disp num">${fvol(totV)}</b><span>Total volume</span></div></div>
   ${all.length>1?`<div class="card" style="margin:8px 0"><b style="font-size:13.5px">Estimated 1RM by session</b> <span class="muted num" style="font-size:12.5px">${chg>=0?'+':''}${Math.round(chg*100)}% since ${short(all[0].d)}</span>${bigChart(st.map(x=>x.best),c)}</div>`:''}
   ${rows}<button class="cta ghost" data-a="close">Close</button>`);
 }
@@ -3087,6 +3094,11 @@ function settingsSheet(){
   <div class="srow"><b>Auto-adjust</b><button class="cta ${S.whoop.auto?'':'ghost'}" style="--c:var(--ok);margin:0;height:44px" data-a="wauto">${S.whoop.auto?'On: workouts follow WHOOP':'Off: I choose manually'}</button></div>
   <div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="wsync">Sync now</button><button class="cta ghost" style="margin:0;color:var(--bad)" data-a="wdisconnect">Disconnect</button></div>`:`${S.whoop.pending?`<p style="font-size:13.5px;margin:0 0 8px"><b>Waiting for WHOOP approval.</b> If the login finished in Safari, come back here and tap Check connection.</p><button class="cta ghost" style="margin:0 0 8px" data-a="wsync">Check connection</button>`:''}<p class="muted" style="font-size:13.5px;margin:0 0 8px">Pull your recovery, HRV and resting heart rate every morning and adjust each workout automatically.</p><button class="cta" style="--c:var(--ink);color:var(--bg);margin:0" data-a="wconnect">Connect WHOOP</button>`}
   <p class="muted" style="font-size:12.5px;margin:8px 0 0">Green 67%+ full session. Yellow 34–66% lighter. Red 33% or less recovery only. HRV 10%+ below your 30-day average, or resting HR 5+ bpm above it, drops the day one level.</p></div>
+  <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Display</h4>
+  <label class="fl2">Units</label><div class="obrow"><button class="obopt ${!imperial()?'on':''}" data-a="prefset" data-f="unit" data-v="kg"><b>Metric (kg, cm)</b></button><button class="obopt ${imperial()?'on':''}" data-a="prefset" data-f="unit" data-v="lb"><b>Imperial (lb, in)</b></button></div>
+  <label class="fl2">Language</label><div class="obrow"><button class="obopt ${!isAr()?'on':''}" data-a="prefset" data-f="lang" data-v="en"><b>English</b></button><button class="obopt ${isAr()?'on':''}" data-a="prefset" data-f="lang" data-v="ar"><b>العربية</b></button></div>
+  ${isAr()?'<p class="muted" style="font-size:12.5px;margin:4px 0 0">تبقى أوصاف التمارين ودليل المكمّلات باللغة الإنجليزية.</p>':''}
+  <label class="fl2">Text size</label><div class="obrow"><button class="obopt ${(prefs().ts||'n')==='n'?'on':''}" data-a="prefset" data-f="ts" data-v="n"><b>Normal</b></button><button class="obopt ${prefs().ts==='l'?'on':''}" data-a="prefset" data-f="ts" data-v="l"><b>Large</b></button><button class="obopt ${prefs().ts==='xl'?'on':''}" data-a="prefset" data-f="ts" data-v="xl"><b>Larger</b></button></div></div>
   <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Workouts</h4>
   ${[['rpe','Ask how hard each set felt (RPE)','Rate sets 6–10; weight suggestions use it'],['wake','Keep the screen on during a session','So the timer and sets stay visible'],['alerts','Alert me when rest is over','Sound, vibration and a notification if the app is in the background']].map(([f,l,sub])=>`<button class="obopt ${prefs()[f]?'on':''}" data-a="preftog" data-f="${f}"><b>${prefs()[f]?'✓ ':''}${l}</b><span>${sub}</span></button>`).join('')}
   <button class="cta ghost" data-a="plates" data-e="">🏋️ Plate calculator</button></div>
@@ -3139,7 +3151,8 @@ function prefs(){S.prefs=S.prefs||{};const p=S.prefs;if(p.bar==null)p.bar=20;if(
 const PLATE_ALL=[25,20,15,10,5,2.5,2,1.25,1,0.5];
 const PLATE_C={25:'#E5484D',20:'#2F5BFF',15:'#E8A900',10:'#12B76A',5:'#F4F5FA',2.5:'#191A4A',2:'#7B4DFF',1.25:'#8E97BF',1:'#00A3FF',0.5:'#FF6A13'};
 const isBarbell=ex=>META[ex]&&META[ex].eq==='bb';
-function platesFor(total,bar,plates){const side=(total-bar)/2;if(side<0)return{side:null,list:[],rest:0};let r=Math.round(side*100)/100;const list=[];plates.slice().sort((a,b)=>b-a).forEach(p=>{while(r>=p-1e-9){list.push(p);r=Math.round((r-p)*100)/100}});return{side,list,rest:r}}
+function platesFor(total,bar,plates){if(imperial()){const r=platesForU(total*LB,(S.prefs.barLb??45),S.prefs.platesLb||[45,35,25,10,5,2.5]);return{side:r.side==null?null:r.side/LB,list:r.list,rest:r.rest/LB,lb:true}}return platesForU(total,bar,plates)}
+function platesForU(total,bar,plates){const side=(total-bar)/2;if(side<0)return{side:null,list:[],rest:0};let r=Math.round(side*100)/100;const list=[];plates.slice().sort((a,b)=>b-a).forEach(p=>{while(r>=p-1e-9){list.push(p);r=Math.round((r-p)*100)/100}});return{side,list,rest:r}}
 function plateSheet(ex,w){
   const p=prefs();UI.pl8={ex,w:w!=null&&w!==''?+w:(UI.pl8&&UI.pl8.w)||p.bar+20};drawPlates();
 }
@@ -3149,9 +3162,9 @@ function drawPlates(){
   openSheet(`<h4 class="disp">Plate calculator</h4>${q.ex&&E[q.ex]?`<p class="muted" style="font-size:13.5px;margin:0 0 6px">${esc(E[q.ex].n)}</p>`:''}
   <div class="pcrow"><button class="mini big" data-a="pl8w" data-v="-2.5" aria-label="Less weight">−</button><label class="fld pcw"><input inputmode="decimal" id="pl8in" data-in="pl8" value="${q.w}" aria-label="Total weight"><em>kg total</em></label><button class="mini big" data-a="pl8w" data-v="2.5" aria-label="More weight">＋</button></div>
   ${res.side==null?`<div class="note">That's lighter than the bar (${p.bar} kg).</div>`:`<div class="pcbar" aria-label="Plates on each side">${stack||'<span class="muted">Empty bar</span>'}<b></b></div>
-  <p style="font-size:15px;margin:8px 0 0"><b>Each side:</b> ${res.list.length?res.list.join(' + ')+' kg':'nothing'}${res.rest>0?`<br><span class="muted">Closest you can load: ${made} kg (${res.rest} kg per side missing).</span>`:''}</p>`}
-  <label class="fl2" style="margin-top:12px">Bar</label><div class="chipsrow">${[20,15,10,7,0].map(b=>`<button class="mini ${p.bar===b?'on':''}" data-a="pl8bar" data-v="${b}">${b?b+' kg':'No bar'}</button>`).join('')}</div>
-  <label class="fl2" style="margin-top:10px">Plates your gym has</label><div class="chipsrow">${PLATE_ALL.map(x=>`<button class="mini ${p.plates.includes(x)?'on':''}" data-a="pl8p" data-v="${x}">${x}</button>`).join('')}</div>
+  <p style="font-size:15px;margin:8px 0 0" data-raw><b>${isAr()?'كل جانب:':'Each side:'}</b> ${res.list.length?res.list.join(' + ')+(res.lb?' lb':' kg'):'nothing'}${res.rest>0?`<br><span class="muted">Closest you can load: ${made} kg (${res.rest} kg per side missing).</span>`:''}</p>`}
+  <label class="fl2" style="margin-top:12px">Bar</label><div class="chipsrow">${imperial()?[45,35,25,15,0].map(b=>`<button class="mini ${(p.barLb??45)===b?'on':''}" data-a="pl8barlb" data-v="${b}" data-raw>${b?b+' lb':'No bar'}</button>`).join(''):[20,15,10,7,0].map(b=>`<button class="mini ${p.bar===b?'on':''}" data-a="pl8bar" data-v="${b}">${b?b+' kg':'No bar'}</button>`).join('')}</div>
+  <label class="fl2" style="margin-top:10px">Plates your gym has</label><div class="chipsrow">${imperial()?'<span class="muted" style="font-size:12.5px">45, 35, 25, 10, 5 and 2.5 lb plates</span>':PLATE_ALL.map(x=>`<button class="mini ${p.plates.includes(x)?'on':''}" data-a="pl8p" data-v="${x}">${x}</button>`).join('')}</div>
   <button class="cta ghost" data-a="close">Done</button>`);
 }
 /* keep the screen on during a session, and alert when rest ends even if the app is in the background */
@@ -3177,12 +3190,12 @@ function drawFocus(){
   if(!n){openSheet(`<div class="fxwrap"><div class="disp" style="font-size:34px">All sets done 💪</div><p class="muted">Finish the core and cardio from the Train tab, or share the workout.</p><button class="cta" style="--c:var(--upper)" data-a="wshare" data-d="${d}">📸 Share workout</button><button class="cta ghost" data-a="close">Close</button></div>`);return}
   const it=n.it,e=E[it.ex],k=it.slot+'|'+n.r,o=slotLog(d,it.slot,it.ex,it.rx.sets),s=o.sets[n.r],sg=e.bw||e.t?null:suggest(it,d);
   if(q.k!==k){q.k=k;q.w=s.w!==''?+s.w:(sg?sg.w:(o.sets.slice(0,n.r).reverse().find(x=>x.w!=='')||{}).w||'');q.r=s.r!==''?+s.r:(e.t?secsOf(it):rangeOf(it.rx.reps)[1])}
-  const step=isBarbell(it.ex)?2.5:(['acc','arm','pre'].includes(it.role)?1:2);
+  const step=imperial()?(isBarbell(it.ex)?5:2.5)/LB:(isBarbell(it.ex)?2.5:(['acc','arm','pre'].includes(it.role)?1:2));
   const tot=groupsTotal(d),done=tot.done;
   openSheet(`<div class="fxwrap"><div class="fxtop"><span class="pill" style="--c:var(--upper)">${done} of ${tot.all} sets</span><button class="mini" data-a="close" aria-label="Exit focus mode">Exit</button></div>
   <div class="fxname disp">${esc(e.n)}</div><div class="muted" style="font-size:14px">Set ${n.r+1} of ${it.rx.sets} · target ${repTxt(it)}${it.rx.rir!=null&&!/^core/.test(it.role)?' · RIR '+it.rx.rir:''}</div>
   ${sg?`<div class="sugg" style="margin-top:6px">${esc(sg.why)}. Suggested <b>${sg.w} kg</b>.</div>`:''}
-  ${!e.bw&&!e.t?`<div class="fxctl"><span>Weight</span><button data-a="fxadj" data-f="w" data-v="${-step}" aria-label="Less weight">−</button><b class="num">${q.w===''?'–':q.w}<small>kg</small></b><button data-a="fxadj" data-f="w" data-v="${step}" aria-label="More weight">＋</button></div>`:''}
+  ${!e.bw&&!e.t?`<div class="fxctl"><span>Weight</span><button data-a="fxadj" data-f="w" data-v="${-step}" aria-label="Less weight">−</button><b class="num" data-raw>${q.w===''?'–':toDisp(q.w)}<small>${uW()}</small></b><button data-a="fxadj" data-f="w" data-v="${step}" aria-label="More weight">＋</button></div>`:''}
   <div class="fxctl"><span>${e.t?'Seconds':'Reps'}</span><button data-a="fxadj" data-f="r" data-v="${e.t?-5:-1}" aria-label="Less">−</button><b class="num">${q.r}<small>${e.t?'s':''}</small></b><button data-a="fxadj" data-f="r" data-v="${e.t?5:1}" aria-label="More">＋</button></div>
   <button class="fxdone" data-a="fxdone">✓ Set done</button>
   <div class="fxrow"><button class="mini" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button>${isBarbell(it.ex)?`<button class="mini" data-a="plates" data-e="${it.ex}" data-w="${q.w}">🏋️ Plates</button>`:''}<button class="mini" data-a="fxskip">Skip set</button></div>
@@ -3191,6 +3204,61 @@ function drawFocus(){
 function groupsTotal(d){let all=0,done=0;blocksFor(d).forEach(b=>b.items.forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)}));coreFor(d).forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)});return{all,done}}
 function fxTimer(){const el=document.getElementById('fxtimer');if(!el)return;if(!TM){el.innerHTML='';return}const rem=Math.max(0,Math.ceil((TM.end-Date.now())/1000));el.innerHTML=`<span>${esc(TM.phases[TM.i].l)}</span><b class="disp num">${fmtT(rem)}</b>`}
 setInterval(()=>{if(UI.fx)fxTimer();if(TM&&!TM.paused){document.title=fmtT(Math.max(0,(TM.end-Date.now())/1000))+' · '+TM.title+' · IRON'}else if(document.title!=='IRON')document.title='IRON'},500);
+
+/* =====================================================================
+   DISPLAY LAYER: units, language, accessibility, text size.
+   Everything is stored in kg and cm. After each screen renders, text is
+   converted to pounds, inches or miles for imperial users, translated for
+   Arabic, and icon-only buttons get screen-reader labels.
+   ===================================================================== */
+const LB=2.20462;
+const imperial=()=>!!(S.prefs&&S.prefs.unit==='lb');
+const isAr=()=>!!(S.prefs&&S.prefs.lang==='ar');
+const uW=()=>imperial()?'lb':'kg';
+function toDisp(kg){if(kg===''||kg==null||isNaN(+kg))return kg;return imperial()?Math.round(+kg*LB*2)/2:+kg}
+function fromDisp(v){if(v===''||v==null||isNaN(+v))return v;return imperial()?Math.round(+v/LB*100)/100:+v}
+function fvol(kg){const v=imperial()?kg*LB:kg;return v>=1000?(v/1000).toFixed(1)+(imperial()?'k lb':'t'):Math.round(v)+' '+uW()}
+const fmtN=n=>(Math.round(n*10)/10).toLocaleString('en',{maximumFractionDigits:1});
+function convText(t){
+  if(!imperial()||!/\d|kg|cm|km/.test(t))return t;
+  return t.replace(/(-?\d[\d,]*(?:\.\d+)?)\s?kg\b/g,(m,n)=>{const v=parseFloat(n.replace(/,/g,''))*LB;return fmtN(Math.round(v*2)/2)+' lb'})
+    .replace(/(\d+(?:\.\d+)?)\s?km\b/g,(m,n)=>(parseFloat(n)*0.621371).toFixed(2)+' mi')
+    .replace(/(\d+(?:\.\d+)?)\s?cm\b/g,(m,n)=>{const i=Math.round(parseFloat(n)/2.54);return Math.floor(i/12)+'′'+(i%12)+'″'})
+    .replace(/^kg$/,'lb').replace(/^kg total$/,'lb total');
+}
+/* Arabic interface labels (exercise descriptions and the supplement guide stay in English) */
+const AR={'Home':'الرئيسية','Train':'التمرين','Plan':'الخطة','Builder':'المُنشئ','Progress':'التقدّم','Supps':'المكمّلات','Habits':'العادات','Travel':'السفر',
+ 'Settings':'الإعدادات','Close':'إغلاق','Cancel':'إلغاء','Save':'حفظ','Done':'تم','Back':'رجوع','Next':'التالي','Undo':'تراجع','Add':'إضافة','Share':'مشاركة','Upload':'رفع','Sync now':'مزامنة الآن','↻ Sync':'↻ مزامنة',
+ 'Good morning':'صباح الخير','Good afternoon':'مساء الخير','Good evening':'مساء الخير','Today':'اليوم','This week':'هذا الأسبوع','Last workout':'آخر تمرين','Recovery':'التعافي','Sleep':'النوم','Strain':'الإجهاد','Workouts':'التمارين',
+ 'Volume this week':'الحجم هذا الأسبوع','Top lift':'أفضل رفعة','Strength':'القوة','Supplements':'المكمّلات','Streaks':'السلاسل','Body weight':'وزن الجسم','Weekly report':'التقرير الأسبوعي','Start session ›':'ابدأ الجلسة ›','Continue ›':'تابع ›','Rest day ›':'يوم راحة ›',
+ 'Mobility':'المرونة','Warm-up':'الإحماء','Core':'الجذع','Cardio':'الكارديو','Long cardio':'كارديو طويل','Rest day':'يوم راحة','Finish session':'إنهاء الجلسة','Session complete':'اكتملت الجلسة','Demo':'فيديو','Replace':'استبدال','Form':'الأداء','History':'السجل','🏋️ Plates':'🏋️ الأقراص',
+ '▶ Focus mode':'▶ وضع التركيز','Compact view':'عرض مختصر','Expand all':'توسيع الكل','Move or copy':'نقل أو نسخ','📸 Share':'📸 مشاركة','✓ Set done':'✓ انتهت المجموعة','Skip set':'تخطي المجموعة','Exit':'خروج','Weight':'الوزن','Reps':'التكرارات','Seconds':'الثواني','reps':'تكرار','How hard?':'ما مدى الصعوبة؟',
+ 'Green':'أخضر','Yellow':'أصفر','Red':'أحمر','full session':'جلسة كاملة','lighter day':'يوم أخف','recovery only':'تعافٍ فقط','Readiness check':'فحص الجاهزية','Muscle soreness':'ألم العضلات','Energy':'الطاقة','Use this for today':'استخدم هذا لليوم','Not now':'ليس الآن',
+ 'Plate calculator':'حاسبة الأقراص','Bar':'العارضة','Plates your gym has':'الأقراص المتوفرة في ناديك','Each side:':'كل جانب:',
+ 'Strength trends':'تطوّر القوة','Sessions per week':'الجلسات في الأسبوع','Stalled lifts':'رفعات متوقفة','Personal records':'أرقام قياسية شخصية','Sessions done':'الجلسات المنجزة','Sets logged':'المجموعات المسجّلة','Avg recovery':'متوسط التعافي','Avg sleep':'متوسط النوم','Supplements taken':'المكمّلات المأخوذة','Habits done':'العادات المنجزة',
+ 'Plan builder':'مُنشئ الخطة','Start from a split':'ابدأ من تقسيم','Your week':'أسبوعك','Cycles and progression':'الدورات والتقدّم','WHOOP intensity':'شدة WHOOP','Mobility focus':'تركيز المرونة','Apply':'تطبيق','Apply to my plan':'طبّق على خطتي','Cycle length':'طول الدورة','Goal':'الهدف','Session length':'مدة الجلسة',
+ 'Your plan':'خطتك','Cloud backup':'النسخ الاحتياطي السحابي','☁️ Cloud backup ›':'☁️ النسخ الاحتياطي السحابي ›','Copy code':'نسخ الرمز','Back up now':'انسخ الآن','Link this device':'اربط هذا الجهاز','Download backup':'تنزيل نسخة احتياطية','Restore from file':'استعادة من ملف','Back to settings':'العودة إلى الإعدادات',
+ 'Theme':'المظهر','Units':'الوحدات','Language':'اللغة','Text size':'حجم النص','Metric (kg, cm)':'متري (كغ، سم)','Imperial (lb, in)':'إمبراطوري (رطل، إنش)','Normal':'عادي','Large':'كبير','Larger':'أكبر','Display':'العرض',
+ 'Body':'الجسم','InBody':'InBody','Trends':'الاتجاهات','Insights':'رؤى','Steps ›':'الخطوات ›','Sleep ›':'النوم ›','Strain ›':'الإجهاد ›','Calories ›':'السعرات ›','HRV':'تقلب نبض القلب',
+ 'Build or improve my stack':'أنشئ أو حسّن مكمّلاتي','📖 Supplement guide':'📖 دليل المكمّلات','Morning':'الصباح','Pre-workout':'قبل التمرين','Post-workout':'بعد التمرين','With meals':'مع الوجبات','Evening':'المساء',
+ 'Workout summary':'ملخص التمرين','Share image':'مشاركة الصورة','Save image':'حفظ الصورة','Copy as text':'نسخ كنص','Nice':'رائع','Session done':'انتهت الجلسة'};
+const AR_PART=[[/^Cycle (\d+) · week (\d+)\/(\d+)$/,'الدورة $1 · الأسبوع $2/$3'],[/^(\d+) of (\d+) sessions$/,'$1 من $2 جلسات'],[/^Set (\d+) of (\d+)/,'المجموعة $1 من $2']];
+function trText(t){if(!isAr())return t;const k=t.trim();if(!k)return t;if(AR[k])return t.replace(k,AR[k]);for(const[re,to]of AR_PART)if(re.test(k))return t.replace(k,k.replace(re,to));return t}
+const ICON_LABEL={close:'Close',tstop:'Stop timer',tpause:'Pause or resume timer',tadj:'Adjust timer',set:'Mark set done',tset:'Start set timer',mob:'Mark done',excol:'Show or hide details',col:'Show or hide section',wk:'Change week',day:'Open day',demo:'Play video',settings:'Settings',swap:'Replace exercise',bdmove:'Move',bddel:'Remove',fxadj:'Adjust',pl8w:'Adjust weight',rpe:'Rate set',supp:'Mark taken',habday:'Toggle day',sdaytoggle:'Toggle day',habm:'Change month',sm:'Change month',hcol:'Colour',hemo:'Emoji'};
+function localizeNode(root){
+  const doU=imperial(),doA=isAr();
+  if(root.nodeType===3){if(root.parentNode&&root.parentNode.closest&&root.parentNode.closest('[data-raw]'))return;let v=root.nodeValue;if(doU)v=convText(v);if(doA)v=trText(v);if(v!==root.nodeValue)root.nodeValue=v;return}
+  if(root.nodeType!==1||root.closest&&root.closest('[data-raw]'))return;
+  if(doU||doA){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentNode&&(n.parentNode.nodeName==='SCRIPT'||n.parentNode.nodeName==='STYLE'||n.parentNode.closest('[data-raw]'))?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});const list=[];while(w.nextNode())list.push(w.currentNode);
+    list.forEach(n=>{let v=n.nodeValue;if(doU)v=convText(v);if(doA)v=trText(v);if(v!==n.nodeValue)n.nodeValue=v});
+    if(doA)root.querySelectorAll&&root.querySelectorAll('[placeholder]').forEach(e=>{const p=e.getAttribute('placeholder');if(AR[p])e.setAttribute('placeholder',AR[p])})}
+  const btns=root.matches&&root.matches('button')?[root]:root.querySelectorAll?[...root.querySelectorAll('button')]:[];
+  btns.forEach(b=>{if(b.hasAttribute('aria-label'))return;const tx=b.textContent.replace(/[\s✕✓−＋↑↓‹›❚▶…]/g,'');if(tx.length)return;b.setAttribute('aria-label',ICON_LABEL[b.dataset.a]||b.title||(b.dataset.a||'button').replace(/([a-z])([A-Z])/g,'$1 $2'))});
+  // weight inputs show the display unit
+  if(doU&&root.querySelectorAll)root.querySelectorAll('input[data-in="w"],input#pl8in').forEach(i=>{if(i.dataset.conv)return;i.dataset.conv=1;if(i.value!=='')i.value=toDisp(i.value);if(i.placeholder&&!isNaN(+i.placeholder))i.placeholder=toDisp(i.placeholder)});
+}
+function applyDisplay(){const p=prefs(),h=document.documentElement;h.lang=p.lang==='ar'?'ar':'en';h.dir=p.lang==='ar'?'rtl':'ltr';h.dataset.ts=p.ts||'n'}
+new MutationObserver(ms=>{if(!S||!S.prefs)return;for(const m of ms)m.addedNodes.forEach(n=>localizeNode(n))}).observe(document.body,{childList:true,subtree:true});
 
 /* ---------- actions ---------- */
 function rerender(){HISTCACHE=null;WICACHE={};renderTop();renderTabs();({home:renderHome,train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits})[UI.tab]();}
@@ -3322,9 +3390,11 @@ document.addEventListener('click',ev=>{
   case'tadj':if(TM){const dv=+el.dataset.v;if(TM.paused)TM.left=Math.max(1,TM.left+dv);else TM.end=Math.max(Date.now()+1000,TM.end+dv*1000);drawTimer()}break;
   case'tpause':if(TM){if(TM.paused){TM.end=Date.now()+TM.left*1000;TM.paused=false}else{TM.left=(TM.end-Date.now())/1000;TM.paused=true}drawTimer()}break;
   case'tstop':TM=null;drawTimer();break;
+  case'prefset':{prefs()[el.dataset.f]=el.dataset.v;save();applyDisplay();rerender();settingsSheet();break}
   case'preftog':{const p2=prefs(),f2=el.dataset.f;p2[f2]=!p2[f2];if(f2==='alerts'&&p2.alerts)askAlerts();if(f2==='wake'&&!p2.wake)wakeOff();save();settingsSheet();break}
   case'plates':plateSheet(el.dataset.e,el.dataset.w);break;
-  case'pl8w':UI.pl8.w=Math.max(0,Math.round((+UI.pl8.w+ +el.dataset.v)*100)/100);drawPlates();break;
+  case'pl8w':UI.pl8.w=Math.max(0,Math.round((+UI.pl8.w+(imperial()?(+el.dataset.v>0?5:-5)/LB:+el.dataset.v))*100)/100);drawPlates();break;
+  case'pl8barlb':prefs().barLb=+el.dataset.v;save();drawPlates();break;
   case'pl8bar':prefs().bar=+el.dataset.v;save();drawPlates();break;
   case'pl8p':{const p2=prefs(),v2=+el.dataset.v,i2=p2.plates.indexOf(v2);if(i2>=0)p2.plates.splice(i2,1);else p2.plates.push(v2);save();drawPlates();break}
   case'rpe':{const[slot,i]=k.split('|');const f=findItem(d,slot);if(!f)break;const o=slotLog(d,slot,f.it.ex,f.it.rx.sets);const v2=+el.dataset.v;if(v2)o.sets[+i].e=v2;else o.sets[+i].e=0;UI.rpeAsk=null;save();rerender();break}
@@ -3389,13 +3459,13 @@ document.addEventListener('input',ev=>{const el=ev.target;if(!el.dataset)return;
 });
 document.addEventListener('change',ev=>{
   const el=ev.target;if(!el.dataset||!el.dataset.in)return;const t=el.dataset.in,k=el.dataset.k,d=UI.date;
-  if(t==='w'||t==='r'){const[slot,i]=k.split('|');const f=findItem(d,slot);if(!f)return;const o=slotLog(d,slot,f.it.ex,f.it.rx.sets);const old=o.sets[+i][t],nv=el.value.replace(',','.').trim();o.sets[+i][t]=nv;
+  if(t==='w'||t==='r'){const[slot,i]=k.split('|');const f=findItem(d,slot);if(!f)return;const o=slotLog(d,slot,f.it.ex,f.it.rx.sets);const old=o.sets[+i][t];let nv=el.value.replace(',','.').trim();if(t==='w'&&nv!==''&&!isNaN(+nv))nv=String(fromDisp(nv));o.sets[+i][t]=nv;
     // copy the new value to the following sets of this move that are not ticked yet and were empty or still matched the old value
-    if(nv!=='')for(let j=+i+1;j<o.sets.length;j++){const q=o.sets[j];if(q.d||!(q[t]===''||q[t]===old))continue;q[t]=nv;const inp=document.querySelector(`input[data-in="${t}"][data-k="${slot}|${j}"]`);if(inp)inp.value=nv}
+    if(nv!=='')for(let j=+i+1;j<o.sets.length;j++){const q=o.sets[j];if(q.d||!(q[t]===''||q[t]===old))continue;q[t]=nv;const inp=document.querySelector(`input[data-in="${t}"][data-k="${slot}|${j}"]`);if(inp)inp.value=t==='w'?toDisp(nv):nv}
     save();HISTCACHE=null}
   else if(t==='map'){const AM=activeMap();if(AM[k]!==el.value){snapSched(`${DN[k]}s changed from ${T[AM[k]].n} to ${T[el.value].n}`,[],[],true);AM[k]=el.value;save();rerender();toast(DN[k]+' is now '+T[el.value].n,()=>{undoSched()})}}
   else if(t==='mvdate'){if(el.value){const mode=(UI.mv&&UI.mv.mode)||'move';if(doSchedule(mode,el.value)){closeSheet();UI.date=mode==='move'?el.value:UI.date;rerender();toast((mode==='move'?'Moved to ':'Copied to ')+short(el.value),()=>{undoSched()})}}}
-  else if(t==='pl8'){const v2=parseFloat(el.value.replace(',','.'));if(!isNaN(v2)){UI.pl8.w=v2;drawPlates()}}
+  else if(t==='pl8'){const v2=parseFloat(el.value.replace(',','.'));if(!isNaN(v2)){UI.pl8.w=fromDisp(v2);drawPlates()}}
   else if(t==='bdday'){UI.bd.week[+k]=el.value;UI.bd.dirty=true;rerender()}
   else if(t==='bdname'){const v2=el.value.trim();if(v2)bdMut(x=>{x.n=v2})}
   else if(t==='start'){if(el.value&&el.value<S.end){S.start=el.value;save();rerender();toast('Plan now starts '+short(el.value))}}
@@ -3407,7 +3477,7 @@ document.addEventListener('change',ev=>{
 function applyTheme(v){if(v==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',v)}
 try{applyTheme(localStorage.getItem(KEY+'-theme')||'auto')}catch(e){}
 (function(){const q=new URLSearchParams(location.search);const w=q.get('whoop');if(w){history.replaceState(null,'',location.pathname);if(w==='connected'){S.whoop.last=0;save();if(!S.whoop.key)setTimeout(()=>toast('WHOOP connected. Go back to the IRON app on your home screen.'),300)}else setTimeout(()=>toast('WHOOP connection failed ('+(q.get('reason')||'unknown')+')'),300)}})();
-applyProfile();applyCustom();UI.fresh=FRESH;
+applyProfile();applyCustom();prefs();applyDisplay();UI.fresh=FRESH;
 autoLinkHabits();
 rerender();
 if(FRESH)setTimeout(openOnboarding,250);
