@@ -16,7 +16,7 @@ test('backups are encrypted: the server never sees the code or the data', async 
 
 test('an older plain backup moves to encrypted storage', async ({ page, request }) => {
   await openApp(page);
-  const code = 'b'.repeat(64);
+  const code = Array.from({ length: 64 }, () => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join(''); // fresh per run so earlier runs can't interfere
   await request.put('/api/sync', { headers: { 'x-iron-sync': code, 'content-type': 'application/json' }, data: { updated: 1000, state: { start: '2026-09-28', logs: { '2026-10-10': { 's0-0': { ex: 'incDB', sets: [{ w: '40', r: '8', d: 1 }] } } } } } });
   globalThis.__promptAnswer = code;
   await Promise.all([page.waitForEvent('load'), page.evaluate((c) => syncLink(c, true), code)]);
