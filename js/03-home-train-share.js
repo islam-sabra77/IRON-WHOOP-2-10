@@ -224,30 +224,35 @@ function blockHTML(d,b,c){
   const rest=Math.max(...b.items.map(x=>x.rx.rest));
   return`<div class="block ss" style="--c:${c}"><div class="sslab"><span>Superset ${b.label}${b.extra?', added in extension':''}</span><span>Rest ${rest} s after ${b.label}${b.items.length}</span></div>${b.items.map((it,i)=>exCard(d,it,{label:b.label+(i+1),block:b,c,idx:i})).join('')}</div>`;
 }
+/* warm-up ramp from the working weight: about 40%, 60% and 80% */
+function warmRamp(w,bar){if(!w||w<=0)return[];const st=w>=60?2.5:1;const r=[[.4,10],[.6,5],[.8,3]].map(([p,reps])=>({w:Math.max(bar||0,Math.round(w*p/st)*st),r:reps}));return r.filter((x,i)=>x.w<w&&(i===0||x.w>r[i-1].w))}
 function exCard(d,it,o){
-  const e=E[it.ex],n=it.rx.sets,log=(S.logs[d]&&S.logs[d][it.slot]&&S.logs[d][it.slot].ex===it.ex)?S.logs[d][it.slot]:{sets:[]};
-  const doneN=log.sets.slice(0,n).filter(s=>s.d).length,complete=doneN>=n;
+  const e=E[it.ex],n0=it.rx.sets,log=(S.logs[d]&&S.logs[d][it.slot]&&S.logs[d][it.slot].ex===it.ex)?S.logs[d][it.slot]:{sets:[]};
+  const n=n0+(log.x||0),lp=e.t?null:lastPerf(it.ex,d);
+  const doneN=log.sets.slice(0,n0).filter(s=>s.d).length,complete=doneN>=n0;
   const sug=e.bw||e.t?null:suggest(it,d);
   const isCore=it.role==='coreR'||it.role==='coreT';
   let rxline=`${n} × ${repTxt(it)}`+(isCore?'':` · RIR ${it.rx.rir}`)+(o.block.items.length===1?` · rest ${it.rx.rest} s`:'');
   const shut=UI.exc[it.slot]===true||(complete&&UI.exo[it.slot]!==true)||(UI.compact&&UI.exo[it.slot]!==true);
   let hh=`<article class="ex ${complete?'complete':''} ${shut?'shut':''}" style="--c:${o.c}">
-   <div class="exh" data-a="excol" data-k="${it.slot}" data-s="${shut?1:0}" role="button" aria-expanded="${!shut}"><span class="lab">${complete?IC.check.replace('<svg','<svg width="20" height="20"'):o.label}</span><div class="ext"><b>${esc(e.n)}</b><div class="rx num">${rxline}</div>${shut?`<span class="prog-chip">${doneN}/${n} sets${complete?' done':''}</span>`:''}</div><span class="chev">${CHEV}</span></div>`;
+   <div class="exh" data-a="excol" data-k="${it.slot}" data-s="${shut?1:0}" role="button" aria-expanded="${!shut}"><span class="lab">${complete?IC.check.replace('<svg','<svg width="20" height="20"'):o.label}</span><div class="ext"><b>${esc(e.n)}</b><div class="rx num">${rxline}</div>${shut?`<span class="prog-chip">${doneN}/${n0} sets${complete?' done':''}</span>`:''}</div><span class="chev">${CHEV}</span></div>`;
   if(shut)return hh+'</article>';
   hh+=`<div style="overflow:hidden;margin-top:8px">${thumb(it.ex,o.c)}<div class="cue" style="font-size:13.5px">${esc(cueOf(e))}${sideNote(e)}</div></div>`;
   if(it.ex!==it.base){const scope=S.swaps[d]&&S.swaps[d][it.slot]?'today':'in every session';hh+=`<div class="swapped"><span>Replaces ${esc(E[it.base].n)} ${scope}</span><button data-a="undoswap" data-k="${it.slot}" data-b="${it.base}">Undo</button></div>`}
   {const plt=!e.bw&&!e.t?plateauOf(it.ex,d):null;if(plt&&!phaseOf(d).deload)hh+=plateauHTML(plt,true)}
   if(sug)hh+=`<div class="sugg num tap" data-a="lifthist" data-e="${it.ex}" role="button">Last (${short(sug.lp.d)}): ${sug.lp.sets.map(s=>s.w+'×'+s.r).join(', ')}. Try <b>${sug.w} kg</b>. <span class="muted">${sug.why}.</span> <u>History ›</u></div>`;
   else if(!e.bw&&!e.t&&!isCore)hh+=`<div class="sugg">First time: pick a load you could lift ${Number(String(it.rx.rir)[0])+0||2} more reps with. The app suggests next time.</div>`;
+  {const tw=+(log.sets.find(q=>q.w!=='')||{}).w||(sug?sug.w:0);if(log.wu&&tw&&!e.bw&&!e.t){const ramp=warmRamp(tw,isBarbell(it.ex)?20:0);hh+=`<div class="wramp"><span>Warm-up</span>${ramp.map((x,j)=>`<button class="${log.wu[j]?'on':''}" data-a="wuset" data-k="${it.slot}" data-v="${j}">${x.w} kg × ${x.r}</button>`).join('')}</div>`}}
   hh+=`<div class="sets">`;
   for(let i=0;i<n;i++){
-    const s=log.sets[i]||{w:'',r:'',d:0},k=it.slot+'|'+i;
+    const s=log.sets[i]||{w:'',r:'',d:0},k=it.slot+'|'+i,ls=lp&&lp.sets[Math.min(i,lp.sets.length-1)],extra=i>=n0;
     if(e.t){const sec=secsOf(it);hh+=`<div class="set t ${s.d?'done':''}"><span class="sn">${i+1}</span><button class="tbtn" data-a="tset" data-k="${k}">${IC.play} ${sec} s${e.u?' each side':''}</button><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
     else if(e.bw){hh+=`<div class="set bw ${s.d?'done':''}"><span class="sn">${i+1}</span><label class="fld"><input inputmode="numeric" data-in="r" data-k="${k}" value="${esc(s.r)}" placeholder="${rangeOf(it.rx.reps)[1]}"><em>reps</em></label><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
-    else{hh+=`<div class="set ${s.d?'done':''}"><span class="sn">${i+1}${s.d&&s.e?`<small class="rpel">@${s.e}</small>`:''}</span><label class="fld"><input inputmode="decimal" data-in="w" data-k="${k}" value="${esc(s.w)}" placeholder="${sug?sug.w:'–'}"><em>kg</em></label><label class="fld"><input inputmode="numeric" data-in="r" data-k="${k}" value="${esc(s.r)}" placeholder="${rangeOf(it.rx.reps)[1]}"><em>reps</em></label><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
+    else{hh+=`<div class="set ${s.d?'done':''}"><span class="sn">${s.t==='d'?'D':extra?'+':i+1}${s.d&&s.e?`<small class="rpel">@${s.e}</small>`:''}</span><label class="fld"><input inputmode="decimal" data-in="w" data-k="${k}" value="${esc(s.w)}" placeholder="${s.t==='d'&&i>0&&log.sets[i-1].w?Math.round(+log.sets[i-1].w*.8/2.5)*2.5:(sug?sug.w:(ls?ls.w:'–'))}"><em>kg</em>${ls&&!s.d?`<small class="lastv">${ls.w}</small>`:''}</label><label class="fld"><input inputmode="numeric" data-in="r" data-k="${k}" value="${esc(s.r)}" placeholder="${rangeOf(it.rx.reps)[1]}"><em>reps</em>${ls&&!s.d?`<small class="lastv">${ls.r}</small>`:''}</label><button class="tick ${s.d?'on':''}" data-a="set" data-k="${k}" aria-label="Set ${i+1} done">${IC.check}</button></div>`}
     if(prefs().rpe&&s.d&&s.e==null&&!e.t&&UI.rpeAsk===k)hh+=rpeRow(k,s);
   }
   hh+=`</div><div class="tools"><button class="mini demo" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button><button class="mini" data-a="swap" data-k="${it.slot}" data-b="${it.base}">${IC.swap} Replace</button><button class="mini" data-a="exinfo" data-k="${it.slot}">${IC.info} Form</button>${isBarbell(it.ex)?`<button class="mini" data-a="plates" data-e="${it.ex}" data-w="${(log.sets.find(q=>q.w!=='')||{}).w||(sug?sug.w:'')}">🏋️ Plates</button>`:''}${!e.bw&&!e.t&&(hist()[it.ex]||[]).length?`<button class="mini" data-a="lifthist" data-e="${it.ex}">History</button>`:''}</div>
+  ${!e.t&&!isCore?`<div class="tools quick"><button class="mini" data-a="addset" data-k="${it.slot}">＋ Set</button>${!e.bw?`<button class="mini" data-a="dropset" data-k="${it.slot}">↓ Drop set</button><button class="mini ${log.wu?'on':''}" data-a="wuramp" data-k="${it.slot}">Warm-up sets</button>`:''}${log.x?`<button class="mini" data-a="rmset" data-k="${it.slot}" aria-label="Remove the last extra set">− Extra</button>`:''}${lp?'<span class="muted swipehint">Small numbers are last time · swipe a set right to finish it</span>':''}</div>`:''}
   <div class="info hide" id="info-${it.slot}">${esc(cueOf(e))}${sideNote(e,1)}${e.p?`<div><span class="chipinj" style="--c:${o.c}">Protects: ${esc(protOf(e))}</span></div>`:''}</div>
   </article>`;
   return hh;

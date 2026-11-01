@@ -51,6 +51,12 @@ document.addEventListener('visibilitychange',()=>{clearTimeout(BGT);if(document.
 /* RPE: how hard the set felt, 6 (easy) to 10 (nothing left) */
 const RPE_L={6:'Easy, 4+ left',7:'3 left',8:'2 left',9:'1 left',10:'Max'};
 function rpeRow(k,s){return`<div class="rperow" role="group" aria-label="How hard was that set?"><span>How hard?</span>${[6,7,8,9,10].map(v=>`<button class="${+s.e===v?'on':''}" data-a="rpe" data-k="${k}" data-v="${v}" title="${RPE_L[v]}">${v}</button>`).join('')}<button class="rpex" data-a="rpe" data-k="${k}" data-v="0" aria-label="Skip">✕</button></div>`}
+/* swipe a set row to the right to finish it */
+(function swipeSets(){let row=null,x0=0,y0=0,dx=0,lock=null;
+  document.addEventListener('touchstart',e=>{const r=e.target.closest('.set');if(!r||e.target.closest('input')||e.touches.length!==1){row=null;return}row=r;x0=e.touches[0].clientX;y0=e.touches[0].clientY;dx=0;lock=null},{passive:true});
+  document.addEventListener('touchmove',e=>{if(!row)return;const t=e.touches[0],mx=t.clientX-x0,my=t.clientY-y0;if(lock===null){if(Math.abs(mx)<10&&Math.abs(my)<10)return;lock=Math.abs(mx)>Math.abs(my)*1.3&&mx>0?'x':'y'}if(lock!=='x')return;dx=Math.max(0,Math.min(140,mx));row.style.transform=`translateX(${dx}px)`;row.classList.toggle('swiping',dx>70)},{passive:true});
+  document.addEventListener('touchend',()=>{if(!row)return;const r=row;row=null;r.style.transition='transform .18s';r.style.transform='';setTimeout(()=>{r.style.transition=''},200);r.classList.remove('swiping');if(lock==='x'&&dx>70){const b=r.querySelector('[data-a="set"]');if(b&&!b.classList.contains('on')){try{navigator.vibrate&&navigator.vibrate(18)}catch(_){}b.click()}}},{passive:true});
+})();
 /* focus mode: the next set, big controls */
 function nextSet(d){
   const groups=blocksFor(d).map(b=>b.items).concat(coreFor(d).length?[coreFor(d)]:[]);
@@ -272,6 +278,10 @@ document.addEventListener('click',ev=>{
   case'pl8p':{const p2=prefs(),v2=+el.dataset.v,i2=p2.plates.indexOf(v2);if(i2>=0)p2.plates.splice(i2,1);else p2.plates.push(v2);save();drawPlates();break}
   case'rpe':{const[slot,i]=k.split('|');const f=findItem(d,slot);if(!f)break;const o=slotLog(d,slot,f.it.ex,f.it.rx.sets);const v2=+el.dataset.v;if(v2)o.sets[+i].e=v2;else o.sets[+i].e=0;UI.rpeAsk=null;save();rerender();break}
   case'focus':focusOpen();break;
+  case'addset':case'dropset':{const f=findItem(d,k);if(!f)break;const o=slotLog(d,k,f.it.ex,f.it.rx.sets);o.x=(o.x||0)+1;const prev=o.sets[o.sets.length-1]||{};o.sets.push({w:a==='dropset'&&prev.w?String(Math.round(+prev.w*.8/2.5)*2.5):'',r:'',d:0,t:a==='dropset'?'d':'x'});save();UI.exo[k]=true;rerender();break}
+  case'rmset':{const f=findItem(d,k);if(!f)break;const o=slotLog(d,k,f.it.ex,f.it.rx.sets);if(o.x){o.sets.pop();o.x--;save();rerender()}break}
+  case'wuramp':{const f=findItem(d,k);if(!f)break;const o=slotLog(d,k,f.it.ex,f.it.rx.sets);o.wu=o.wu?null:[];save();UI.exo[k]=true;rerender();break}
+  case'wuset':{const f=findItem(d,k);if(!f)break;const o=slotLog(d,k,f.it.ex,f.it.rx.sets);o.wu=o.wu||[];o.wu[+el.dataset.v]=!o.wu[+el.dataset.v];markStart(d);save();rerender();break}
   case'report':reportSheet(el.dataset.v);break;
   case'platswap':{const from=el.dataset.e,to=el.dataset.v;S.swapsAll[from]=to;save();closeSheet();rerender();toast('Swapped to '+E[to].n+' in every session',()=>{delete S.swapsAll[from]});break}
   case'rcopen':UI.rc=null;readinessSheet(d===todayS()?d:todayS());break;
