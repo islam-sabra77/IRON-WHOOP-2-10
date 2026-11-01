@@ -359,6 +359,8 @@ button.insight:first-of-type{border-top:0}
 .gitem summary b{font-size:15.5px}.gitem summary span{font-size:12.5px;color:var(--mu)}
 .gitem summary em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--ok)}
 .gitem[open] summary{margin-bottom:8px}
+.synccode{font-size:17px;font-weight:800;letter-spacing:.04em;background:var(--sf2);border-radius:12px;padding:10px 12px;word-break:break-all;line-height:1.5}
+.setlink{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
 /* InBody */
 .ibgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
 .ibf{display:grid;grid-template-columns:1fr 64px auto;align-items:center;gap:4px;font-size:12.5px;border-bottom:1px solid var(--ln);padding:3px 0}.ibf input{height:34px;padding:0 6px;text-align:right}.ibf em{font-style:normal;color:var(--mu);font-size:11.5px;min-width:22px}
@@ -585,7 +587,7 @@ try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
 const FRESH=!S||typeof S!=='object';
 if(!S||typeof S!=='object')S=defaults();
 S=Object.assign(defaults(),S);
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){S._u=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof syncSoon==='function')syncSoon()}
 
 /* ---------- dates ---------- */
 const pad=n=>String(n).padStart(2,'0');
@@ -1053,7 +1055,7 @@ function drawOb(){
     ${a.supps==='quiz'&&a.sq?(()=>{const R=sqRecommend(a.sq);return`<div class="card"><h4 class="disp" style="font-size:22px;margin:0 0 6px">Your supplement stack</h4>${R.list.length?R.list.map(x=>`<div class="hrow" style="grid-template-columns:1fr auto"><span><b>${esc(x.e.n)}</b><br><span class="muted" style="font-size:12.5px">For ${esc(x.why.slice(0,2).join(', '))}</span></span><span class="muted" style="font-size:12.5px;text-align:right">${esc(x.e.s)}</span></div>`).join(''):'<p class="muted">No supplements matched your answers.</p>'}${R.blocked.length?`<p class="muted" style="font-size:12.5px;margin:6px 0 0">Left out for safety: ${R.blocked.map(x=>esc(x.e.n)).join(', ')}.</p>`:''}<p class="muted" style="font-size:12px;margin:6px 0 0">General guidance, not medical advice. Check with your doctor if you take medicine.</p></div>`})():''}
     ${!UI.fresh?'<div class="note"><b>This replaces your current program</b> from the start date. Your logs, WHOOP and history stay, and you can restore the previous plan in Settings.</div>':''}`}
   const last=UI.ob.step===n-1,first=UI.ob.step===0;
-  document.getElementById('onb').innerHTML=`<div class="obwrap">${h}<div class="obnav" style="${first&&UI.fresh?'grid-template-columns:1fr':''}">${first?(UI.fresh?'':'<button class="cta ghost" data-a="obclose">Cancel</button>'):`<button class="cta ghost" data-a="obback">Back</button>`}<button class="cta" style="--c:var(--upper)" data-a="${last?'obfinish':'obnext'}">${first?'Start':last?'Build my plan':'Next'}</button></div>${first&&UI.fresh?'<button class="linkbtn" style="display:block;margin:10px auto 0" data-a="obskip">Skip and use the sample plan</button>':''}</div>`;
+  document.getElementById('onb').innerHTML=`<div class="obwrap">${h}<div class="obnav" style="${first&&UI.fresh?'grid-template-columns:1fr':''}">${first?(UI.fresh?'':'<button class="cta ghost" data-a="obclose">Cancel</button>'):`<button class="cta ghost" data-a="obback">Back</button>`}<button class="cta" style="--c:var(--upper)" data-a="${last?'obfinish':'obnext'}">${first?'Start':last?'Build my plan':'Next'}</button></div>${first&&UI.fresh?'<button class="linkbtn" style="display:block;margin:10px auto 0" data-a="obskip">Skip and use the sample plan</button><button class="linkbtn" style="display:block;margin:6px auto 0" data-a="oblink">Already use IRON? Restore from your other phone</button>':''}</div>`;
   document.getElementById('onb').scrollTop=0;
 }
 function obFinish(){
@@ -2920,6 +2922,70 @@ function moveSheet(){
   ${can?`<button class="cta ghost" data-a="undosched">↶ Undo last change: ${esc(S.hist[can-1].label)}</button>`:''}
   <button class="cta ghost" data-a="close">Cancel</button>`);
 }
+/* =====================================================================
+   CLOUD BACKUP AND SYNC
+   Your whole log is saved to your Netlify site under a private sync code.
+   Enter the same code on another phone to bring everything across;
+   both devices then stay in step. Changes on two devices are merged day by day.
+   ===================================================================== */
+const SYNC_DICTS=['logs','done','ready','moves','swaps','suppLog','habitLog','body','inbody','wdata','wwk','habOv','vids','clips','col'];
+let SYNC_T=null,SYNC_BUSY=false;
+function syncOn(){return!!(S.sync&&S.sync.on&&S.sync.key)}
+function newSyncKey(){const a=new Uint8Array(32);crypto.getRandomValues(a);return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('')}
+const fmtCode=k=>k.match(/.{1,4}/g).join('-');
+const cleanCode=c=>String(c||'').toLowerCase().replace(/[^a-f0-9]/g,'');
+/* merge two copies: per-day maps are combined, newer copy wins on clashes and for everything else */
+function mergeState(local,remote){
+  const newer=(remote._u||0)>(local._u||0)?remote:local,older=newer===remote?local:remote;
+  const out=Object.assign({},older,newer);
+  SYNC_DICTS.forEach(k=>{if(older[k]||newer[k]){const o=older[k]||{},n=newer[k]||{};out[k]=Object.assign({},o,n);if(k==='logs'){Object.keys(o).forEach(d=>{if(n[d]&&o[d]){const m=Object.assign({},o[d],n[d]);out[k][d]=m}})}}});
+  out._u=Math.max(local._u||0,remote._u||0);out.sync=local.sync;return out;
+}
+function syncSoon(){if(!syncOn()||!navigator.onLine)return;clearTimeout(SYNC_T);SYNC_T=setTimeout(()=>syncNow(false),4000)}
+async function syncNow(manual){
+  if(!syncOn()||SYNC_BUSY)return;SYNC_BUSY=true;const key=S.sync.key;
+  try{
+    const r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':key}});
+    let remote=null;if(r.ok)remote=(await r.json());else if(r.status!==404)throw new Error('get '+r.status);
+    let changed=false;
+    if(remote&&remote.state&&(remote.updated||0)>(S.sync.last||0)){
+      const merged=mergeState(S,remote.state);changed=JSON.stringify(merged)!==JSON.stringify(S);
+      if(changed){Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,defaults(),merged)}
+    }
+    const upd=Math.max(S._u||Date.now(),(remote&&remote.updated)||0);S._u=upd;
+    const body=JSON.stringify({updated:upd,state:Object.assign({},S,{sync:{on:true,key}})});
+    const p=await fetch('/api/sync',{method:'PUT',headers:{'Content-Type':'application/json','x-iron-sync':key},body});
+    if(p.status===409&&!manual){SYNC_BUSY=false;return syncNow(true)}
+    if(!p.ok)throw new Error('put '+p.status);
+    S.sync.last=upd;S.sync.at=Date.now();S.sync.err=null;localStorage.setItem(KEY,JSON.stringify(S));
+    if(changed){applyCustom&&applyCustom();rerender();if(manual)toast('Synced. Changes from your other device are in.')}else if(manual)toast('Backed up');
+  }catch(e){S.sync.err=String(e&&e.message||e);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(_){}if(manual)toast(location.protocol==='file:'?'Cloud backup works on your Netlify site':'Backup failed. It retries automatically.')}
+  finally{SYNC_BUSY=false}
+}
+function syncTurnOn(){S.sync=Object.assign({on:true,key:S.sync&&S.sync.key||newSyncKey(),last:0},S.sync,{on:true});save();syncNow(true);syncSheet()}
+async function syncLink(code){
+  const key=cleanCode(code);if(key.length<48){toast('That code looks incomplete');return}
+  try{const r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':key}});
+    if(r.status===404){toast('No backup found for that code');return}if(!r.ok)throw 0;const j=await r.json();
+    if(!window.confirm('Replace the data on this device with the backup from '+new Date(j.updated).toLocaleString()+'?'))return;
+    const st=Object.assign(defaults(),j.state,{sync:{on:true,key,last:j.updated,at:Date.now()}});localStorage.setItem(KEY,JSON.stringify(st));location.reload();
+  }catch(e){toast('Couldn’t reach the backup. Check your connection.')}
+}
+function syncSheet(){
+  const on=syncOn(),sy=S.sync||{};
+  openSheet(`<h4 class="disp">Cloud backup</h4>
+  ${on?`<div class="note" style="--c:var(--ok)"><b>On.</b> Every change is saved to the cloud a few seconds after you make it${sy.at?`. Last backup: ${new Date(sy.at).toLocaleString([],{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:''}.${sy.err?' <b>Last attempt failed</b>; it retries when you’re online.':''}</div>
+  <label class="fl2">Your private sync code</label><div class="synccode num" aria-label="Sync code">${fmtCode(sy.key)}</div>
+  <p class="muted" style="font-size:12.5px;margin:4px 0 0">Anyone with this code can read your data. Keep it private, like a password. Enter it on another phone to bring everything across.</p>
+  <div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="synccopy">Copy code</button><button class="cta ghost" style="margin:0" data-a="syncnow">Back up now</button></div>
+  <button class="cta ghost" style="color:var(--bad)" data-a="syncoff">Turn off cloud backup</button>`
+  :`<p style="font-size:14px">Your training lives only in this browser. Turn on cloud backup so a lost phone or cleared browser never costs you your logs.</p><button class="cta" style="--c:var(--ok)" data-a="syncon">Turn on cloud backup</button>`}
+  <label class="fl2" style="margin-top:14px">Bring data from another device</label><input type="text" id="synclink" placeholder="Paste the sync code from your other phone" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="cta ghost" data-a="synclink">Link this device</button>
+  <label class="fl2" style="margin-top:14px">Backup file</label><div class="grid2"><button class="cta ghost" style="margin:0" data-a="bkfile">Download backup</button><button class="cta ghost" style="margin:0" data-a="bkload">Restore from file</button></div>
+  <button class="cta ghost" data-a="settings">Back to settings</button>`);
+}
+function bkDownload(){const b=new Blob([JSON.stringify(S)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='iron-backup-'+todayS()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast('Backup downloaded')}
+function bkLoad(){const inp=document.createElement('input');inp.type='file';inp.accept='application/json,.json';inp.onchange=async()=>{const f=inp.files&&inp.files[0];if(!f)return;try{const o=JSON.parse(await f.text());if(!o||!o.start)throw 0;if(!window.confirm('Replace the data on this device with this backup?'))return;const st=Object.assign(defaults(),o,{sync:S.sync});localStorage.setItem(KEY,JSON.stringify(st));location.reload()}catch(e){toast('That file isn’t an IRON backup')}};inp.click()}
 function settingsSheet(){
   const th=document.documentElement.getAttribute('data-theme')||'auto';
   openSheet(`<h4 class="disp">Settings</h4>
@@ -2930,7 +2996,7 @@ function settingsSheet(){
   <div class="srow"><b>Auto-adjust</b><button class="cta ${S.whoop.auto?'':'ghost'}" style="--c:var(--ok);margin:0;height:44px" data-a="wauto">${S.whoop.auto?'On: workouts follow WHOOP':'Off: I choose manually'}</button></div>
   <div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="wsync">Sync now</button><button class="cta ghost" style="margin:0;color:var(--bad)" data-a="wdisconnect">Disconnect</button></div>`:`${S.whoop.pending?`<p style="font-size:13.5px;margin:0 0 8px"><b>Waiting for WHOOP approval.</b> If the login finished in Safari, come back here and tap Check connection.</p><button class="cta ghost" style="margin:0 0 8px" data-a="wsync">Check connection</button>`:''}<p class="muted" style="font-size:13.5px;margin:0 0 8px">Pull your recovery, HRV and resting heart rate every morning and adjust each workout automatically.</p><button class="cta" style="--c:var(--ink);color:var(--bg);margin:0" data-a="wconnect">Connect WHOOP</button>`}
   <p class="muted" style="font-size:12.5px;margin:8px 0 0">Green 67%+ full session. Yellow 34–66% lighter. Red 33% or less recovery only. HRV 10%+ below your 30-day average, or resting HR 5+ bpm above it, drops the day one level.</p></div>
-  <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Backup</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Your logs are saved in this browser. Copy the backup text to keep a copy or move to another device, then paste it there and tap Restore.</p><textarea id="bk"></textarea><div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="bkcopy">Copy backup</button><button class="cta" style="--c:var(--upper);margin:0" data-a="bkrestore">Restore</button></div></div>
+  <button class="card setlink" style="margin-top:12px" data-a="syncopen"><h4 class="disp" style="font-size:22px;margin:0">☁️ Cloud backup ›</h4><span class="muted" style="font-size:13.5px">${syncOn()?'On'+(S.sync.at?' · last backup '+new Date(S.sync.at).toLocaleString([],{weekday:'short',hour:'2-digit',minute:'2-digit'}):''):'Off. Turn it on so you never lose your logs.'}</span></button>
   <button class="cta ghost" style="color:var(--bad)" data-a="reset">Reset everything</button>`);
 }
 function habSheet(id){
@@ -3073,6 +3139,7 @@ document.addEventListener('click',ev=>{
   case'move':UI.mv={mode:'move'};moveSheet();break;
   case'obopen':closeSheet();openOnboarding();break;
   case'obclose':closeOnboarding();break;
+  case'oblink':{const c=window.prompt('Paste the sync code from your other phone (Settings → Cloud backup):','');if(c)syncLink(c);break}
   case'obskip':closeOnboarding();UI.fresh=false;save();toast('Using the sample plan. Build your own anytime in Settings.');break;
   case'obrestore':if(window.confirm('Go back to your previous plan? Your logs stay.'))restorePlan();break;
   case'obback':UI.ob.step=Math.max(0,UI.ob.step-1);if(OB_STEPS[UI.ob.step]==='suppq'&&UI.ob.a.supps!=='quiz')UI.ob.step--;drawOb();break;
@@ -3130,6 +3197,14 @@ document.addEventListener('click',ev=>{
     let msg='';if(!hb.link&&!hb.noAuto){const g=guessLink(n);if(g){hb.link=g;msg='Linked to WHOOP '+LINKS[g.k].short+' automatically'}}
     save();closeSheet();rerender();if(msg)toast(msg);break}
   case'habdel':{const i=S.habits.findIndex(h=>h.id===k);if(i<0)break;const rem=S.habits.splice(i,1)[0];if(UI.hx===k)UI.hx=null;save();closeSheet();rerender();toast('Deleted '+rem.n,()=>S.habits.splice(i,0,rem));break}
+  case'syncopen':syncSheet();break;
+  case'syncon':syncTurnOn();break;
+  case'syncoff':if(window.confirm('Turn off cloud backup on this device? Your cloud copy stays until you reuse the code.')){S.sync.on=false;save();syncSheet()}break;
+  case'syncnow':syncNow(true).then(()=>syncSheet());break;
+  case'synccopy':{const c=fmtCode(S.sync.key);(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(()=>toast('Sync code copied')).catch(()=>window.prompt('Your sync code:',c));break}
+  case'synclink':syncLink(document.getElementById('synclink').value);break;
+  case'bkfile':bkDownload();break;
+  case'bkload':bkLoad();break;
   case'bkcopy':{const tx=document.getElementById('bk');tx.value=JSON.stringify(S);tx.select();try{navigator.clipboard.writeText(tx.value).then(()=>toast('Backup copied'),()=>toast('Select the text and copy it'))}catch(e){toast('Select the text and copy it')}break}
   case'bkrestore':{try{const o=JSON.parse(document.getElementById('bk').value);if(!o||!o.start)throw 0;S=Object.assign(defaults(),o);save();closeSheet();rerender();toast('Backup restored')}catch(e){toast('That text isn\u2019t a valid backup')}break}
   case'reset':if(window.confirm('Delete all logs, habits and settings? This cannot be undone.')){S=defaults();save();closeSheet();UI.date=S.start;rerender()}break;
@@ -3165,8 +3240,10 @@ autoLinkHabits();
 rerender();
 if(FRESH)setTimeout(openOnboarding,250);
 if(WH_ON&&(S.whoop.connected||S.whoop.pending))whoopSync(false);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&WH_ON&&(S.whoop.connected||S.whoop.pending))whoopSync(false)});
-window.__S=()=>S;window.__est=estimate;window.__UI=UI;
+if(syncOn())setTimeout(()=>syncNow(false),800);
+window.addEventListener('online',()=>{if(syncOn())syncNow(false)});
+document.addEventListener('visibilitychange',()=>{if(syncOn()&&document.visibilityState==='hidden'){clearTimeout(SYNC_T);syncNow(false)}if(syncOn()&&document.visibilityState==='visible')syncNow(false);if(document.visibilityState==='visible'&&WH_ON&&(S.whoop.connected||S.whoop.pending))whoopSync(false)});
+window.__S=()=>S;window.__est=estimate;window.__UI=UI;window.__iron={save,rerender,syncNow,syncOn,mergeState};
 })();
 </script>
 </body>
