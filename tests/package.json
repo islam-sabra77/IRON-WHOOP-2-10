@@ -1,0 +1,13 @@
+{
+  "name": "iron-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "unit": "node --test \"unit/*.test.mjs\"",
+    "e2e": "playwright test",
+    "test": "npm run unit && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "~1.63.0"
+  }
+}
