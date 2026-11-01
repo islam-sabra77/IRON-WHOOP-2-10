@@ -16,7 +16,7 @@ function logError(msg,src,stack){
 window.addEventListener('error',ev=>logError(ev.message,(ev.filename||'')+':'+(ev.lineno||''),ev.error&&ev.error.stack));
 window.addEventListener('unhandledrejection',ev=>{const r=ev.reason;logError(r&&r.message||String(r),'promise',r&&r.stack)});
 function errSheet(){const list=errList().slice().reverse();
-  openSheet(`<h4 class="disp">Error log</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Problems IRON ran into on this phone. They are also sent to your site so they can be fixed.</p>
+  openSheet(`<h4 class="disp">Error log</h4><p class="muted" style="font-size:14px;margin:0 0 8px">Problems IRON ran into on this phone. They are also sent to your site so they can be fixed.</p>
   ${list.length?list.map(e=>`<div class="hrow" style="grid-template-columns:1fr"><span><b>${esc(e.msg)}</b><br><span class="muted" style="font-size:12px">${new Date(e.t).toLocaleString()} · ${esc(e.tab)} · ${esc(e.src)}</span></span></div>`).join(''):'<p class="muted">No errors recorded. 🎉</p>'}
   ${list.length?'<button class="cta ghost" data-a="errclear">Clear the log</button>':''}<button class="cta ghost" data-a="settings">Back to settings</button>`)}
 document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if(!el)return;if(el.dataset.a==='errlog')errSheet();if(el.dataset.a==='errclear'){localStorage.removeItem(ERR_KEY);errSheet()}});

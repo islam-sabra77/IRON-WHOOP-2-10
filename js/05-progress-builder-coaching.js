@@ -26,7 +26,7 @@ function drawMetric(){
 }
 function bodySheet(){
   const t=todayS(),f=k=>{const lv=lastVal(k,t);return lv?(+lv.v).toFixed(1):''};
-  openSheet(`<h4 class="disp">Log body composition</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Fill in what you measured. Lean mass is worked out for you from weight and body fat, so leave it empty unless your scale reports it. Grey numbers are your last entries.</p>
+  openSheet(`<h4 class="disp">Log body composition</h4><p class="muted" style="font-size:14px;margin:0 0 8px">Fill in what you measured. Lean mass is worked out for you from weight and body fat, so leave it empty unless your scale reports it. Grey numbers are your last entries.</p>
   <label class="fl2" for="bdate">Date</label><input type="date" id="bdate" value="${t}" max="${t}">
   <div class="grid2"><div><label class="fl2" for="b_weight">Weight (kg)</label><input type="text" inputmode="decimal" id="b_weight" placeholder="${f('weight')}"></div><div><label class="fl2" for="b_fat">Body fat (%)</label><input type="text" inputmode="decimal" id="b_fat" placeholder="${f('fat')}"></div></div>
   <label class="fl2" for="b_lean">Lean body mass (kg), optional</label><input type="text" inputmode="decimal" id="b_lean" placeholder="${f('lean')||'calculated'}">
@@ -67,16 +67,16 @@ function renderProgress(){
   h+=`<div class="card"><h4 class="disp">Sessions per week</h4><div style="overflow-x:auto"><svg viewBox="0 0 ${W*(bw+4)} 108" width="100%" style="min-width:${W*(bw+4)}px;display:block">${bars}</svg></div></div>`;
   // lifts
   const hs=hist();const liftsAll=Object.keys(hs).filter(ex=>E[ex]&&!E[ex].bw&&!E[ex].t).sort((a,b)=>hs[b].length-hs[a].length),lifts=UI.allLifts?liftsAll:liftsAll.slice(0,10);
-  if(S.whoop.connected)h+=`<button class="card" style="display:block;width:100%;text-align:left" data-a="tab" data-v="whoop"><h4 class="disp" style="margin:0">WHOOP dashboard →</h4><span class="muted" style="font-size:13.5px">Recovery, sleep, strain and trends now live in the WHOOP tab.</span></button>`;
+  if(S.whoop.connected)h+=`<button class="card" style="display:block;width:100%;text-align:left" data-a="tab" data-v="whoop"><h4 class="disp" style="margin:0">WHOOP dashboard →</h4><span class="muted" style="font-size:14px">Recovery, sleep, strain and trends now live in the WHOOP tab.</span></button>`;
   h+=`<div class="card"><h4 class="disp">Strength trends</h4>`;
   if(!lifts.length)h+=`<p class="muted" style="margin:0;font-size:14px">Log weights and reps on any exercise and its estimated one-rep max shows up here, session by session.</p>`;
   lifts.forEach(ex=>{const pts=hs[ex].map(x=>Math.max(...x.sets.map(s=>e1rm(+s.w,+s.r))));const best=Math.max(...hs[ex].map(x=>Math.max(...x.sets.map(s=>+s.w))));
-    h+=`<button class="lh" data-a="lifthist" data-e="${ex}" aria-label="See ${esc(E[ex].n)} history"><div class="lhr"><div style="flex:1;min-width:0"><b style="font-size:14.5px">${esc(E[ex].n)}</b><div class="muted num" style="font-size:12.5px">Best ${best} kg, ${hs[ex].length} session${hs[ex].length>1?'s':''}</div></div>${spark(pts)}<span class="lhgo">›</span></div></button>`});
+    h+=`<button class="lh" data-a="lifthist" data-e="${ex}" aria-label="See ${esc(E[ex].n)} history"><div class="lhr"><div style="flex:1;min-width:0"><b style="font-size:15px">${esc(E[ex].n)}</b><div class="muted num" style="font-size:13px">Best ${best} kg, ${hs[ex].length} session${hs[ex].length>1?'s':''}</div></div>${spark(pts)}<span class="lhgo">›</span></div></button>`});
   if(lifts.length)h+=`<p class="tapnote" style="margin:6px 0 0">Tap any lift to see every session and set.</p>`;
   if(liftsAll.length>10)h+=`<button class="cta ghost" data-a="alllifts">${UI.allLifts?'Show top 10':'Show all '+liftsAll.length+' lifts'}</button>`;
   h+=`</div>`;
-  {const pl=plateaus();if(pl.length)h+=`<div class="card"><h4 class="disp">Stalled lifts</h4><p class="muted" style="font-size:13.5px;margin:0 0 6px">No new best in the last 3 sessions. Tap one for ways to break through.</p>${pl.map(x=>`<button class="lh" data-a="lifthist" data-e="${x.ex}"><div class="lhr"><div style="flex:1"><b style="font-size:14.5px">${esc(E[x.ex].n)}</b><div class="muted" style="font-size:12.5px">Best ${x.best} kg e1RM · ${esc(x.fixes[0])}</div></div><span class="lhgo">›</span></div></button>`).join('')}</div>`}
-  h+=`<button class="card setlink" data-a="report"><h4 class="disp" style="margin:0">📊 Weekly report ›</h4><span class="muted" style="font-size:13.5px">Sessions, volume, records, recovery and next week\u2019s focus</span></button>`;
+  {const pl=plateaus();if(pl.length)h+=`<div class="card"><h4 class="disp">Stalled lifts</h4><p class="muted" style="font-size:14px;margin:0 0 6px">No new best in the last 3 sessions. Tap one for ways to break through.</p>${pl.map(x=>`<button class="lh" data-a="lifthist" data-e="${x.ex}"><div class="lhr"><div style="flex:1"><b style="font-size:15px">${esc(E[x.ex].n)}</b><div class="muted" style="font-size:13px">Best ${x.best} kg e1RM · ${esc(x.fixes[0])}</div></div><span class="lhgo">›</span></div></button>`).join('')}</div>`}
+  h+=`<button class="card setlink" data-a="report"><h4 class="disp" style="margin:0">${IC.chart} Weekly report ›</h4><span class="muted" style="font-size:14px">Sessions, volume, records, recovery and next week\u2019s focus</span></button>`;
   h+=ibCard();
   // extend
   const r=A.rec;
@@ -95,7 +95,7 @@ function whoopTrend(){
   days.forEach(([d,x],i)=>{if(!x||x.rec==null)return;const hh=x.rec/100*H;const c=x.rec>=67?'#12B76A':x.rec>=34?'#F59E0B':'#EF3B55';bars+=`<rect x="${(i*bw+1).toFixed(1)}" y="${(H-hh).toFixed(1)}" width="${(bw-2).toFixed(1)}" height="${hh.toFixed(1)}" rx="2" fill="${c}" opacity=".55"/>`;
     const cx=(i*bw+bw/2).toFixed(1);if(x.hrv!=null)hp+=`${cx},${(H-8-(x.hrv-hmin)/((hmax-hmin)||1)*(H-24)).toFixed(1)} `;if(x.rhr!=null)rp+=`${cx},${(H-8-(x.rhr-rmin)/((rmax-rmin)||1)*(H-24)).toFixed(1)} `});
   const avg=a=>a.length?Math.round(a.reduce((p,q)=>p+q,0)/a.length):'–';
-  return`<div class="card"><h4 class="disp">WHOOP trends</h4><div class="muted" style="font-size:12.5px;margin-bottom:6px">Last 30 days. Bars: recovery. Lines: <b style="color:#2F5BFF">HRV</b> and <b style="color:#FF2D78">resting HR</b>.</div>
+  return`<div class="card"><h4 class="disp">WHOOP trends</h4><div class="muted" style="font-size:13px;margin-bottom:6px">Last 30 days. Bars: recovery. Lines: <b style="color:#2F5BFF">HRV</b> and <b style="color:#FF2D78">resting HR</b>.</div>
   <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">${bars}<polyline points="${hp}" fill="none" stroke="#2F5BFF" stroke-width="2.5" stroke-linejoin="round"/><polyline points="${rp}" fill="none" stroke="#FF2D78" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="4 3"/></svg>
   <div class="grid2" style="grid-template-columns:repeat(3,1fr);margin-top:10px"><div class="stat"><b class="disp num">${avg(have.map(x=>x[1].rec))}%</b><span>Avg recovery</span></div><div class="stat"><b class="disp num">${avg(hv)}</b><span>Avg HRV ms</span></div><div class="stat"><b class="disp num">${avg(rv)}</b><span>Avg RHR</span></div></div></div>`;
 }
@@ -226,7 +226,7 @@ function renderBuild(){
   h+=`<div class="card">${cardHead('bpre','Start from a split')}${isCol('bpre')?'':BPRESETS.map(p=>`<button class="obopt" data-a="bdpreset" data-v="${p.id}"><b>${p.l}</b><span>${p.s}</span></button>`).join('')}</div>`;
   // week
   h+=`<div class="card">${cardHead('bweek','Your week')}`;
-  if(!isCol('bweek')){h+=`<p class="muted" style="font-size:13.5px;margin:0 0 6px">Pick a session for each day. Tap <b>Edit moves</b> to replace, add, remove or reorder exercises.</p>`;
+  if(!isCol('bweek')){h+=`<p class="muted" style="font-size:14px;margin:0 0 6px">Pick a session for each day. Tap <b>Edit moves</b> to replace, add, remove or reorder exercises.</p>`;
     for(let i=0;i<7;i++){const val=bd.week[i],key=g.map[i],tp=g.tpls[key]||T[key],kd=tp?tp.k:'rest';
       const opts=Object.keys(BT).map(k=>`<option value="${k}" ${val===k?'selected':''}>${BT[k].l}</option>`).join('')+(curKeys.length?`<optgroup label="Keep a current session">${[...new Set([...curKeys,...(val.slice(0,2)==='k:'?[val.slice(2)]:[])])].filter(k=>T[k]).map(k=>`<option value="k:${k}" ${val==='k:'+k?'selected':''}>${esc(T[k].n)}</option>`).join('')}</optgroup>`:'');
       const moves=tp&&tp.blocks?tp.blocks.flatMap(b=>b.i.map(x=>x[0])).filter(x=>E[x]):[];
@@ -236,7 +236,7 @@ function renderBuild(){
   // cycles
   h+=`<div class="card">${cardHead('bcyc','Cycles and progression')}`;
   if(!isCol('bcyc')){
-    h+=`<label class="fl2">Cycle length</label>${bdChips('cycleLen',[[6,'6 weeks'],[7,'7 weeks'],[8,'8 weeks']],bd.cycleLen)}<p class="muted" style="font-size:12.5px;margin:4px 0 0">Build weeks add reps, then weight. The last week of every cycle is a lighter deload.</p>
+    h+=`<label class="fl2">Cycle length</label>${bdChips('cycleLen',[[6,'6 weeks'],[7,'7 weeks'],[8,'8 weeks']],bd.cycleLen)}<p class="muted" style="font-size:13px;margin:4px 0 0">Build weeks add reps, then weight. The last week of every cycle is a lighter deload.</p>
     <label class="fl2" style="margin-top:10px">Goal</label>${bdChips('goal',GOALS,bd.goal)}
     <label class="fl2" style="margin-top:10px">Session length</label>${bdChips('len',[[45,'45 min'],[60,'60 min'],[90,'75–90 min']],bd.len)}
     ${bdToggle('adapt',bd.adapt,'Adapt each new cycle to my progress','At the start of each cycle the app reviews your lifts, attendance and WHOOP recovery, then moves on, holds or trims volume.')}
@@ -244,7 +244,7 @@ function renderBuild(){
     // timeline
     const cn=cycleOf(t0<S.start?S.start:t0).c;let tl='';
     for(let c=Math.max(0,cn-1);c<=cn+3;c++){const st=cycleStart(c);if(st>S.end)break;const dec=cycleDecision(c),s2=phaseForCycle(c),L2=cycleOf(st).CL;
-      tl+=`<div class="bdcyc" style="--c:${PH_COLOR[s2]}"><div><b>Cycle ${c+1}</b> <span class="muted num">${short(st)} · ${L2} weeks</span></div><div><span class="pill" style="--c:${PH_COLOR[s2]}">${SCH[s2].name}</span>${c===cn?' <span class="pill" style="--c:var(--ink)">now</span>':''}${dec?(dec.vol>0?' <span class="pill" style="--c:var(--ok)">+volume</span>':dec.vol<0?' <span class="pill" style="--c:var(--bad)">trimmed</span>':''):''}</div>${dec?`<div class="muted" style="font-size:12.5px;margin-top:4px">${esc(dec.why)}</div>`:c>cn?'<div class="muted" style="font-size:12.5px;margin-top:4px">Projected. Decided from your progress when the cycle starts.</div>':''}</div>`}
+      tl+=`<div class="bdcyc" style="--c:${PH_COLOR[s2]}"><div><b>Cycle ${c+1}</b> <span class="muted num">${short(st)} · ${L2} weeks</span></div><div><span class="pill" style="--c:${PH_COLOR[s2]}">${SCH[s2].name}</span>${c===cn?' <span class="pill" style="--c:var(--ink)">now</span>':''}${dec?(dec.vol>0?' <span class="pill" style="--c:var(--ok)">+volume</span>':dec.vol<0?' <span class="pill" style="--c:var(--bad)">trimmed</span>':''):''}</div>${dec?`<div class="muted" style="font-size:13px;margin-top:4px">${esc(dec.why)}</div>`:c>cn?'<div class="muted" style="font-size:13px;margin-top:4px">Projected. Decided from your progress when the cycle starts.</div>':''}</div>`}
     h+=`<label class="fl2" style="margin-top:12px">Your cycles</label>${tl}`;
   }
   h+=`</div>`;
@@ -261,12 +261,12 @@ function renderBuild(){
     if(!m.auto)h+=`<label class="fl2" style="margin-top:8px">Areas to work on</label><div class="obrow wrap">${Object.keys(MOB_AREAS).map(k=>`<button class="obopt ${m.areas.includes(k)?'on':''}" data-a="bdarea" data-v="${k}"><b>${MOB_AREAS[k].l}</b></button>`).join('')}</div>`;
     h+=`<label class="fl2" style="margin-top:8px">Minutes per session</label>${bdChips('mobmins',[[5,'5'],[8,'8'],[12,'12'],[15,'15']],m.mins)}`;
     const ref=t0<S.start?S.start:t0,prv=k=>mobListFrom(m,ref,k).map(x=>E[x[0]].n).join(', ');
-    h+=`<div class="note" style="margin-top:10px"><b>Upper days:</b> ${esc(prv('upper'))}<br><b>Lower days:</b> ${esc(prv('lower'))}<br><span class="muted" style="font-size:12.5px">Deload weeks and low-recovery weeks add one more drill.</span></div>`}
+    h+=`<div class="note" style="margin-top:10px"><b>Upper days:</b> ${esc(prv('upper'))}<br><b>Lower days:</b> ${esc(prv('lower'))}<br><span class="muted" style="font-size:13px">Deload weeks and low-recovery weeks add one more drill.</span></div>`}
   h+=`</div>`;
   // apply
   const nx=addD(sunOf(t0),7);
   h+=`<div class="card"><h4 class="disp">Apply</h4><div class="obrow"><button class="obopt ${bd.from==='today'?'on':''}" data-a="bdset" data-f="from" data-v="today"><b>From today</b><span>${short(t0<S.start?S.start:t0)}</span></button><button class="obopt ${bd.from==='next'?'on':''}" data-a="bdset" data-f="from" data-v="next"><b>From next week</b><span>${short(nx<S.start?S.start:nx)}</span></button></div>
-  <p class="muted" style="font-size:12.5px;margin:6px 0 0">Earlier days, your logs and single-day moves stay as they are.</p>
+  <p class="muted" style="font-size:13px;margin:6px 0 0">Earlier days, your logs and single-day moves stay as they are.</p>
   <button class="cta" style="--c:var(--upper)" data-a="bdapply">Apply to my plan</button>
   ${S.customPrev?'<button class="cta ghost" data-a="bdundo">↶ Undo last apply</button>':''}
   ${bd.dirty?'<button class="cta ghost" data-a="bddiscard">Discard changes</button>':''}</div>`;
@@ -284,7 +284,7 @@ function drawBdEdit(){
   const i=UI.bde,{key,tpl}=bdTpl(i);if(!tpl){closeSheet();return}const c=KCOLOR(tpl.k),F=flatOf(tpl);
   const row=(x,j,kind,n)=>`<div class="bdmv" style="--c:${c}"><div class="bdmvn"><b>${esc(E[x[0]]?E[x[0]].n:x[0])}</b><span>${ROLE_L[x[1]]||x[1]}${META[x[0]]?' · '+EQ_L[META[x[0]].eq]:''}</span></div>
     <div class="bdmvb"><button class="mini demo" data-a="demo" data-e="${x[0]}" aria-label="Play video">${IC.play}</button><button class="mini" data-a="bdrep" data-k="${kind}" data-v="${j}">Replace</button><button class="mini" data-a="bdmove" data-k="${kind}" data-v="${j}" data-d="-1" ${j===0?'disabled':''} aria-label="Move up">↑</button><button class="mini" data-a="bdmove" data-k="${kind}" data-v="${j}" data-d="1" ${j===n-1?'disabled':''} aria-label="Move down">↓</button><button class="mini" data-a="bddel" data-k="${kind}" data-v="${j}" aria-label="Remove">✕</button></div></div>`;
-  openSheet(`<h4 class="disp">${esc(tpl.n)}, ${DN[i]}</h4><p class="muted" style="font-size:13.5px;margin:0 0 6px">Changes are saved in the builder. Tap <b>Apply to my plan</b> when you are done.</p>
+  openSheet(`<h4 class="disp">${esc(tpl.n)}, ${DN[i]}</h4><p class="muted" style="font-size:14px;margin:0 0 6px">Changes are saved in the builder. Tap <b>Apply to my plan</b> when you are done.</p>
   <label class="fl2">Session name</label><input type="text" data-in="bdname" value="${esc(tpl.n)}" maxlength="30">
   <label class="fl2" style="margin-top:10px">Strength${tpl.k==='hiit'?' circuit':''}</label>${F.flat.map((x,j)=>row(x,j,'s',F.flat.length)).join('')||'<p class="muted">No moves yet.</p>'}
   <button class="cta ghost" style="margin-top:6px" data-a="bdadd" data-k="s">＋ Add exercise</button>
@@ -352,15 +352,15 @@ function nextFocus(ws){const nd=addD(ws,8),ph=phaseOf(nd),wi=weekInt(nd);const p
 function reportSheet(ws){
   const t=todayS();ws=ws||addD(sunOf(t),-7);const r=weekData(ws);S.seenReport=ws;save();
   const pct=v=>v==null?'–':Math.round(v*100)+'%',dv=r.pv.vol?(r.v.vol-r.pv.vol)/r.pv.vol:null,pl=plateaus();
-  openSheet(`<h4 class="disp">Week of ${short(r.ws)}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">${short(r.ws)} – ${short(r.we)}</p>
+  openSheet(`<h4 class="disp">Week of ${short(r.ws)}</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${short(r.ws)} – ${short(r.we)}</p>
   <div class="grid2"><div class="stat"><b class="disp num">${r.done}/${r.sched}</b><span>Sessions done</span></div><div class="stat"><b class="disp num">${fvol(r.v.vol)}</b><span>Volume${dv!=null?` (${dv>=0?'+':''}${Math.round(dv*100)}%)`:''}</span></div>
   <div class="stat"><b class="disp num">${r.prs.length}</b><span>Personal records</span></div><div class="stat"><b class="disp num">${r.v.sets}</b><span>Sets logged</span></div>
   ${r.rec!=null?`<div class="stat"><b class="disp num" style="color:${recCol(r.rec)}">${Math.round(r.rec)}%</b><span>Avg recovery</span></div>`:''}${r.slp!=null?`<div class="stat"><b class="disp num">${hm(r.slp)}</b><span>Avg sleep</span></div>`:''}
   ${r.str!=null?`<div class="stat"><b class="disp num">${r.str.toFixed(1)}</b><span>Avg day strain</span></div>`:''}${r.wks.length?`<div class="stat"><b class="disp num">${r.wks.length}</b><span>WHOOP workouts</span></div>`:''}
   <div class="stat"><b class="disp num">${pct(r.sup)}</b><span>Supplements taken</span></div><div class="stat"><b class="disp num">${pct(r.hab)}</b><span>Habits done</span></div>
   ${r.w1&&r.w0?`<div class="stat"><b class="disp num">${(r.w1.v-r.w0.v>=0?'+':'')+(r.w1.v-r.w0.v).toFixed(1)} kg</b><span>Body weight change</span></div>`:''}</div>
-  ${r.prs.length?`<div class="card" style="margin-top:10px"><b>🏆 Personal records</b>${r.prs.slice(0,6).map(x=>`<div class="hrow" style="grid-template-columns:1fr auto"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><b class="num">${x.e1} kg e1RM <span style="color:var(--ok)">+${x.up}</span></b></div>`).join('')}</div>`:''}
-  ${pl.length?`<div class="card"><b>⏸ Stalled lifts</b>${pl.slice(0,4).map(x=>`<div style="padding:6px 0;border-top:1px solid var(--ln)"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><div class="muted" style="font-size:12.5px">${esc(x.fixes[0])}</div></div>`).join('')}</div>`:''}
+  ${r.prs.length?`<div class="card" style="margin-top:10px"><b>${IC.trophy} Personal records</b>${r.prs.slice(0,6).map(x=>`<div class="hrow" style="grid-template-columns:1fr auto"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><b class="num">${x.e1} kg e1RM <span style="color:var(--ok)">+${x.up}</span></b></div>`).join('')}</div>`:''}
+  ${pl.length?`<div class="card"><b>${IC.pause} Stalled lifts</b>${pl.slice(0,4).map(x=>`<div style="padding:6px 0;border-top:1px solid var(--ln)"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><div class="muted" style="font-size:13px">${esc(x.fixes[0])}</div></div>`).join('')}</div>`:''}
   <div class="note" style="--c:var(--upper)"><b>Focus for next week:</b> ${esc(nextFocus(ws))}</div>
   <div class="grid2"><button class="cta ghost" style="margin:0" data-a="report" data-v="${addD(ws,-7)}">‹ Previous week</button>${addD(ws,7)<=addD(sunOf(t),-7)?`<button class="cta ghost" style="margin:0" data-a="report" data-v="${addD(ws,7)}">Next week ›</button>`:`<button class="cta ghost" style="margin:0" data-a="report" data-v="${sunOf(t)}">This week so far</button>`}</div>
   <button class="cta ghost" data-a="close">Close</button>`);
@@ -373,9 +373,9 @@ function readinessScore(d,sore,energy){const w=whoopDay(d),x=(S.wdata||{})[d]||{
   sc=Math.max(0,Math.min(100,Math.round(sc)));return{score:sc,lvl:sc>=67?'g':sc>=34?'y':'r',why}}
 function readinessSheet(d){const q=UI.rc=UI.rc&&UI.rc.d===d?UI.rc:Object.assign({d,sore:2,energy:3},(S.rcheck||{})[d]||{});const r=readinessScore(d,q.sore,q.energy),c={g:'var(--ok)',y:'var(--warn)',r:'var(--bad)'}[r.lvl];
   const row=(f,l,labels)=>`<label class="fl2">${l}</label><div class="obrow">${[1,2,3,4,5].map(v=>`<button class="obopt ${q[f]===v?'on':''}" data-a="rcset" data-f="${f}" data-v="${v}"><b>${v}</b><span>${labels[v-1]}</span></button>`).join('')}</div>`;
-  openSheet(`<h4 class="disp">Readiness check</h4><p class="muted" style="font-size:13.5px;margin:0 0 6px">10 seconds before you train. Combined with WHOOP, it sets today’s session.</p>
+  openSheet(`<h4 class="disp">Readiness check</h4><p class="muted" style="font-size:14px;margin:0 0 6px">10 seconds before you train. Combined with WHOOP, it sets today’s session.</p>
   ${row('sore','Muscle soreness',['None','Slight','Some','Sore','Very'])}${row('energy','Energy',['Drained','Low','OK','Good','Great'])}
-  <div class="rcscore" style="--c:${c}">${ring(r.score/100,c,96,11,r.score)}<div><b class="disp" style="font-size:24px">${{g:'Ready to push',y:'Train lighter',r:'Recovery day'}[r.lvl]}</b><p style="font-size:13.5px;margin:4px 0 0">${r.why.length?esc(r.why.join(', '))+'. ':''}${{g:'Full session as planned.',y:'One set fewer on accessories and arms, main lifts stop 2 reps short, cardio stays easy.',r:'Lifting is off today: mobility, core and an easy 30-minute walk or ride.'}[r.lvl]}</p></div></div>
+  <div class="rcscore" style="--c:${c}">${ring(r.score/100,c,96,11,r.score)}<div><b class="disp" style="font-size:24px">${{g:'Ready to push',y:'Train lighter',r:'Recovery day'}[r.lvl]}</b><p style="font-size:14px;margin:4px 0 0">${r.why.length?esc(r.why.join(', '))+'. ':''}${{g:'Full session as planned.',y:'One set fewer on accessories and arms, main lifts stop 2 reps short, cardio stays easy.',r:'Lifting is off today: mobility, core and an easy 30-minute walk or ride.'}[r.lvl]}</p></div></div>
   <button class="cta" style="--c:${c}" data-a="rcsave">Use this for today</button><button class="cta ghost" data-a="close">Not now</button>`)}
 function liftSheet(ex){
   const e=E[ex];if(!e)return;const all=(hist()[ex]||[]).slice(),c=COLORS.upper;
@@ -389,8 +389,8 @@ function liftSheet(ex){
     <div class="lhmeta num"><span>Volume <b>${Math.round(s2.vol).toLocaleString()} kg</b></span><span>Total reps <b>${s2.reps}</b></span><span>Best e1RM <b>${Math.round(s2.best)} kg</b></span>${tn?`<span>Session <b>${esc(tn)}</b></span>`:''}</div>
     <button class="mini" style="margin-top:8px" data-a="histday" data-d="${x.d}">Open this day →</button></details>`}
   const plt=plateauOf(ex);
-  openSheet(`<h4 class="disp">${esc(e.n)}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Every session you logged, newest first. Tap a session to see each set.</p>${plt?plateauHTML(plt):''}
+  openSheet(`<h4 class="disp">${esc(e.n)}</h4><p class="muted" style="font-size:14px;margin:0 0 8px">Every session you logged, newest first. Tap a session to see each set.</p>${plt?plateauHTML(plt):''}
   <div class="grid2" style="margin-bottom:6px"><div class="stat"><b class="disp num">${bestW} kg</b><span>Heaviest set</span></div><div class="stat"><b class="disp num">${Math.round(bestE)} kg</b><span>Best est. 1RM</span></div><div class="stat"><b class="disp num">${all.length}</b><span>Sessions logged</span></div><div class="stat"><b class="disp num">${fvol(totV)}</b><span>Total volume</span></div></div>
-  ${all.length>1?`<div class="card" style="margin:8px 0"><b style="font-size:13.5px">Estimated 1RM by session</b> <span class="muted num" style="font-size:12.5px">${chg>=0?'+':''}${Math.round(chg*100)}% since ${short(all[0].d)}</span>${bigChart(st.map(x=>x.best),c)}</div>`:''}
+  ${all.length>1?`<div class="card" style="margin:8px 0"><b style="font-size:14px">Estimated 1RM by session</b> <span class="muted num" style="font-size:13px">${chg>=0?'+':''}${Math.round(chg*100)}% since ${short(all[0].d)}</span>${bigChart(st.map(x=>x.best),c)}</div>`:''}
   ${rows}<button class="cta ghost" data-a="close">Close</button>`);
 }

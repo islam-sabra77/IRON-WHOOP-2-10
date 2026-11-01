@@ -32,12 +32,12 @@ function plateSheet(ex,w){
 function drawPlates(){
   const p=prefs(),q=UI.pl8,res=platesFor(q.w,p.bar,p.plates),made=q.w-2*res.rest;
   const stack=res.list.map(x=>`<i class="plate" style="--c:${PLATE_C[x]||'#888'};height:${40+x*3.2}px" title="${x} kg"><span>${x}</span></i>`).join('');
-  openSheet(`<h4 class="disp">Plate calculator</h4>${q.ex&&E[q.ex]?`<p class="muted" style="font-size:13.5px;margin:0 0 6px">${esc(E[q.ex].n)}</p>`:''}
+  openSheet(`<h4 class="disp">Plate calculator</h4>${q.ex&&E[q.ex]?`<p class="muted" style="font-size:14px;margin:0 0 6px">${esc(E[q.ex].n)}</p>`:''}
   <div class="pcrow"><button class="mini big" data-a="pl8w" data-v="-2.5" aria-label="Less weight">−</button><label class="fld pcw"><input inputmode="decimal" id="pl8in" data-in="pl8" value="${q.w}" aria-label="Total weight"><em>kg total</em></label><button class="mini big" data-a="pl8w" data-v="2.5" aria-label="More weight">＋</button></div>
   ${res.side==null?`<div class="note">That's lighter than the bar (${p.bar} kg).</div>`:`<div class="pcbar" aria-label="Plates on each side">${stack||'<span class="muted">Empty bar</span>'}<b></b></div>
   <p style="font-size:15px;margin:8px 0 0" data-raw><b>${isAr()?'كل جانب:':'Each side:'}</b> ${res.list.length?res.list.join(' + ')+(res.lb?' lb':' kg'):'nothing'}${res.rest>0?`<br><span class="muted">Closest you can load: ${made} kg (${res.rest} kg per side missing).</span>`:''}</p>`}
   <label class="fl2" style="margin-top:12px">Bar</label><div class="chipsrow">${imperial()?[45,35,25,15,0].map(b=>`<button class="mini ${(p.barLb??45)===b?'on':''}" data-a="pl8barlb" data-v="${b}" data-raw>${b?b+' lb':'No bar'}</button>`).join(''):[20,15,10,7,0].map(b=>`<button class="mini ${p.bar===b?'on':''}" data-a="pl8bar" data-v="${b}">${b?b+' kg':'No bar'}</button>`).join('')}</div>
-  <label class="fl2" style="margin-top:10px">Plates your gym has</label><div class="chipsrow">${imperial()?'<span class="muted" style="font-size:12.5px">45, 35, 25, 10, 5 and 2.5 lb plates</span>':PLATE_ALL.map(x=>`<button class="mini ${p.plates.includes(x)?'on':''}" data-a="pl8p" data-v="${x}">${x}</button>`).join('')}</div>
+  <label class="fl2" style="margin-top:10px">Plates your gym has</label><div class="chipsrow">${imperial()?'<span class="muted" style="font-size:13px">45, 35, 25, 10, 5 and 2.5 lb plates</span>':PLATE_ALL.map(x=>`<button class="mini ${p.plates.includes(x)?'on':''}" data-a="pl8p" data-v="${x}">${x}</button>`).join('')}</div>
   <button class="cta ghost" data-a="close">Done</button>`);
 }
 /* keep the screen on during a session, and alert when rest ends even if the app is in the background */
@@ -51,6 +51,10 @@ document.addEventListener('visibilitychange',()=>{clearTimeout(BGT);if(document.
 /* RPE: how hard the set felt, 6 (easy) to 10 (nothing left) */
 const RPE_L={6:'Easy, 4+ left',7:'3 left',8:'2 left',9:'1 left',10:'Max'};
 function rpeRow(k,s){return`<div class="rperow" role="group" aria-label="How hard was that set?"><span>How hard?</span>${[6,7,8,9,10].map(v=>`<button class="${+s.e===v?'on':''}" data-a="rpe" data-k="${k}" data-v="${v}" title="${RPE_L[v]}">${v}</button>`).join('')}<button class="rpex" data-a="rpe" data-k="${k}" data-v="0" aria-label="Skip">✕</button></div>`}
+/* personal record moment */
+function celebratePR(ex,w,r,up){let el=document.getElementById('prburst');if(el)el.remove();el=document.createElement('div');el.id='prburst';el.className='prburst';el.setAttribute('role','status');
+  el.innerHTML=`<div class="prcard">${IC.trophy}<b class="disp">New personal record</b><span>${esc(E[ex].n)}: ${w} kg × ${r} (+${up} kg est. 1RM)</span></div>${Array.from({length:18},(_,i)=>`<i style="--a:${i*20}deg;--c:${['#2F5BFF','#FF6A13','#12B76A','#E8A900','#FF2D78','#7B4DFF'][i%6]}"></i>`).join('')}`;
+  document.body.appendChild(el);try{navigator.vibrate&&navigator.vibrate([30,60,30,60,60])}catch(_){}beep(1046,.12,2);setTimeout(()=>el.classList.add('out'),2200);setTimeout(()=>el.remove(),2700)}
 /* swipe a set row to the right to finish it */
 (function swipeSets(){let row=null,x0=0,y0=0,dx=0,lock=null;
   document.addEventListener('touchstart',e=>{const r=e.target.closest('.set');if(!r||e.target.closest('input')||e.touches.length!==1){row=null;return}row=r;x0=e.touches[0].clientX;y0=e.touches[0].clientY;dx=0;lock=null},{passive:true});
@@ -66,7 +70,7 @@ function nextSet(d){
 function focusOpen(){const d=UI.date;UI.fx={d};wakeOn();askAlerts();drawFocus()}
 function drawFocus(){
   const q=UI.fx;if(!q)return;const d=q.d,n=nextSet(d);
-  if(!n){openSheet(`<div class="fxwrap"><div class="disp" style="font-size:34px">All sets done 💪</div><p class="muted">Finish the core and cardio from the Train tab, or share the workout.</p><button class="cta" style="--c:var(--upper)" data-a="wshare" data-d="${d}">📸 Share workout</button><button class="cta ghost" data-a="close">Close</button></div>`);return}
+  if(!n){openSheet(`<div class="fxwrap"><div class="disp" style="font-size:34px">All sets done 💪</div><p class="muted">Finish the core and cardio from the Train tab, or share the workout.</p><button class="cta" style="--c:var(--upper)" data-a="wshare" data-d="${d}">${IC.share} Share workout</button><button class="cta ghost" data-a="close">Close</button></div>`);return}
   const it=n.it,e=E[it.ex],k=it.slot+'|'+n.r,o=slotLog(d,it.slot,it.ex,it.rx.sets),s=o.sets[n.r],sg=e.bw||e.t?null:suggest(it,d);
   if(q.k!==k){q.k=k;q.w=s.w!==''?+s.w:(sg?sg.w:(o.sets.slice(0,n.r).reverse().find(x=>x.w!=='')||{}).w||'');q.r=s.r!==''?+s.r:(e.t?secsOf(it):rangeOf(it.rx.reps)[1])}
   const step=imperial()?(isBarbell(it.ex)?5:2.5)/LB:(isBarbell(it.ex)?2.5:(['acc','arm','pre'].includes(it.role)?1:2));
@@ -77,7 +81,7 @@ function drawFocus(){
   ${!e.bw&&!e.t?`<div class="fxctl"><span>Weight</span><button data-a="fxadj" data-f="w" data-v="${-step}" aria-label="Less weight">−</button><b class="num" data-raw>${q.w===''?'–':toDisp(q.w)}<small>${uW()}</small></b><button data-a="fxadj" data-f="w" data-v="${step}" aria-label="More weight">＋</button></div>`:''}
   <div class="fxctl"><span>${e.t?'Seconds':'Reps'}</span><button data-a="fxadj" data-f="r" data-v="${e.t?-5:-1}" aria-label="Less">−</button><b class="num">${q.r}<small>${e.t?'s':''}</small></b><button data-a="fxadj" data-f="r" data-v="${e.t?5:1}" aria-label="More">＋</button></div>
   <button class="fxdone" data-a="fxdone">✓ Set done</button>
-  <div class="fxrow"><button class="mini" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button>${isBarbell(it.ex)?`<button class="mini" data-a="plates" data-e="${it.ex}" data-w="${q.w}">🏋️ Plates</button>`:''}<button class="mini" data-a="fxskip">Skip set</button></div>
+  <div class="fxrow"><button class="mini" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button>${isBarbell(it.ex)?`<button class="mini" data-a="plates" data-e="${it.ex}" data-w="${q.w}">${IC.plate} Plates</button>`:''}<button class="mini" data-a="fxskip">Skip set</button></div>
   <div id="fxtimer" class="fxtimer"></div></div>`);fxTimer();
 }
 function groupsTotal(d){let all=0,done=0;blocksFor(d).forEach(b=>b.items.forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)}));coreFor(d).forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)});return{all,done}}
@@ -110,16 +114,16 @@ const AR={'Home':'الرئيسية','Train':'التمرين','Plan':'الخطة'
  'Settings':'الإعدادات','Close':'إغلاق','Cancel':'إلغاء','Save':'حفظ','Done':'تم','Back':'رجوع','Next':'التالي','Undo':'تراجع','Add':'إضافة','Share':'مشاركة','Upload':'رفع','Sync now':'مزامنة الآن','↻ Sync':'↻ مزامنة',
  'Good morning':'صباح الخير','Good afternoon':'مساء الخير','Good evening':'مساء الخير','Today':'اليوم','This week':'هذا الأسبوع','Last workout':'آخر تمرين','Recovery':'التعافي','Sleep':'النوم','Strain':'الإجهاد','Workouts':'التمارين',
  'Volume this week':'الحجم هذا الأسبوع','Top lift':'أفضل رفعة','Strength':'القوة','Supplements':'المكمّلات','Streaks':'السلاسل','Body weight':'وزن الجسم','Weekly report':'التقرير الأسبوعي','Start session ›':'ابدأ الجلسة ›','Continue ›':'تابع ›','Rest day ›':'يوم راحة ›',
- 'Mobility':'المرونة','Warm-up':'الإحماء','Core':'الجذع','Cardio':'الكارديو','Long cardio':'كارديو طويل','Rest day':'يوم راحة','Finish session':'إنهاء الجلسة','Session complete':'اكتملت الجلسة','Demo':'فيديو','Replace':'استبدال','Form':'الأداء','History':'السجل','🏋️ Plates':'🏋️ الأقراص',
- '▶ Focus mode':'▶ وضع التركيز','Compact view':'عرض مختصر','Expand all':'توسيع الكل','Move or copy':'نقل أو نسخ','📸 Share':'📸 مشاركة','✓ Set done':'✓ انتهت المجموعة','Skip set':'تخطي المجموعة','Exit':'خروج','Weight':'الوزن','Reps':'التكرارات','Seconds':'الثواني','reps':'تكرار','How hard?':'ما مدى الصعوبة؟',
+ 'Mobility':'المرونة','Warm-up':'الإحماء','Core':'الجذع','Cardio':'الكارديو','Long cardio':'كارديو طويل','Rest day':'يوم راحة','Finish session':'إنهاء الجلسة','Session complete':'اكتملت الجلسة','Demo':'فيديو','Replace':'استبدال','Form':'الأداء','History':'السجل','Plates':'الأقراص',
+ '▶ Focus mode':'▶ وضع التركيز','Compact view':'عرض مختصر','Expand all':'توسيع الكل','Move or copy':'نقل أو نسخ','Share':'مشاركة','✓ Set done':'✓ انتهت المجموعة','Skip set':'تخطي المجموعة','Exit':'خروج','Weight':'الوزن','Reps':'التكرارات','Seconds':'الثواني','reps':'تكرار','How hard?':'ما مدى الصعوبة؟',
  'Green':'أخضر','Yellow':'أصفر','Red':'أحمر','full session':'جلسة كاملة','lighter day':'يوم أخف','recovery only':'تعافٍ فقط','Readiness check':'فحص الجاهزية','Muscle soreness':'ألم العضلات','Energy':'الطاقة','Use this for today':'استخدم هذا لليوم','Not now':'ليس الآن',
  'Plate calculator':'حاسبة الأقراص','Bar':'العارضة','Plates your gym has':'الأقراص المتوفرة في ناديك','Each side:':'كل جانب:',
  'Strength trends':'تطوّر القوة','Sessions per week':'الجلسات في الأسبوع','Stalled lifts':'رفعات متوقفة','Personal records':'أرقام قياسية شخصية','Sessions done':'الجلسات المنجزة','Sets logged':'المجموعات المسجّلة','Avg recovery':'متوسط التعافي','Avg sleep':'متوسط النوم','Supplements taken':'المكمّلات المأخوذة','Habits done':'العادات المنجزة',
  'Plan builder':'مُنشئ الخطة','Start from a split':'ابدأ من تقسيم','Your week':'أسبوعك','Cycles and progression':'الدورات والتقدّم','WHOOP intensity':'شدة WHOOP','Mobility focus':'تركيز المرونة','Apply':'تطبيق','Apply to my plan':'طبّق على خطتي','Cycle length':'طول الدورة','Goal':'الهدف','Session length':'مدة الجلسة',
- 'Your plan':'خطتك','Cloud backup':'النسخ الاحتياطي السحابي','☁️ Cloud backup ›':'☁️ النسخ الاحتياطي السحابي ›','Copy code':'نسخ الرمز','Back up now':'انسخ الآن','Link this device':'اربط هذا الجهاز','Download backup':'تنزيل نسخة احتياطية','Restore from file':'استعادة من ملف','Back to settings':'العودة إلى الإعدادات',
+ 'Your plan':'خطتك','Cloud backup':'النسخ الاحتياطي السحابي','Cloud backup ›':'النسخ الاحتياطي السحابي ›','Copy code':'نسخ الرمز','Back up now':'انسخ الآن','Link this device':'اربط هذا الجهاز','Download backup':'تنزيل نسخة احتياطية','Restore from file':'استعادة من ملف','Back to settings':'العودة إلى الإعدادات',
  'Theme':'المظهر','Units':'الوحدات','Language':'اللغة','Text size':'حجم النص','Metric (kg, cm)':'متري (كغ، سم)','Imperial (lb, in)':'إمبراطوري (رطل، إنش)','Normal':'عادي','Large':'كبير','Larger':'أكبر','Display':'العرض',
  'Body':'الجسم','InBody':'InBody','Trends':'الاتجاهات','Insights':'رؤى','Steps ›':'الخطوات ›','Sleep ›':'النوم ›','Strain ›':'الإجهاد ›','Calories ›':'السعرات ›','HRV':'تقلب نبض القلب',
- 'Build or improve my stack':'أنشئ أو حسّن مكمّلاتي','📖 Supplement guide':'📖 دليل المكمّلات','Morning':'الصباح','Pre-workout':'قبل التمرين','Post-workout':'بعد التمرين','With meals':'مع الوجبات','Evening':'المساء',
+ 'Build or improve my stack':'أنشئ أو حسّن مكمّلاتي','Supplement guide':'دليل المكمّلات','Morning':'الصباح','Pre-workout':'قبل التمرين','Post-workout':'بعد التمرين','With meals':'مع الوجبات','Evening':'المساء',
  'Workout summary':'ملخص التمرين','Share image':'مشاركة الصورة','Save image':'حفظ الصورة','Copy as text':'نسخ كنص','Nice':'رائع','Session done':'انتهت الجلسة'};
 const AR_PART=[[/^Cycle (\d+) · week (\d+)\/(\d+)$/,'الدورة $1 · الأسبوع $2/$3'],[/^(\d+) of (\d+) sessions$/,'$1 من $2 جلسات'],[/^Set (\d+) of (\d+)/,'المجموعة $1 من $2']];
 function trText(t){if(!isAr())return t;const k=t.trim();if(!k)return t;if(AR[k])return t.replace(k,AR[k]);for(const[re,to]of AR_PART)if(re.test(k))return t.replace(k,k.replace(re,to));return t}
@@ -140,7 +144,9 @@ function applyDisplay(){const p=prefs(),h=document.documentElement;h.lang=p.lang
 new MutationObserver(ms=>{if(!S||!S.prefs)return;for(const m of ms)m.addedNodes.forEach(n=>localizeNode(n))}).observe(document.body,{childList:true,subtree:true});
 
 /* ---------- actions ---------- */
-function rerender(){HISTCACHE=null;WICACHE={};renderTop();renderTabs();({home:renderHome,train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits})[UI.tab]();}
+function rerender(){HISTCACHE=null;WICACHE={};renderTop();renderTabs();const R2={home:renderHome,train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits,more:renderMore,goals:typeof renderGoals==='function'?renderGoals:renderMore,food:typeof renderFood==='function'?renderFood:renderMore};(R2[UI.tab]||renderHome)();
+  const v=document.getElementById('view');if(MORE_TABS.includes(UI.tab)&&UI.tab!=='more')v.insertAdjacentHTML('afterbegin',`<button class="backlink" data-a="tab" data-v="more">${IC.back}<span>More</span></button>`);
+  if(UI.lastTab!==UI.tab){v.classList.remove('fadein');void v.offsetWidth;v.classList.add('fadein');UI.lastTab=UI.tab}}
 function markStart(d){const l=L(d);if(!l._t0){l._t0=Date.now();askAlerts()}if(d===todayS())wakeOn()}
 function checkComplete(d){const u=units(d);if(pctOf(u)>=1&&!S.done[d]){S.done[d]={t:Date.now()};save();wakeOff();UI.fx=null;rerender();finishSheet(d);return true}return false}
 function findItem(d,slot){for(const b of blocksFor(d)){for(let i=0;i<b.items.length;i++)if(b.items[i].slot===slot)return{it:b.items[i],b,idx:i}}const c=coreFor(d);for(let i=0;i<c.length;i++)if(c[i].slot===slot)return{it:c[i],b:{items:c},idx:i};return null}
@@ -149,6 +155,7 @@ function toggleSet(d,k,forceOn){
   const o=slotLog(d,slot,it.ex,it.rx.sets),s=o.sets[+i];const on=forceOn?true:!s.d;
   if(on){const sg=suggest(it,d);if(!e.t){if(s.r==='')s.r=String(rangeOf(it.rx.reps)[1]);if(!e.bw&&s.w===''&&sg)s.w=String(sg.w)}if(e.t&&s.r==='')s.r=String(secsOf(it))}
   s.d=on?1:0;markStart(d);save();delete UI.exo[slot];UI.rpeAsk=on&&!e.t?k:null;
+  if(on){try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}UI.pop=k;setTimeout(()=>{UI.pop=null},500);if(!e.bw&&!e.t&&+s.w>0&&+s.r>0){HISTCACHE=null;const prev=(hist()[it.ex]||[]).filter(x=>x.d<d);if(prev.length){const best=Math.max(...prev.map(x=>Math.max(...x.sets.map(q=>e1rm(+q.w,+q.r))))),now=e1rm(+s.w,+s.r);if(now>best*1.005)setTimeout(()=>celebratePR(it.ex,+s.w,+s.r,Math.round(now-best)),60)}}}
   if(on&&!checkComplete(d)){
     const last=f.idx===f.b.items.length-1;
     if(last){const rest=Math.max(...f.b.items.map(x=>x.rx.rest));const more=+i<it.rx.sets-1;startTimer('Rest',[{l:more?'Set '+(+i+2)+' is next':'Next exercise is up',s:rest,c:COLORS.upper}])}
