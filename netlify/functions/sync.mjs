@@ -1,6 +1,8 @@
-// Cloud backup and sync. Each person's data is stored under a hash of their private sync code.
+// Cloud backup and sync. Data arrives already encrypted on the phone (AES-GCM, key derived from the private
+// sync code); this server only sees a separate access token derived from the code and the ciphertext.
 //   GET  /api/sync  -> { updated, state }     (404 when nothing is stored yet)
-//   PUT  /api/sync  body { updated, state }   -> { ok, updated }
+//   PUT  /api/sync  body { updated, enc }     -> { ok, updated }   (older apps sent { updated, state })
+//   DELETE /api/sync                          -> removes the stored copy (used after moving to encrypted storage)
 import { getStore } from '@netlify/blobs';
 
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
@@ -18,13 +20,14 @@ export default async (req) => {
     const text = await req.text();
     if (text.length > 8_000_000) return json({ error: 'too_large' }, 413);
     let body; try { body = JSON.parse(text); } catch { return json({ error: 'bad_body' }, 400); }
-    if (!body || typeof body.state !== 'object' || typeof body.updated !== 'number') return json({ error: 'bad_body' }, 400);
+    if (!body || typeof body.updated !== 'number' || !(typeof body.enc === 'object' && body.enc && typeof body.enc.ct === 'string') && typeof body.state !== 'object') return json({ error: 'bad_body' }, 400);
     const cur = await store.get(id, { type: 'json' });
     // Refuse to overwrite newer data; the app merges and retries.
     if (cur && cur.updated > body.updated) return json({ error: 'stale', updated: cur.updated }, 409);
-    await store.setJSON(id, { updated: body.updated, state: body.state, at: Date.now() });
+    await store.setJSON(id, body.enc ? { updated: body.updated, enc: body.enc, at: Date.now() } : { updated: body.updated, state: body.state, at: Date.now() });
     return json({ ok: true, updated: body.updated });
   }
+  if (req.method === 'DELETE') { await store.delete(id); return json({ ok: true }); }
   return json({ error: 'method' }, 405);
 };
 export const config = { path: '/api/sync' };

@@ -7,13 +7,13 @@ function renderPlan(){
   const W=totalWeeks(),curW=inPlan(t)?weekNo(t):0;let ps='';
   for(let w=1;w<=W;w++){const d=addD(sunOf(S.start),(w-1)*7+1);const ph=phaseOf(d<S.start?S.start:d);ps+=`<span class="${ph.deload?'dl':''} ${w===curW?'now':''}" style="--c:${PH_COLOR[ph.s]}" title="Week ${w}">${w}</span>`}
   h+=`<div class="card">${cardHead('pblocks','Training blocks')}${isCol('pblocks')?'':`<div class="phases">${ps}</div><div class="legend"><span style="--c:${PH_COLOR.F}"><i></i>Cycle 1: Hypertrophy base</span><span style="--c:${PH_COLOR.H}"><i></i>Cycle 2: Build</span><span style="--c:${PH_COLOR.S}"><i></i>Cycle 3: Strength</span><span style="--c:#c8cdea"><i></i>Deload</span></div>
-<p class="muted" style="font-size:13.5px;margin:0 0 8px">Each cycle (6 weeks unless you change it in the Builder): weeks 1–3 add a rep at the same weight, week 4 adds weight and resets the reps, later weeks push the reps again, and the last week is a lighter deload. Every new cycle drops the rep targets and raises the loads, and accessory and arm moves rotate every other cycle. Main lifts stay so your strength keeps building.</p>
+<p class="muted" style="font-size:14px;margin:0 0 8px">Each cycle (6 weeks unless you change it in the Builder): weeks 1–3 add a rep at the same weight, week 4 adds weight and resets the reps, later weeks push the reps again, and the last week is a lighter deload. Every new cycle drops the rep targets and raises the loads, and accessory and arm moves rotate every other cycle. Main lifts stay so your strength keeps building.</p>
 ${(()=>{const CL=cycleOf(todayS()<S.start?S.start:todayS()).CL,n=CL-1,ix=[...Array(CL).keys()];return`<div style="overflow-x:auto"><table class="cyc"><tr><th></th>${ix.map(i=>`<th>W${i+1}</th>`).join('')}</tr>${['F','H','S'].map(k=>`<tr><td><b style="color:${PH_COLOR[k]}">${SCH[k].name}</b></td>${ix.map(i=>`<td>${i===n?'2×'+SCH[k].main[1]:(SCH[k].main[0]+(i>=3?1:0))+'×'+(SCH[k].main[1]+OFF_SEQ[n][i])}${FOCUS_SEQ[n][i]===3?'<br><span class="up">+kg</span>':''}</td>`).join('')}</tr>`).join('')}</table></div>`})()}`}</div>`;
   // weekly schedule
   {const hs=S.hist||[];h+=`<div class="card">${cardHead('phist','Schedule changes')}`;
-   if(!isCol('phist')){h+=hs.length?`<p class="muted" style="font-size:13.5px;margin:0 0 6px">Every move, copy and weekly change is saved here. Undo them one at a time, newest first, or go back to the original plan.</p>${hs.slice(-6).reverse().map((e,i)=>`<div class="hrow" style="grid-template-columns:1fr auto"><span>${esc(e.label)}${i===0?' <span class="pill" style="--c:var(--ink)">latest</span>':''}</span><em class="muted">${short(ds(new Date(e.t)))}</em></div>`).join('')}<div class="grid2" style="margin-top:10px"><button class="cta" style="--c:var(--cardio);margin:0" data-a="undosched">↶ Undo latest</button><button class="cta ghost" style="margin:0" data-a="resetsched">Reset to original</button></div>`:`<p class="muted" style="font-size:13.5px;margin:0">Nothing changed yet. Open any day in the Train tab and tap <b>Move or copy</b>.</p>${Object.keys(S.moves).length?'<button class="cta ghost" data-a="resetsched">Reset to original</button>':''}`}
+   if(!isCol('phist')){h+=hs.length?`<p class="muted" style="font-size:14px;margin:0 0 6px">Every move, copy and weekly change is saved here. Undo them one at a time, newest first, or go back to the original plan.</p>${hs.slice(-6).reverse().map((e,i)=>`<div class="hrow" style="grid-template-columns:1fr auto"><span>${esc(e.label)}${i===0?' <span class="pill" style="--c:var(--ink)">latest</span>':''}</span><em class="muted">${short(ds(new Date(e.t)))}</em></div>`).join('')}<div class="grid2" style="margin-top:10px"><button class="cta" style="--c:var(--cardio);margin:0" data-a="undosched">↶ Undo latest</button><button class="cta ghost" style="margin:0" data-a="resetsched">Reset to original</button></div>`:`<p class="muted" style="font-size:14px;margin:0">Nothing changed yet. Open any day in the Train tab and tap <b>Move or copy</b>.</p>${Object.keys(S.moves).length?'<button class="cta ghost" data-a="resetsched">Reset to original</button>':''}`}
    h+=`</div>`}
-  h+=`<div class="card">${cardHead('psched','Weekly schedule')}`;if(!isCol('psched')){h+=`<p class="muted" style="font-size:13.5px;margin:0 0 6px">Change which day each session falls on. It applies to every week; single-day moves are made from the Train tab.</p>`;
+  h+=`<div class="card">${cardHead('psched','Weekly schedule')}`;if(!isCol('psched')){h+=`<p class="muted" style="font-size:14px;margin:0 0 6px">Change which day each session falls on. It applies to every week; single-day moves are made from the Train tab.</p>`;
   const AM=activeMap();for(let i=0;i<7;i++){h+=`<div class="srow"><b>${DN[i]}</b><select data-in="map" data-k="${i}">${TPL_KEYS.map(k=>`<option value="${k}" ${AM[i]===k?'selected':''}>${T[k].n} — ${T[k].f}</option>`).join('')}</select></div>`}
   h+=`<div class="srow"><b>Start date</b><input type="date" data-in="start" value="${S.start}"></div><div class="srow"><b>End date</b><div style="display:flex;gap:8px;align-items:center"><span class="num" style="font-weight:750">${nice(S.end)}</span><button class="mini" data-a="tab" data-v="progress" style="margin-left:auto">Extend plan</button></div></div>`}h+=`</div>`;
   h+=`<div class="legend">${[['Upper','upper'],['Lower','lower'],['Travel','travel'],['Long cardio','long'],['Rest','rest']].map(x=>`<span style="--c:${COLORS[x[1]]}"><i></i>${x[0]}</span>`).join('')}<span style="--c:transparent"><i style="outline:2.5px solid var(--ok)"></i>Done</span></div>`;
@@ -39,7 +39,7 @@ function renderTravel(){
   let h=`<h2 class="pagetitle disp">Travel</h2><p class="sub">Four full-body sessions with zero equipment. Same flow as the gym days: mobility, strength supersets, core, then a low-impact cardio circuit.</p>`;
   h+=`<div class="card">${cardHead('ttrips','Trips')}`;
   if(!isCol('ttrips')){
-    h+=`<p class="muted" style="font-size:13.5px;margin:0 0 6px">Add your travel dates. Lifting days inside a trip switch to travel sessions automatically, rotating A, B, C, D. Saturday cardio and rest days stay as they are.</p>`;
+    h+=`<p class="muted" style="font-size:14px;margin:0 0 6px">Add your travel dates. Lifting days inside a trip switch to travel sessions automatically, rotating A, B, C, D. Saturday cardio and rest days stay as they are.</p>`;
     (S.trips||[]).slice().sort((a,b)=>a.from<b.from?-1:1).forEach(x=>{let n=0;for(let d=x.from;d<=x.to;d=addD(d,1))if(T[tplOf(d)||'rest']&&T[tplOf(d)||'rest'].k==='travel')n++;const i=S.trips.indexOf(x);
       h+=`<div class="trip"><div><b>${short(x.from)} to ${short(x.to)}</b><span>${n} travel session${n===1?'':'s'}${x.to<t?', finished':(x.from<=t?', happening now':'')}</span></div><button class="mini" data-a="deltrip" data-v="${i}">Remove</button></div>`});
     h+=`<div class="grid2" style="margin-top:8px"><label class="fl">From<input type="date" id="tripFrom" value="${pdate}"></label><label class="fl">To<input type="date" id="tripTo" value="${addD(pdate,4)}"></label></div><button class="cta" style="--c:var(--travel)" data-a="addtrip">Add trip</button>`;
@@ -59,7 +59,7 @@ function renderTravel(){
     }
     h+=`</div></div>`;
   });
-  h+=`<p class="muted" style="font-size:12.5px">Reps and holds grow week by week inside each 6-week cycle, just like the gym sessions, with a 4th round in Strength cycles and 2 easy rounds in deload weeks.</p>`;
+  h+=`<p class="muted" style="font-size:13px">Reps and holds grow week by week inside each 6-week cycle, just like the gym sessions, with a 4th round in Strength cycles and 2 easy rounds in deload weeks.</p>`;
   v.innerHTML=h;
 }
 
@@ -131,7 +131,7 @@ function sessionSummary(d){
 function wkCard(){
   const t=todayS(),list=wkList(addD(t,-27),t);let h=`<div class="card" style="--c:${WC.strain}"><h4 class="disp" style="margin:0 0 4px">Workouts</h4>`;
   if(!UI.wdemo&&S.whoop.wkAccess===false)h+=`<div class="note">WHOOP needs permission to share workouts. Reconnect once to load them.${WH_ON?' <button class="mini" data-a="wconnect">Reconnect WHOOP</button>':''}</div>`;
-  if(!list.length){h+=`<p class="muted" style="font-size:13.5px;margin:0">No workouts from WHOOP in the last 4 weeks yet. Workouts appear here after WHOOP scores them.</p></div>`;return h}
+  if(!list.length){h+=`<p class="muted" style="font-size:14px;margin:0">No workouts from WHOOP in the last 4 weeks yet. Workouts appear here after WHOOP scores them.</p></div>`;return h}
   h+=`<p class="muted" style="font-size:13px;margin:0 0 4px">Last 4 weeks. Tap one for heart-rate zones and what you lifted.</p>`;
   const show=UI.wkAll?list:list.slice(0,6);
   show.forEach(w=>{const s=sessionSummary(w.d),st=new Date(w.start);
@@ -144,15 +144,15 @@ function wkSheet(id){
   const w=wkAll()[id];if(!w)return;const s=sessionSummary(w.d),st=new Date(w.start),en=new Date(w.end),tot=w.zones.reduce((a,b)=>a+b,0)||1;
   const same=Object.values(wkAll()).filter(x=>x.sport===w.sport&&x.id!==w.id&&x.d<w.d&&x.d>=addD(w.d,-28)&&x.strain!=null);const avgS=same.length?same.reduce((a,x)=>a+x.strain,0)/same.length:null;
   const hi=(w.zones[4]+w.zones[5])/6e4;
-  let h=`<h4 class="disp">${esc(sportName(w.sport))}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">${nice(w.d)} · ${st.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}–${en.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${wkMins(w)} min${w.pct!=null&&w.pct<95?' · '+Math.round(w.pct)+'% recorded':''}</p>
+  let h=`<h4 class="disp">${esc(sportName(w.sport))}</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${nice(w.d)} · ${st.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}–${en.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${wkMins(w)} min${w.pct!=null&&w.pct<95?' · '+Math.round(w.pct)+'% recorded':''}</p>
   <div class="grid2"><div class="stat"><b class="disp num">${w.strain!=null?w.strain.toFixed(1):'–'}</b><span>Strain${avgS!=null?` (usual ${avgS.toFixed(1)})`:''}</span></div><div class="stat"><b class="disp num">${w.kj!=null?Math.round(w.kj/4.184):'–'}</b><span>Calories</span></div><div class="stat"><b class="disp num">${w.ahr||'–'}</b><span>Average heart rate</span></div><div class="stat"><b class="disp num">${w.mhr||'–'}</b><span>Max heart rate</span></div>${w.dist?`<div class="stat"><b class="disp num">${(w.dist/1000).toFixed(2)} km</b><span>Distance</span></div>`:''}<div class="stat"><b class="disp num">${Math.round(hi)} min</b><span>Zones 4–5 (hard)</span></div></div>
-  <div class="card" style="margin-top:10px"><b>Heart-rate zones</b><span class="muted" style="font-size:12.5px"> · % of max heart rate</span>${zoneBar(w.zones,12)}
+  <div class="card" style="margin-top:10px"><b>Heart-rate zones</b><span class="muted" style="font-size:13px"> · % of max heart rate</span>${zoneBar(w.zones,12)}
   ${w.zones.map((v,i)=>`<div class="zrow"><i style="background:${ZONE_C[i]}"></i><span>${ZONE_L[i]}</span><b class="num">${Math.round(v/6e4)} min</b><em class="num">${Math.round(v/tot*100)}%</em></div>`).join('')}</div>`;
   h+=`<div class="card"><b>Your IRON session that day</b>`;
-  if(!s.t)h+=`<p class="muted" style="font-size:13.5px;margin:4px 0 0">No IRON session on this day.</p>`;
+  if(!s.t)h+=`<p class="muted" style="font-size:14px;margin:4px 0 0">No IRON session on this day.</p>`;
   else{h+=`<div class="muted" style="font-size:13px;margin:2px 0 6px">${esc(s.t.n)}${s.done?' · finished':''}${s.sets?` · ${s.sets} sets · ${Math.round(s.vol).toLocaleString()} kg volume`:''}${s.cardio?' · cardio done':''}</div>`;
     if(s.ex.length)h+=s.ex.map(x=>`<div class="wkex"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><span class="num">${x.sets.map(q=>(q.w!==''&&q.w!=null?q.w+' kg × ':'')+(q.r||'–')).join(', ')}</span></div>`).join('');
-    else h+=`<p class="muted" style="font-size:13.5px;margin:0">No sets logged in IRON for this day.</p>`;
+    else h+=`<p class="muted" style="font-size:14px;margin:0">No sets logged in IRON for this day.</p>`;
     h+=`<button class="mini" style="margin-top:8px" data-a="histday" data-d="${w.d}">Open this day →</button>`}
   h+=`</div><p class="muted" style="font-size:12px">WHOOP shares heart rate and strain. Sets and weights come from what you log in IRON.</p><button class="cta ghost" data-a="close">Close</button>`;
   openSheet(h);
@@ -224,7 +224,7 @@ function drawIbReview(){
   const q=UI.ib,r=q.r,d=r.test_date&&/^\d{4}-\d\d-\d\d$/.test(r.test_date)?r.test_date:todayS();
   const fld=(k,l,u)=>`<label class="ibf"><span>${l}</span><input inputmode="decimal" data-ib="${k}" value="${r[k]!=null?r[k]:''}" placeholder="–"><em>${u}</em></label>`;
   openSheet(`<div data-raw><h4 class="disp">${q.auto?'Check your InBody numbers':'Enter your InBody numbers'}</h4>
-  ${q.msg?`<div class="note">${esc(q.msg)} You can type the numbers in below.</div>`:'<p class="muted" style="font-size:13.5px;margin:0 0 8px">IRON read these from your sheet. Fix anything that looks wrong, then save.</p>'}
+  ${q.msg?`<div class="note">${esc(q.msg)} You can type the numbers in below.</div>`:'<p class="muted" style="font-size:14px;margin:0 0 8px">IRON read these from your sheet. Fix anything that looks wrong, then save.</p>'}
   <label class="fl2">Test date</label><input type="date" id="ibdate" value="${d}" max="${todayS()}">
   <div class="ibgrid">${IB_FIELDS.map(x=>fld(...x)).join('')}</div>
   <label class="fl2" style="margin-top:10px">Segmental lean (kg)</label><div class="ibgrid">${IB_SEG.map(([s,l])=>`<label class="ibf"><span>${l}</span><input inputmode="decimal" data-ib="segmental_lean_kg.${s}" value="${(r.segmental_lean_kg||{})[s]??''}" placeholder="–"><em>kg</em></label>`).join('')}</div>
@@ -243,11 +243,11 @@ function ibSave(){
   b.src='inbody';S.body[d]=b;save();closeSheet();UI.ib=null;rerender();toast('InBody result saved for '+short(d));
 }
 function ibCard(){
-  const L2=ibLatest();let h=`<div class="card" style="--c:${WC.body}"><div class="ctop"><h4 class="disp" style="margin:0">InBody</h4><button class="mini" data-a="ibupload">⬆ Upload</button></div>`;
-  if(!L2)return h+`<p class="muted" style="font-size:13.5px;margin:6px 0 0">Upload a photo or PDF of your InBody result sheet. IRON reads the numbers, you check them, and they're tracked here over time.</p></div>`;
+  const L2=ibLatest();let h=`<div class="card" style="--c:${WC.body}"><div class="ctop"><h4 class="disp" style="margin:0">InBody</h4><button class="mini" data-a="ibupload">${IC.upload} Upload</button></div>`;
+  if(!L2)return h+`<p class="muted" style="font-size:14px;margin:6px 0 0">Upload a photo or PDF of your InBody result sheet. IRON reads the numbers, you check them, and they're tracked here over time.</p></div>`;
   const r=L2.r,p=L2.prev,dl=(k,good)=>{if(!p||r[k]==null||p[k]==null)return'';const v=r[k]-p[k];if(Math.abs(v)<0.05)return'<em class="ibd">±0</em>';const ok=good===0?null:(v>0)===(good>0);return`<em class="ibd" style="color:${ok==null?'var(--mu)':ok?'var(--ok)':'var(--bad)'}">${v>0?'+':''}${(+v).toFixed(k==='inbody_score'||k==='visceral_fat_level'?0:1)}</em>`};
   const tile=(k,l,u,good,mk)=>`<button class="btile" style="--c:${WC.body}" ${mk?`data-a="metric" data-v="${mk}"`:'data-a="ibopen"'}><span>${l}</span><b class="disp num">${r[k]!=null?(+r[k]).toFixed(k==='inbody_score'||k==='visceral_fat_level'?0:1):'–'}<small>${u}</small></b>${dl(k,good)}</button>`;
-  h+=`<div class="muted" style="font-size:12.5px;margin:2px 0 8px">Latest scan ${nice(L2.d)}${p?' · change vs '+short(p.test_date):''}</div>
+  h+=`<div class="muted" style="font-size:13px;margin:2px 0 8px">Latest scan ${nice(L2.d)}${p?' · change vs '+short(p.test_date):''}</div>
   <div class="bgrid">${tile('inbody_score','Score','',1,'ibscore')}${tile('skeletal_muscle_mass_kg','Muscle','kg',1,'smm')}${tile('body_fat_mass_kg','Fat mass','kg',-1,'bfm')}${tile('percent_body_fat','Body fat','%',-1,'fat')}${tile('visceral_fat_level','Visceral','',-1,'visceral')}${tile('weight_kg','Weight','kg',0,'weight')}</div>`;
   if(r.fat_control_kg!=null||r.muscle_control_kg!=null)h+=`<div class="note" style="margin-top:8px"><b>InBody targets:</b> ${r.target_weight_kg!=null?'reach '+r.target_weight_kg+' kg':''}${r.fat_control_kg!=null?` · fat ${r.fat_control_kg>0?'+':''}${r.fat_control_kg} kg`:''}${r.muscle_control_kg!=null?` · muscle ${r.muscle_control_kg>0?'+':''}${r.muscle_control_kg} kg`:''}</div>`;
   return h+`<button class="cta ghost" data-a="ibopen">Full report and history</button></div>`;
@@ -256,13 +256,13 @@ function ibSheet(){
   const L2=ibLatest();if(!L2){ibUploadPick();return}const r=L2.r,ds2=ibDates();
   const seg=(key,pk)=>{const s=r[key]||{},pc=r[pk]||{};const cell=(n)=>{const v=s[n],p=pc[n];return`<div class="ibseg ${p!=null?(p>110?'over':p<90?'under':''):''}"><span>${IB_SEG.find(x=>x[0]===n)[1]}</span><b class="num">${v!=null?v+' kg':'–'}</b>${p!=null?`<em class="num">${p}%</em>`:''}</div>`};return`<div class="ibbody">${cell('left_arm')}${cell('right_arm')}${cell('trunk')}${cell('left_leg')}${cell('right_leg')}</div>`};
   const imb=(()=>{const a=r.segmental_lean_kg||{};const out=[];[['left_arm','right_arm','arms'],['left_leg','right_leg','legs']].forEach(([l,rr,n])=>{if(a[l]&&a[rr]){const df=Math.abs(a[l]-a[rr])/Math.max(a[l],a[rr]);if(df>=0.05)out.push(`${n}: ${a[l]<a[rr]?'left':'right'} side is ${Math.round(df*100)}% lighter`)}});return out})();
-  openSheet(`<h4 class="disp">InBody ${short(L2.d)}</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">${esc(r.device||'InBody')}${r.age?' · age '+r.age:''}${r.height_cm?' · '+r.height_cm+' cm':''}</p>
+  openSheet(`<h4 class="disp">InBody ${short(L2.d)}</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${esc(r.device||'InBody')}${r.age?' · age '+r.age:''}${r.height_cm?' · '+r.height_cm+' cm':''}</p>
   <div class="card">${IB_FIELDS.filter(([k])=>r[k]!=null).map(([k,l,u])=>`<div class="hrow" style="grid-template-columns:1fr auto"><span>${l}</span><b class="num">${r[k]}${u?' '+u:''}</b></div>`).join('')}</div>
   <label class="fl2">Segmental lean (vs normal for your size)</label>${seg('segmental_lean_kg','segmental_lean_pct')}
   <label class="fl2">Segmental fat</label>${seg('segmental_fat_kg','segmental_fat_pct')}
   ${imb.length?`<div class="note"><b>Left–right difference:</b> ${imb.join('; ')}. Single-leg and single-arm work, weaker side first, helps even this out.</div>`:''}
   <label class="fl2" style="margin-top:10px">History</label>${ds2.slice().reverse().map(d=>{const x=ibAll()[d];return`<div class="hrow" style="grid-template-columns:1fr auto auto auto"><span>${short(d)}</span><b class="num">${x.weight_kg??'–'} kg</b><span class="num">${x.skeletal_muscle_mass_kg??'–'} SMM</span><span class="num">${x.percent_body_fat??'–'}%</span></div>`}).join('')}
-  <button class="cta" style="--c:${WC.body}" data-a="ibupload">⬆ Upload a new scan</button><button class="cta ghost" data-a="ibshare">Share summary</button><button class="cta ghost" data-a="close">Close</button>`);
+  <button class="cta" style="--c:${WC.body}" data-a="ibupload">${IC.upload} Upload a new scan</button><button class="cta ghost" data-a="ibshare">Share summary</button><button class="cta ghost" data-a="close">Close</button>`);
 }
 function ibText(){const L2=ibLatest();if(!L2)return'';const r=L2.r;return`InBody ${nice(L2.d)}\n`+IB_FIELDS.filter(([k])=>r[k]!=null).map(([k,l,u])=>`${l}: ${r[k]}${u?' '+u:''}`).join('\n')}
 function stepsCard(d){
@@ -278,11 +278,11 @@ function stepsCard(d){
 function renderWhoop(){
   const v=document.getElementById('view'),t=todayS();
   if(!S.whoop.connected&&!UI.wdemo){
-    v.innerHTML=`<h2 class="pagetitle disp">WHOOP</h2><p class="sub">Recovery, sleep, strain, steps and body in one place, linked to your training.</p>
+    v.innerHTML=`<h2 class="pagetitle disp">Body</h2><p class="sub">Recovery, sleep, strain, steps and body in one place, linked to your training.</p>
     <div class="whero" style="--c:#191A4A;grid-template-columns:1fr"><div style="position:relative;z-index:1"><div class="wd">Not connected</div><h3 class="disp">Your body's daily report</h3><p>Connect WHOOP to see recovery, HRV, resting heart rate, sleep stages, strain and steps, plus insights on how your training affects recovery.</p>
-    <div class="hero-actions">${WH_ON?'<button class="hbtn solid" style="--c:#191A4A" data-a="wconnect">Connect WHOOP</button>':'<button class="hbtn solid" style="--c:#191A4A" data-a="settings">Open Settings</button>'}<button class="hbtn" data-a="wdemo">Preview with sample data</button></div></div></div>${bodyCard()}`;return}
+    <div class="hero-actions">${WH_ON?'<button class="hbtn solid" style="--c:#191A4A" data-a="wconnect">Connect WHOOP</button>':'<button class="hbtn solid" style="--c:#191A4A" data-a="settings">Open Settings</button>'}<button class="hbtn" data-a="wdemo">Preview with sample data</button></div></div></div>${bodyCard()}${ibCard()}`;return}
   const d=UI.wday&&W(UI.wday)?UI.wday:latestDay();UI.wday=d;const x=W(d)||{};
-  let h=`<div class="phead"><h2 class="pagetitle disp">WHOOP</h2>${UI.wdemo?'':`<button class="addbtn" style="--c:var(--ink);color:var(--bg)" data-a="wsync">↻ Sync</button>`}</div>`;
+  let h=`<div class="phead"><h2 class="pagetitle disp">Body</h2>${UI.wdemo?'':`<button class="addbtn" style="--c:var(--ink);color:var(--bg)" data-a="wsync">↻ Sync</button>`}</div>`;
   if(UI.wdemo)h+=`<div class="demo-banner"><span>Sample data preview. Nothing here is yours yet.</span><button class="mini" data-a="wdemo">Exit</button></div>`;
   const rc=x.rec!=null?recCol(x.rec):'#8E97BF',R=60,C=2*Math.PI*R,L=C*.75,val=x.rec!=null?L*x.rec/100:0;
   const lvl=x.rec==null?null:(UI.wdemo?(x.rec>=67?'g':x.rec>=34?'y':'r'):(whoopDay(d)||{}).lvl);
@@ -297,7 +297,7 @@ function renderWhoop(){
   h+=stepsCard(d);
   const sl=x.sleep;
   if(sl){const tot=(sl.light||0)+(sl.deep||0)+(sl.rem||0)+(sl.awake||0)||1;const pctNeed=sl.need?Math.min(100,sl.dur/sl.need*100):null;
-    h+=`<div class="card" style="--c:${WC.sleep}"><button class="linkhead wide" data-a="metric" data-v="sleep"><div><h4 class="disp" style="margin:0">Sleep ›</h4><div class="muted" style="font-size:13px">${sl.bed?new Date(sl.bed).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' to '+new Date(sl.wake).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''}</div></div><div style="text-align:right"><b class="disp num" style="font-size:38px;color:${WC.sleep}">${hm(sl.dur)}</b><div class="muted" style="font-size:12.5px">${sl.need?'needed '+hm(sl.need):''}</div></div></button>
+    h+=`<div class="card" style="--c:${WC.sleep}"><button class="linkhead wide" data-a="metric" data-v="sleep"><div><h4 class="disp" style="margin:0">Sleep ›</h4><div class="muted" style="font-size:13px">${sl.bed?new Date(sl.bed).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' to '+new Date(sl.wake).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):''}</div></div><div style="text-align:right"><b class="disp num" style="font-size:38px;color:${WC.sleep}">${hm(sl.dur)}</b><div class="muted" style="font-size:13px">${sl.need?'needed '+hm(sl.need):''}</div></div></button>
     ${pctNeed!=null?`<div class="bar2" style="margin-top:8px"><span style="width:${pctNeed}%;background:${WC.sleep}"></span></div>`:''}
     <div class="sbar">${[['awake','#C8CDEA'],['light','#9DB8FF'],['deep','#2F5BFF'],['rem','#7B4DFF']].map(([kk,cc])=>`<i style="width:${(sl[kk]||0)/tot*100}%;background:${cc}"></i>`).join('')}</div>
     <div class="slegend">${[['Awake','awake','#C8CDEA'],['Light','light','#9DB8FF'],['Deep','deep','#2F5BFF'],['REM','rem','#7B4DFF']].map(([n,kk,cc])=>`<span style="--c:${cc}">${n}<em>${hm(sl[kk])}</em></span>`).join('')}</div>
@@ -306,9 +306,9 @@ function renderWhoop(){
   {const R2=62,arc=(a0,a1)=>{const p=a=>[80+R2*Math.cos(Math.PI*(1-a/21)),82-R2*Math.sin(Math.PI*(1-a/21))];const[x0,y0]=p(a0),[x1,y1]=p(a1);return`M${x0.toFixed(1)} ${y0.toFixed(1)} A${R2} ${R2} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`};
     const sw=sv!=null?sv:0;const nd=(()=>{const a=Math.PI*(1-Math.min(21,sw)/21);return[80+R2*Math.cos(a),82-R2*Math.sin(a)]})();
     h+=`<div class="card" style="--c:${WC.strain}"><button class="linkhead wide" data-a="metric" data-v="strain" style="justify-content:flex-start;gap:12px"><svg viewBox="0 0 160 92" style="width:150px;flex:0 0 150px"><path d="${arc(0,21)}" fill="none" stroke="var(--sf2)" stroke-width="14" stroke-linecap="round"/>${lvl?`<path d="${arc(band[0]+.01,band[1])}" fill="none" stroke="${rc}" stroke-opacity=".35" stroke-width="14"/>`:''}${sv!=null?`<path class="arc" d="${arc(0,Math.max(.2,Math.min(21,sw)))}" fill="none" stroke="${WC.strain}" stroke-width="14" stroke-linecap="round"/><circle cx="${nd[0].toFixed(1)}" cy="${nd[1].toFixed(1)}" r="6" fill="#fff" stroke="${WC.strain}" stroke-width="3"/>`:''}<text x="80" y="78" text-anchor="middle" font-size="30" font-weight="850" fill="var(--ink)" style="font-stretch:68%">${sv!=null?sv.toFixed(1):'–'}</text></svg>
-    <div><h4 class="disp" style="margin:0">Strain ›</h4><div style="font-size:13.5px">${lvl?`Target for a ${{g:'green',y:'yellow',r:'red'}[lvl]} day: <b>${band[0]}–${band[1]}</b>.`:''} ${sv!=null&&lvl?(sv>band[1]?'You went over, so prioritise sleep tonight.':sv>=band[0]?'Right in the zone.':d===t?'Room to build as the day goes on.':'Lighter than the target.'):''}</div></div></button>
+    <div><h4 class="disp" style="margin:0">Strain ›</h4><div style="font-size:14px">${lvl?`Target for a ${{g:'green',y:'yellow',r:'red'}[lvl]} day: <b>${band[0]}–${band[1]}</b>.`:''} ${sv!=null&&lvl?(sv>band[1]?'You went over, so prioritise sleep tonight.':sv>=band[0]?'Right in the zone.':d===t?'Room to build as the day goes on.':'Lighter than the target.'):''}</div></div></button>
     <div class="kv" style="grid-template-columns:repeat(3,1fr)"><button data-a="metric" data-v="kcal"><b class="disp num">${x.kcal!=null?x.kcal.toLocaleString():'–'}</b><span>Calories ›</span></button><button data-a="metric" data-v="ahr"><b class="disp num">${x.ahr||'–'}</b><span>Avg HR ›</span></button><div><b class="disp num">${x.mhr||'–'}</b><span>Max HR</span></div></div></div>`}
-  {const wi=UI.wdemo?null:weekInt(t);if(wi)h+=`<div class="card" style="--c:${wi.lvl==='push'?'var(--ok)':wi.lvl==='ease'?'var(--bad)':'var(--upper)'}"><h4 class="disp" style="margin:0 0 4px">Training intensity this week: ${wi.lvl==='push'?'push':wi.lvl==='ease'?'ease off':'normal'}</h4><p style="font-size:13.5px;margin:0">${esc(wi.why)}</p></div>`}
+  {const wi=UI.wdemo?null:weekInt(t);if(wi)h+=`<div class="card" style="--c:${wi.lvl==='push'?'var(--ok)':wi.lvl==='ease'?'var(--bad)':'var(--upper)'}"><h4 class="disp" style="margin:0 0 4px">Training intensity this week: ${wi.lvl==='push'?'push':wi.lvl==='ease'?'ease off':'normal'}</h4><p style="font-size:14px;margin:0">${esc(wi.why)}</p></div>`}
   h+=wkCard();
   h+=bodyCard();
   h+=ibCard();

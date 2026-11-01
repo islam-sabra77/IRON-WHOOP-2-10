@@ -3,7 +3,7 @@ import { openApp, noErrors, liftingDay, openDay } from './helpers.mjs';
 
 test('every tab renders without errors', async ({ page }) => {
   await openApp(page);
-  for (const t of ['home', 'train', 'plan', 'build', 'whoop', 'progress', 'supps', 'habits', 'travel']) {
+  for (const t of ['home', 'train', 'plan', 'build', 'whoop', 'progress', 'supps', 'habits', 'travel', 'more', 'goals', 'food']) {
     await page.evaluate((t) => { UI.tab = t; rerender(); }, t);
     await expect(page.locator('#view')).not.toBeEmpty();
   }
@@ -102,4 +102,15 @@ test('readiness check sets the day level', async ({ page }) => {
   await openApp(page);
   const r = await page.evaluate(() => readinessScore(todayS(), 5, 1));
   expect(r.lvl).toBe('r');
+});
+
+test('five tabs, More opens the rest, back returns to More', async ({ page }) => {
+  await openApp(page);
+  expect(await page.locator('.tab').count()).toBe(5);
+  await page.click('.tab[data-v="more"]');
+  await page.click('.mitem[data-v="habits"]');
+  await expect(page.locator('.tab.on')).toHaveAttribute('data-v', 'more');
+  await page.click('.backlink');
+  expect(await page.evaluate(() => UI.tab)).toBe('more');
+  noErrors(page);
 });

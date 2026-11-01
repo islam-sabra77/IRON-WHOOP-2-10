@@ -2,7 +2,7 @@
 /* ---------- SUPPLEMENT STACK QUESTIONNAIRE ----------
    A few questions about goals, issues, diet and medicines build a stack from the guide.
    Used in the setup questionnaire and from the Supplements tab (new stack or improve the current one). */
-const SQ_GOALS=[['muscle','💪 Build muscle'],['strength','🏋️ Strength and power'],['endurance','🏃 Endurance'],['fatloss','🔥 Lose fat'],['energy','⚡ More energy'],['focus','🧠 Focus and memory'],['sleep','🌙 Better sleep'],['stress','🧘 Less stress'],['joints','🦴 Joint health'],['heart','❤️ Heart health'],['immunity','🛡️ Immunity'],['gut','🌿 Gut health'],['skin','✨ Skin and hair'],['hormones','⚖️ Hormone balance'],['longevity','⏳ Healthy ageing']];
+const SQ_GOALS=[['muscle','💪 Build muscle'],['strength',''+IC.plate+' Strength and power'],['endurance','🏃 Endurance'],['fatloss','🔥 Lose fat'],['energy',''+IC.bolt+' More energy'],['focus','🧠 Focus and memory'],['sleep','🌙 Better sleep'],['stress','🧘 Less stress'],['joints','🦴 Joint health'],['heart','❤️ Heart health'],['immunity','🛡️ Immunity'],['gut','🌿 Gut health'],['skin',''+IC.spark+' Skin and hair'],['hormones','⚖️ Hormone balance'],['longevity','⏳ Healthy ageing']];
 const SQ_ISSUES=[['poorsleep','Trouble sleeping'],['lowenergy','Tired or low energy'],['anxious','Stressed or anxious'],['jointpain','Joint pain or stiffness'],['soreness','Slow recovery or very sore'],['bloating','Bloating or digestion'],['colds','Catch colds often'],['lowsun','Little sun or low vitamin D'],['cramps','Muscle cramps'],['bloodsugar','High blood sugar'],['cholesterol','High cholesterol'],['bp','High blood pressure'],['migraine','Migraines'],['lowiron','Low iron or heavy periods'],['none','None of these']];
 const SQ_MEDS=[['thinners','Blood thinners'],['bpmeds','Blood pressure medicine'],['diabmeds','Diabetes medicine'],['antidep','Antidepressants'],['thyroid','Thyroid condition'],['pregnant','Pregnant or breastfeeding'],['kidney','Kidney problems'],['liver','Liver problems'],['none','None of these']];
 /* what each answer points to: [supplement id, points, reason] */
@@ -107,12 +107,12 @@ function sqResultsHTML(R,a,sel,mode){
 function sqOpen(mode){UI.sq={mode:mode||(S.supps.length?'improve':'new'),a:sqDefaults(),view:'q',sel:{}};drawSq()}
 function drawSq(){
   const q=UI.sq,pn=document.getElementById('panel'),keep=q.keepScroll?pn.scrollTop:0;q.keepScroll=false;
-  if(q.view==='q'){openSheet(`<h4 class="disp">Build or improve my stack</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">Answer a few questions and IRON picks supplements from the 200-item guide, with doses and the best time to take them.</p>
+  if(q.view==='q'){openSheet(`<h4 class="disp">Build or improve my stack</h4><p class="muted" style="font-size:14px;margin:0 0 8px">Answer a few questions and IRON picks supplements from the 200-item guide, with doses and the best time to take them.</p>
     <div class="obrow"><button class="obopt ${q.mode==='new'?'on':''}" data-a="sqmode" data-v="new"><b>New stack</b><span>Replace my current list</span></button><button class="obopt ${q.mode==='improve'?'on':''}" data-a="sqmode" data-v="improve"><b>Improve my stack</b><span>Add what’s missing for my goals</span></button></div>
-    ${q.mode==='improve'?'<p class="muted" style="font-size:12.5px;margin:6px 0 0">Tip: to target one thing, pick just that goal or issue (for example only Better sleep).</p>':''}
+    ${q.mode==='improve'?'<p class="muted" style="font-size:13px;margin:6px 0 0">Tip: to target one thing, pick just that goal or issue (for example only Better sleep).</p>':''}
     ${sqForm(q.a,['sqpick','sqtog'])}<button class="cta" style="--c:var(--cardio)" data-a="sqgo">See my ${q.mode==='new'?'stack':'suggestions'}</button><button class="cta ghost" data-a="close">Cancel</button>`)}
   else{const R=sqRecommend(q.a);const n=Object.keys(q.sel).filter(k=>q.sel[k]).length;
-    openSheet(`<h4 class="disp">${q.mode==='new'?'Your new stack':'Suggestions for your stack'}</h4><p class="muted" style="font-size:13.5px;margin:0 0 6px">Tap to tick or untick. ${q.mode==='new'?'Saving replaces your current list (you can undo).':'Ticked items are added to your current list.'}</p>
+    openSheet(`<h4 class="disp">${q.mode==='new'?'Your new stack':'Suggestions for your stack'}</h4><p class="muted" style="font-size:14px;margin:0 0 6px">Tap to tick or untick. ${q.mode==='new'?'Saving replaces your current list (you can undo).':'Ticked items are added to your current list.'}</p>
     ${sqResultsHTML(R,q.a,q.sel,q.mode)}<button class="cta" style="--c:var(--cardio)" data-a="sqsave" ${n?'':'disabled'}>${q.mode==='new'?`Save as my stack (${n})`:`Add ${n} to my stack`}</button><button class="cta ghost" data-a="sqback">Change answers</button>`)}
   if(keep)setTimeout(()=>{pn.scrollTop=keep},0);
 }
@@ -133,10 +133,10 @@ function renderSupps(){
   UI.sm=UI.sm||{};const v=document.getElementById('view'),t=todayS();if(!UI.sday||UI.sday>t)UI.sday=t;const d=UI.sday,lg=S.suppLog[d]||{};
   const taken=S.supps.filter(s=>lg[s.id]).length,isT=d===t;
   let h=`<div class="phead"><h2 class="pagetitle disp">Supplements</h2><button class="addbtn" style="--c:var(--cardio)" data-a="addsupp">${IC.plus}Add</button></div>
-  <button class="obopt" style="margin:0 0 12px" data-a="sqopen"><b>✨ Build or improve my stack</b><span>Answer a few questions about goals, issues, diet and medicines</span></button>
+  <button class="obopt" style="margin:0 0 12px" data-a="sqopen"><b>${IC.spark} Build or improve my stack</b><span>Answer a few questions about goals, issues, diet and medicines</span></button>
   <div class="sdaynav"><button class="mini" data-a="sday" data-v="-1" aria-label="Previous day">‹</button><label class="sdate"><b>${isT?'Today':nice(d)}</b><span>${isT?nice(d):'Tap to pick another day'}</span><input type="date" data-in="sday" value="${d}" max="${t}" aria-label="Pick a day"></label><button class="mini" data-a="sday" data-v="1" ${isT?'disabled':''} aria-label="Next day">›</button></div>
   ${isT?'':`<div class="demo-banner"><span>Editing a past day. Tick what you took on ${nice(d)}.</span><button class="mini" data-a="stoday">Today</button></div>`}
-  <div class="card"><div class="ringwrap">${ring(S.supps.length?taken/S.supps.length:0,COLORS.cardio,88,10,taken+'/'+S.supps.length)}<div><div class="disp" style="font-size:30px">${taken===S.supps.length&&taken?(isT?'All taken today':'All taken'):(isT?'Today\u2019s stack':'Stack for '+short(d))}</div><div class="muted" style="font-size:13.5px">${suppStreak()?suppStreak()+'-day streak with everything taken':'Take all of them to start a streak'}</div></div></div></div>
+  <div class="card"><div class="ringwrap">${ring(S.supps.length?taken/S.supps.length:0,COLORS.cardio,88,10,taken+'/'+S.supps.length)}<div><div class="disp" style="font-size:30px">${taken===S.supps.length&&taken?(isT?'All taken today':'All taken'):(isT?'Today\u2019s stack':'Stack for '+short(d))}</div><div class="muted" style="font-size:14px">${suppStreak()?suppStreak()+'-day streak with everything taken':'Take all of them to start a streak'}</div></div></div></div>
   <p class="tapnote">Tap a supplement to see its calendar, benefits and best time to take it.</p>`;
   SLOTS.forEach(sl=>{const list=S.supps.filter(s=>s.slot===sl);if(!list.length)return;h+=`<div class="slot">${sl}</div>`;
     list.forEach(s=>{const on=!!lg[s.id],open=UI.sx===s.id,info=suppInfo(s.n);let dots='';for(let i=13;i>=0;i--){const dd=addD(t,-i);dots+=`<i class="${sTaken(s.id,dd)?'on':''} ${dd===d?'sel':''}"></i>`}
@@ -152,15 +152,15 @@ function renderSupps(){
       }
       h+=`</div>`})});
   if(!S.supps.length)h+=`<div class="card"><p style="margin:0">No supplements in your list. Tap <b>Add</b> or browse the guide.</p></div>`;
-  h+=`<div class="grid2" style="margin-top:12px"><button class="cta" style="--c:var(--cardio);margin:0" data-a="addsupp">${IC.plus} Add</button><button class="cta ghost" style="margin:0" data-a="sguide">📖 Supplement guide</button></div><button class="cta" style="--c:var(--ink);color:var(--bg)" data-a="sqopen">✨ Build or improve my stack</button>
-  <p class="muted" style="font-size:12.5px;margin-top:14px">Doses and timings are general guidance for healthy adults, not medical advice. Check with your doctor before starting anything new, especially if you take medication.</p>`;
+  h+=`<div class="grid2" style="margin-top:12px"><button class="cta" style="--c:var(--cardio);margin:0" data-a="addsupp">${IC.plus} Add</button><button class="cta ghost" style="margin:0" data-a="sguide">${IC.book} Supplement guide</button></div><button class="cta" style="--c:var(--ink);color:var(--bg)" data-a="sqopen">${IC.spark} Build or improve my stack</button>
+  <p class="muted" style="font-size:13px;margin-top:14px">Doses and timings are general guidance for healthy adults, not medical advice. Check with your doctor before starting anything new, especially if you take medication.</p>`;
   v.innerHTML=h;
 }
 function suppStreak(){let t=todayS(),n=0;const full=d=>S.supps.length&&S.supps.every(s=>S.suppLog[d]&&S.suppLog[d][s.id]);if(!full(t))t=addD(t,-1);while(full(t)&&n<1000){n++;t=addD(t,-1)}return n}
 function guideSheet(q){
   q=(q||'').toLowerCase().trim();const list=SUPP_DB.filter(e=>!q||e.n.toLowerCase().includes(q)||e.a.some(a=>a.includes(q))).sort((a,b)=>a.n.localeCompare(b.n));
   const inStack=e=>S.supps.some(s=>suppInfo(s.n)===e);
-  openSheet(`<h4 class="disp">Supplement guide</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">${SUPP_DB.length} common supplements with benefits, dose and best time. Tap one to read more and add it to your stack.</p>
+  openSheet(`<h4 class="disp">Supplement guide</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${SUPP_DB.length} common supplements with benefits, dose and best time. Tap one to read more and add it to your stack.</p>
   <input type="text" id="gq" data-in="gq" placeholder="Search, e.g. magnesium" value="${esc(q)}" autocomplete="off">
   <div id="glist">${list.map(e=>`<details class="gitem"><summary><b>${esc(e.n)}</b><span>${esc(e.d)}</span>${inStack(e)?'<em>In your stack</em>':''}</summary>${suppInfoHTML(e)}${inStack(e)?'':`<button class="cta" style="--c:var(--cardio);margin-top:8px" data-a="gadd" data-v="${e.id}">${IC.plus} Add to my stack</button>`}</details>`).join('')||'<p class="muted">No match. Try another name.</p>'}</div>
   <button class="cta ghost" data-a="close">Close</button>`);
@@ -223,7 +223,7 @@ function renderHabits(){
     let doneM=0,elig=0;for(let i=1;i<=dim;i++){const d=ds(new Date(y,mo-1,i));if(d<=t){elig++;if(habDone(x.id,d))doneM++}}
     const p=elig?doneM/elig:0,open=UI.hx===x.id;
     let strip='';for(let i=27;i>=0;i--){const d=addD(t,-i);strip+=`<i class="${habDone(x.id,d)?'on':''}"></i>`}
-    h+=`<div class="hab" style="--c:${x.c}"><div class="habh" data-a="habopen" data-k="${x.id}" style="cursor:pointer"><span class="emo">${x.e}</span><div class="mi"><b>${esc(x.n)}</b><div class="hstat"><span><b>${habStreak(x.id)}</b> day streak</span><span>Best <b>${habBest(x.id)}</b></span></div>${x.link?`<div class="linkbadge">🔗 WHOOP · ${esc(linkText(x))}${S.whoop.connected?'':' · connect WHOOP'}</div>`:''}</div>${ring(p,x.c,52,7,Math.round(p*100)+'%')}<button class="editbtn" data-a="habedit" data-k="${x.id}" aria-label="Edit or remove ${esc(x.n)}">${IC.pen}</button></div>
+    h+=`<div class="hab" style="--c:${x.c}"><div class="habh" data-a="habopen" data-k="${x.id}" style="cursor:pointer"><span class="emo">${x.e}</span><div class="mi"><b>${esc(x.n)}</b><div class="hstat"><span><b>${habStreak(x.id)}</b> day streak</span><span>Best <b>${habBest(x.id)}</b></span></div>${x.link?`<div class="linkbadge">${IC.link} WHOOP · ${esc(linkText(x))}${S.whoop.connected?'':' · connect WHOOP'}</div>`:''}</div>${ring(p,x.c,52,7,Math.round(p*100)+'%')}<button class="editbtn" data-a="habedit" data-k="${x.id}" aria-label="Edit or remove ${esc(x.n)}">${IC.pen}</button></div>
     <div class="dots" style="grid-template-columns:repeat(28,1fr);margin-top:10px" title="Last 28 days">${strip}</div>`;
     if(open){
       let cells=DS.map(dd=>`<div class="dh" style="font-size:11px;text-align:center;color:var(--mu);font-weight:700">${dd[0]}</div>`).join('');for(let i=0;i<first;i++)cells+='<button class="hday blank" tabindex="-1"></button>';
@@ -253,7 +253,7 @@ function drawPlayer(){
   const ex=UI.pl.ex,e=E[ex],id=ytId(ex),c=playerColor();
   openSheet(`<h4 class="disp">${esc(e.n)}</h4>
   <div class="stage vid">${id?`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1" title="${esc(e.n)} demo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`:`<p style="padding:24px;color:#fff">No video saved for this move yet. <a style="color:#fff;text-decoration:underline" href="${esc(vidUrl(ex))}" target="_blank" rel="noopener">Find one on YouTube</a>, then tap “Use a different video” below and paste its link.</p>`}</div>
-  <div class="cue" style="margin-top:10px;font-size:14.5px">${esc(cueOf(e))}${sideNote(e,1)}</div>${e.p?`<span class="chipinj" style="--c:${c}">Protects: ${esc(protOf(e))}</span>`:''}
+  <div class="cue" style="margin-top:10px;font-size:15px">${esc(cueOf(e))}${sideNote(e,1)}</div>${e.p?`<span class="chipinj" style="--c:${c}">Protects: ${esc(protOf(e))}</span>`:''}
   <div class="pctl" style="--c:${c};margin-top:12px"><button data-a="vidchange" data-e="${ex}">Use a different video</button>${S.vids[ex]?`<button data-a="vidreset" data-e="${ex}">Back to default</button>`:''}</div>
   ${id?`<div class="pnote">If this video won't play here, <a href="https://www.youtube.com/shorts/${id}" target="_blank" rel="noopener">open it on YouTube</a>.</div>`:''}
   <button class="cta ghost" data-a="close">Close</button>`);
@@ -333,7 +333,7 @@ function moveSheet(){
    Enter the same code on another phone to bring everything across;
    both devices then stay in step. Changes on two devices are merged day by day.
    ===================================================================== */
-const SYNC_DICTS=['logs','done','rcheck','ready','moves','swaps','suppLog','habitLog','body','inbody','wdata','wwk','habOv','vids','clips','col'];
+const SYNC_DICTS=['logs','done','rcheck','food','ready','moves','swaps','suppLog','habitLog','body','inbody','wdata','wwk','habOv','vids','clips','col'];
 let SYNC_T=null,SYNC_BUSY=false;
 function syncOn(){return!!(S.sync&&S.sync.on&&S.sync.key)}
 function newSyncKey(){const a=new Uint8Array(32);crypto.getRandomValues(a);return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('')}
@@ -346,46 +346,103 @@ function mergeState(local,remote){
   SYNC_DICTS.forEach(k=>{if(older[k]||newer[k]){const o=older[k]||{},n=newer[k]||{};out[k]=Object.assign({},o,n);if(k==='logs'){Object.keys(o).forEach(d=>{if(n[d]&&o[d]){const m=Object.assign({},o[d],n[d]);out[k][d]=m}})}}});
   out._u=Math.max(local._u||0,remote._u||0);out.sync=local.sync;return out;
 }
+/* ---------- end-to-end encryption ----------
+   From the sync code the phone derives two separate keys: an AES-GCM key that encrypts your data,
+   and an access token the server stores it under. The server never sees the code or the AES key. */
+const TXT=new TextEncoder(),hex2u8=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16))),u82hex=u=>Array.from(new Uint8Array(u)).map(b=>b.toString(16).padStart(2,'0')).join('');
+const u82b64=u=>{let s='';new Uint8Array(u).forEach(b=>s+=String.fromCharCode(b));return btoa(s)},b642u8=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const KEYCACHE={};
+async function syncKeys(code){if(KEYCACHE[code])return KEYCACHE[code];const ikm=await crypto.subtle.importKey('raw',hex2u8(code),'HKDF',false,['deriveKey','deriveBits']);
+  const p=info=>({name:'HKDF',hash:'SHA-256',salt:TXT.encode('iron-sync-v2'),info:TXT.encode(info)});
+  const aes=await crypto.subtle.deriveKey(p('aes'),ikm,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+  const token=u82hex(await crypto.subtle.deriveBits(p('auth'),ikm,256));return KEYCACHE[code]={aes,token}}
+async function gz(u8,dir){if(typeof CompressionStream==='undefined')return u8;const s=new Blob([u8]).stream().pipeThrough(dir?new CompressionStream('gzip'):new DecompressionStream('gzip'));return new Uint8Array(await new Response(s).arrayBuffer())}
+async function sealState(obj,key){const raw=TXT.encode(JSON.stringify(obj)),z=typeof CompressionStream!=='undefined';const data=z?await gz(raw,true):raw;const iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data);return{v:2,z,iv:u82b64(iv),ct:u82b64(ct)}}
+async function openState(enc,key){const pt=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b642u8(enc.iv)},key,b642u8(enc.ct)));return JSON.parse(new TextDecoder().decode(enc.z?await gz(pt,false):pt))}
+/* fetch the stored copy for a code: encrypted (new) or plain under the raw code (older backups) */
+async function syncFetch(code){const{aes,token}=await syncKeys(code);
+  let r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':token}});
+  if(r.ok){const j=await r.json();return{updated:j.updated,state:j.enc?await openState(j.enc,aes):j.state,legacy:false}}
+  if(r.status!==404)throw new Error('get '+r.status);
+  r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':code}});
+  if(r.ok){const j=await r.json();return{updated:j.updated,state:j.state,legacy:true}}
+  if(r.status!==404)throw new Error('get '+r.status);return null}
 function syncSoon(){if(!syncOn()||!navigator.onLine)return;clearTimeout(SYNC_T);SYNC_T=setTimeout(()=>syncNow(false),4000)}
 async function syncNow(manual){
   if(!syncOn()||SYNC_BUSY)return;SYNC_BUSY=true;const key=S.sync.key;
   try{
-    const r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':key}});
-    let remote=null;if(r.ok)remote=(await r.json());else if(r.status!==404)throw new Error('get '+r.status);
+    const{aes,token}=await syncKeys(key);const remote=await syncFetch(key);
     let changed=false;
     if(remote&&remote.state&&(remote.updated||0)>(S.sync.last||0)){
       const merged=mergeState(S,remote.state);changed=JSON.stringify(merged)!==JSON.stringify(S);
       if(changed){Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,defaults(),merged)}
     }
     const upd=Math.max(S._u||Date.now(),(remote&&remote.updated)||0);S._u=upd;
-    const body=JSON.stringify({updated:upd,state:Object.assign({},S,{sync:{on:true,key}})});
-    const p=await fetch('/api/sync',{method:'PUT',headers:{'Content-Type':'application/json','x-iron-sync':key},body});
+    const enc=await sealState(Object.assign({},S,{sync:{on:true,key}}),aes);
+    const p=await fetch('/api/sync',{method:'PUT',headers:{'Content-Type':'application/json','x-iron-sync':token},body:JSON.stringify({updated:upd,enc})});
     if(p.status===409&&!manual){SYNC_BUSY=false;return syncNow(true)}
     if(!p.ok)throw new Error('put '+p.status);
-    S.sync.last=upd;S.sync.at=Date.now();S.sync.err=null;localStorage.setItem(KEY,JSON.stringify(S));
-    if(changed){applyCustom&&applyCustom();rerender();if(manual)toast('Synced. Changes from your other device are in.')}else if(manual)toast('Backed up');
+    if(remote&&remote.legacy)fetch('/api/sync',{method:'DELETE',headers:{'x-iron-sync':key}}).catch(()=>{});
+    S.sync.last=upd;S.sync.at=Date.now();S.sync.err=null;S.sync.e2e=true;localStorage.setItem(KEY,JSON.stringify(S));
+    if(changed){applyCustom&&applyCustom();rerender();if(manual)toast('Synced. Changes from your other device are in.')}else if(manual)toast('Backed up (encrypted)');
   }catch(e){S.sync.err=String(e&&e.message||e);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(_){}if(manual)toast(location.protocol==='file:'?'Cloud backup works on your Netlify site':'Backup failed. It retries automatically.')}
   finally{SYNC_BUSY=false}
 }
 function syncTurnOn(){S.sync=Object.assign({on:true,key:S.sync&&S.sync.key||newSyncKey(),last:0},S.sync,{on:true});save();syncNow(true);syncSheet()}
-async function syncLink(code){
+async function syncLink(code,skipConfirm){
   const key=cleanCode(code);if(key.length<48){toast('That code looks incomplete');return}
-  try{const r=await fetch('/api/sync',{cache:'no-store',headers:{'x-iron-sync':key}});
-    if(r.status===404){toast('No backup found for that code');return}if(!r.ok)throw 0;const j=await r.json();
-    if(!window.confirm('Replace the data on this device with the backup from '+new Date(j.updated).toLocaleString()+'?'))return;
-    const st=Object.assign(defaults(),j.state,{sync:{on:true,key,last:j.updated,at:Date.now()}});localStorage.setItem(KEY,JSON.stringify(st));location.reload();
-  }catch(e){toast('Couldn’t reach the backup. Check your connection.')}
+  try{const j=await syncFetch(key);if(!j){toast('No backup found for that code');return}
+    if(!skipConfirm&&!window.confirm('Replace the data on this device with the backup from '+new Date(j.updated).toLocaleString()+'?'))return;
+    const st=Object.assign(defaults(),j.state,{sync:{on:true,key,last:j.legacy?0:j.updated,at:Date.now()}});localStorage.setItem(KEY,JSON.stringify(st));location.reload();
+  }catch(e){toast(e&&e.name==='OperationError'?'That code doesn’t match this backup':'Couldn’t reach the backup. Check your connection.')}
+}
+/* ---------- passkeys ----------
+   The passkey signs you in on a new phone. The sync code is stored on the server only after being
+   encrypted with a key that comes from the passkey itself (WebAuthn PRF), so only your passkey can unlock it. */
+const b64u=u=>u82b64(u).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''),unb64u=s=>b642u8(s.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((s.length+3)%4));
+let PRF_SALT=null;async function prfSalt(){return PRF_SALT||(PRF_SALT=new Uint8Array(await crypto.subtle.digest('SHA-256',TXT.encode('iron-passkey-prf-v1'))))}
+const pkSupported=()=>!!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext);
+async function prfKey(out){const ikm=await crypto.subtle.importKey('raw',out,'HKDF',false,['deriveKey']);return crypto.subtle.deriveKey({name:'HKDF',hash:'SHA-256',salt:TXT.encode('iron-wrap-v1'),info:TXT.encode('wrap')},ikm,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function wrapCode(out,code){const k=await prfKey(out),iv=crypto.getRandomValues(new Uint8Array(12));return{iv:u82b64(iv),ct:u82b64(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,TXT.encode(code)))}}
+async function unwrapCode(out,w){const k=await prfKey(out);return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b642u8(w.iv)},k,b642u8(w.ct)))}
+async function pkPost(step,body){const r=await fetch('/api/passkey?step='+step,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.error||('http '+r.status)),{code:j.error});return j}
+function credJSON(c){const r=c.response,o={id:c.id,rawId:b64u(c.rawId),type:c.type,clientExtensionResults:{},authenticatorAttachment:c.authenticatorAttachment||undefined,response:{clientDataJSON:b64u(r.clientDataJSON)}};
+  if(r.attestationObject){o.response.attestationObject=b64u(r.attestationObject);o.response.transports=r.getTransports?r.getTransports():[]}
+  else{o.response.authenticatorData=b64u(r.authenticatorData);o.response.signature=b64u(r.signature);if(r.userHandle)o.response.userHandle=b64u(r.userHandle)}return o}
+async function pkAssert(extraWrapped){const{options:o}=await pkPost('auth-options');const salt=await prfSalt();
+  const c=await navigator.credentials.get({publicKey:{challenge:unb64u(o.challenge),rpId:o.rpId,timeout:o.timeout,userVerification:o.userVerification||'preferred',allowCredentials:[],extensions:{prf:{eval:{first:salt}}}}});
+  const ext=c.getClientExtensionResults?c.getClientExtensionResults():{},out=ext.prf&&ext.prf.results&&ext.prf.results.first;
+  return{c,out}}
+async function passkeyRegister(){
+  if(!pkSupported()){toast('Passkeys aren’t supported in this browser');return}if(!syncOn()){toast('Turn on cloud backup first');return}
+  try{const{options:o}=await pkPost('reg-options');const salt=await prfSalt();
+    const c=await navigator.credentials.create({publicKey:{challenge:unb64u(o.challenge),rp:o.rp,user:{id:unb64u(o.user.id),name:o.user.name,displayName:o.user.displayName},pubKeyCredParams:o.pubKeyCredParams,timeout:o.timeout,attestation:'none',authenticatorSelection:o.authenticatorSelection,excludeCredentials:[],extensions:{prf:{eval:{first:salt}}}}});
+    const ext=c.getClientExtensionResults?c.getClientExtensionResults():{};let out=ext.prf&&ext.prf.results&&ext.prf.results.first;
+    const wrapped=out?await wrapCode(out,S.sync.key):null;await pkPost('reg-verify',{response:credJSON(c),wrapped});
+    if(!out&&ext.prf&&ext.prf.enabled){toast('One more tap to finish setting up the passkey');const a=await pkAssert();if(a.out){await pkPost('auth-verify',{response:credJSON(a.c),wrapped:await wrapCode(a.out,S.sync.key)});out=a.out}}
+    S.sync.pk={at:Date.now(),prf:!!out};save();syncSheet();toast(out?'Passkey ready. Use it to sign in on a new phone.':'Passkey saved, but this device can’t lock the code to it. Keep your sync code too.');
+  }catch(e){if(e&&e.name==='NotAllowedError')return;toast('Couldn’t create the passkey'+(e&&e.code?' ('+e.code+')':''))}
+}
+async function passkeySignIn(){
+  if(!pkSupported()){toast('Passkeys aren’t supported in this browser');return}
+  try{const a=await pkAssert();const j=await pkPost('auth-verify',{response:credJSON(a.c)});
+    if(!a.out||!j.wrapped){toast('This passkey can’t unlock your backup on this device. Enter your sync code instead.');return}
+    const code=await unwrapCode(a.out,j.wrapped);await syncLink(code,false);
+  }catch(e){if(e&&e.name==='NotAllowedError')return;toast(e&&e.code==='unknown_passkey'?'That passkey isn’t linked to a backup':'Passkey sign-in failed')}
 }
 function syncSheet(){
   const on=syncOn(),sy=S.sync||{};
   openSheet(`<h4 class="disp">Cloud backup</h4>
   ${on?`<div class="note" style="--c:var(--ok)"><b>On.</b> Every change is saved to the cloud a few seconds after you make it${sy.at?`. Last backup: ${new Date(sy.at).toLocaleString([],{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:''}.${sy.err?' <b>Last attempt failed</b>; it retries when you’re online.':''}</div>
   <label class="fl2">Your private sync code</label><div class="synccode num" aria-label="Sync code">${fmtCode(sy.key)}</div>
-  <p class="muted" style="font-size:12.5px;margin:4px 0 0">Anyone with this code can read your data. Keep it private, like a password. Enter it on another phone to bring everything across.</p>
+  <p class="muted" style="font-size:13px;margin:4px 0 0">Keep this code private, like a password: it is the key to your encrypted backup. Enter it on another phone to bring everything across.</p>
   <div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="synccopy">Copy code</button><button class="cta ghost" style="margin:0" data-a="syncnow">Back up now</button></div>
   <button class="cta ghost" style="color:var(--bad)" data-a="syncoff">Turn off cloud backup</button>`
   :`<p style="font-size:14px">Your training lives only in this browser. Turn on cloud backup so a lost phone or cleared browser never costs you your logs.</p><button class="cta" style="--c:var(--ok)" data-a="syncon">Turn on cloud backup</button>`}
-  <label class="fl2" style="margin-top:14px">Bring data from another device</label><input type="text" id="synclink" placeholder="Paste the sync code from your other phone" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="cta ghost" data-a="synclink">Link this device</button>
+  ${on&&pkSupported()?`<label class="fl2" style="margin-top:14px">Passkey</label>${sy.pk?`<div class="note" style="--c:var(--ok)"><b>Passkey added ${short(ds(new Date(sy.pk.at)))}.</b> ${sy.pk.prf?'On a new phone, tap Sign in with passkey: Face ID or your fingerprint unlocks everything.':'This device can’t lock the code to the passkey, so keep your sync code as well.'}</div>`:`<p class="muted" style="font-size:13px;margin:0 0 6px">Sign in on a new phone with Face ID or your fingerprint instead of typing the code.</p>`}<button class="cta ghost" data-a="pkreg">${sy.pk?'Add another passkey':'Create a passkey'}</button>`:''}
+  ${on?`<p class="muted" style="font-size:12px;margin:8px 0 0">${IC.check} Encrypted on this phone before upload. The server can’t read your data.</p>`:''}
+  <label class="fl2" style="margin-top:14px">Bring data from another device</label>${pkSupported()?'<button class="cta ghost" style="margin-top:0" data-a="pksignin">Sign in with passkey</button>':''}<input type="text" id="synclink" placeholder="Paste the sync code from your other phone" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="cta ghost" data-a="synclink">Link this device</button>
   <label class="fl2" style="margin-top:14px">Backup file</label><div class="grid2"><button class="cta ghost" style="margin:0" data-a="bkfile">Download backup</button><button class="cta ghost" style="margin:0" data-a="bkload">Restore from file</button></div>
   <button class="cta ghost" data-a="settings">Back to settings</button>`);
 }
@@ -395,22 +452,22 @@ function settingsSheet(){
   const th=document.documentElement.getAttribute('data-theme')||'auto';
   openSheet(`<h4 class="disp">Settings</h4>
   <div class="srow"><b>Theme</b><select data-in="theme"><option value="auto" ${th==='auto'?'selected':''}>Match my device</option><option value="light" ${th==='light'?'selected':''}>Light</option><option value="dark" ${th==='dark'?'selected':''}>Dark</option></select></div>
-  <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Your plan</h4><p class="muted" style="font-size:13.5px;margin:0 0 8px">${S.prof?`Built from your questionnaire on ${nice(S.prof.created)}.`:'Answer the questionnaire and 7 quick self-tests to get a plan built around your goal, equipment, schedule and injuries.'}</p><button class="cta" style="--c:var(--upper);margin:0" data-a="obopen">${S.prof?'Retake the questionnaire':'Build my personal plan'}</button>${S.planBackup?'<button class="cta ghost" data-a="obrestore">Restore my previous plan</button>':''}</div>
+  <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Your plan</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${S.prof?`Built from your questionnaire on ${nice(S.prof.created)}.`:'Answer the questionnaire and 7 quick self-tests to get a plan built around your goal, equipment, schedule and injuries.'}</p><button class="cta" style="--c:var(--upper);margin:0" data-a="obopen">${S.prof?'Retake the questionnaire':'Build my personal plan'}</button>${S.planBackup?'<button class="cta ghost" data-a="obrestore">Restore my previous plan</button>':''}</div>
   <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">WHOOP</h4>
-  ${!WH_ON?`<p class="muted" style="font-size:13.5px;margin:0">WHOOP works once IRON is online on your Netlify site.</p>`:S.whoop.connected?`<p style="font-size:13.5px;margin:0 0 8px">Connected. Last sync ${S.whoop.last?new Date(S.whoop.last).toLocaleString([], {weekday:'short',hour:'2-digit',minute:'2-digit'}):'never'}.</p>
+  ${!WH_ON?`<p class="muted" style="font-size:14px;margin:0">WHOOP works once IRON is online on your Netlify site.</p>`:S.whoop.connected?`<p style="font-size:14px;margin:0 0 8px">Connected. Last sync ${S.whoop.last?new Date(S.whoop.last).toLocaleString([], {weekday:'short',hour:'2-digit',minute:'2-digit'}):'never'}.</p>
   <div class="srow"><b>Auto-adjust</b><button class="cta ${S.whoop.auto?'':'ghost'}" style="--c:var(--ok);margin:0;height:44px" data-a="wauto">${S.whoop.auto?'On: workouts follow WHOOP':'Off: I choose manually'}</button></div>
-  <div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="wsync">Sync now</button><button class="cta ghost" style="margin:0;color:var(--bad)" data-a="wdisconnect">Disconnect</button></div>`:`${S.whoop.pending?`<p style="font-size:13.5px;margin:0 0 8px"><b>Waiting for WHOOP approval.</b> If the login finished in Safari, come back here and tap Check connection.</p><button class="cta ghost" style="margin:0 0 8px" data-a="wsync">Check connection</button>`:''}<p class="muted" style="font-size:13.5px;margin:0 0 8px">Pull your recovery, HRV and resting heart rate every morning and adjust each workout automatically.</p><button class="cta" style="--c:var(--ink);color:var(--bg);margin:0" data-a="wconnect">Connect WHOOP</button>`}
-  <p class="muted" style="font-size:12.5px;margin:8px 0 0">Green 67%+ full session. Yellow 34–66% lighter. Red 33% or less recovery only. HRV 10%+ below your 30-day average, or resting HR 5+ bpm above it, drops the day one level.</p></div>
+  <div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="wsync">Sync now</button><button class="cta ghost" style="margin:0;color:var(--bad)" data-a="wdisconnect">Disconnect</button></div>`:`${S.whoop.pending?`<p style="font-size:14px;margin:0 0 8px"><b>Waiting for WHOOP approval.</b> If the login finished in Safari, come back here and tap Check connection.</p><button class="cta ghost" style="margin:0 0 8px" data-a="wsync">Check connection</button>`:''}<p class="muted" style="font-size:14px;margin:0 0 8px">Pull your recovery, HRV and resting heart rate every morning and adjust each workout automatically.</p><button class="cta" style="--c:var(--ink);color:var(--bg);margin:0" data-a="wconnect">Connect WHOOP</button>`}
+  <p class="muted" style="font-size:13px;margin:8px 0 0">Green 67%+ full session. Yellow 34–66% lighter. Red 33% or less recovery only. HRV 10%+ below your 30-day average, or resting HR 5+ bpm above it, drops the day one level.</p></div>
   <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Display</h4>
   <label class="fl2">Units</label><div class="obrow"><button class="obopt ${!imperial()?'on':''}" data-a="prefset" data-f="unit" data-v="kg"><b>Metric (kg, cm)</b></button><button class="obopt ${imperial()?'on':''}" data-a="prefset" data-f="unit" data-v="lb"><b>Imperial (lb, in)</b></button></div>
   <label class="fl2">Language</label><div class="obrow"><button class="obopt ${!isAr()?'on':''}" data-a="prefset" data-f="lang" data-v="en"><b>English</b></button><button class="obopt ${isAr()?'on':''}" data-a="prefset" data-f="lang" data-v="ar"><b>العربية</b></button></div>
-  ${isAr()?'<p class="muted" style="font-size:12.5px;margin:4px 0 0">تبقى أوصاف التمارين ودليل المكمّلات باللغة الإنجليزية.</p>':''}
+  ${isAr()?'<p class="muted" style="font-size:13px;margin:4px 0 0">تبقى أوصاف التمارين ودليل المكمّلات باللغة الإنجليزية.</p>':''}
   <label class="fl2">Text size</label><div class="obrow"><button class="obopt ${(prefs().ts||'n')==='n'?'on':''}" data-a="prefset" data-f="ts" data-v="n"><b>Normal</b></button><button class="obopt ${prefs().ts==='l'?'on':''}" data-a="prefset" data-f="ts" data-v="l"><b>Large</b></button><button class="obopt ${prefs().ts==='xl'?'on':''}" data-a="prefset" data-f="ts" data-v="xl"><b>Larger</b></button></div></div>
   <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Workouts</h4>
   ${[['rpe','Ask how hard each set felt (RPE)','Rate sets 6–10; weight suggestions use it'],['wake','Keep the screen on during a session','So the timer and sets stay visible'],['alerts','Alert me when rest is over','Sound, vibration and a notification if the app is in the background']].map(([f,l,sub])=>`<button class="obopt ${prefs()[f]?'on':''}" data-a="preftog" data-f="${f}"><b>${prefs()[f]?'✓ ':''}${l}</b><span>${sub}</span></button>`).join('')}
-  <button class="cta ghost" data-a="plates" data-e="">🏋️ Plate calculator</button></div>
-  <button class="card setlink" style="margin-top:12px" data-a="syncopen"><h4 class="disp" style="font-size:22px;margin:0">☁️ Cloud backup ›</h4><span class="muted" style="font-size:13.5px">${syncOn()?'On'+(S.sync.at?' · last backup '+new Date(S.sync.at).toLocaleString([],{weekday:'short',hour:'2-digit',minute:'2-digit'}):''):'Off. Turn it on so you never lose your logs.'}</span></button>
-  <button class="cta ghost" data-a="errlog">🩺 Error log${(typeof errList==='function'&&errList().length)?' ('+errList().length+')':''}</button>
+  <button class="cta ghost" data-a="plates" data-e="">${IC.plate} Plate calculator</button></div>
+  <button class="card setlink" style="margin-top:12px" data-a="syncopen"><h4 class="disp" style="font-size:22px;margin:0">${IC.cloud} Cloud backup ›</h4><span class="muted" style="font-size:14px">${syncOn()?'On'+(S.sync.at?' · last backup '+new Date(S.sync.at).toLocaleString([],{weekday:'short',hour:'2-digit',minute:'2-digit'}):''):'Off. Turn it on so you never lose your logs.'}</span></button>
+  <button class="cta ghost" data-a="errlog">${IC.alert} Error log${(typeof errList==='function'&&errList().length)?' ('+errList().length+')':''}</button>
   <button class="cta ghost" style="color:var(--bad)" data-a="reset">Reset everything</button>`);
 }
 function habSheet(id){
@@ -418,7 +475,7 @@ function habSheet(id){
   openSheet(`<h4 class="disp">${id?'Edit habit':'New habit'}</h4><input type="text" id="hn" placeholder="e.g. Read 10 pages" value="${esc(x.n)}" maxlength="40">
   <div class="emopick">${EMOJIS.map(e=>`<button class="${e===x.e?'on':''}" data-a="hemo" data-v="${e}">${e}</button>`).join('')}</div>
   <div class="swatches">${HAB_COLORS.map(c=>`<button class="sw ${c===x.c?'on':''}" style="--c:${c}" data-a="hcol" data-v="${c}" aria-label="Colour"></button>`).join('')}</div>
-  <div class="card" style="--c:${WC.rec};margin:10px 0 0"><h4 class="disp" style="margin:0 0 4px;font-size:22px">🔗 Auto-track with WHOOP</h4>
+  <div class="card" style="--c:${WC.rec};margin:10px 0 0"><h4 class="disp" style="margin:0 0 4px;font-size:22px">${IC.link} Auto-track with WHOOP</h4>
   <select id="hlk" data-in="hlk"><option value="">Off: I tick it myself</option>${Object.keys(LINKS).map(k=>`<option value="${k}" ${lk&&lk.k===k?'selected':''}>${LINKS[k].l}</option>`).join('')}</select>
   <div id="hlrow" class="${lk?'':'hide'}"><label class="fl2" id="hllab" for="hlt">${lk?`Done when ${LINKS[lk.k].l.toLowerCase()} ${LINKS[lk.k].op}`:''} ${lk&&LINKS[lk.k].u?'('+LINKS[lk.k].u+')':''}</label><input type="text" inputmode="decimal" id="hlt" value="${lk?lk.t:''}"></div>
   <div class="pnote">The habit ticks itself every day from your WHOOP data. Sleep is counted on the morning you wake up. You can still tap any day to override it.</div></div>
@@ -431,6 +488,6 @@ function finishSheet(d){
   const cs=[COLORS.upper,COLORS.lower,COLORS.mob,COLORS.core,COLORS.cardio,COLORS.long];
   openSheet(`<div class="celebrate"><div class="burst">${cs.map((c,i)=>`<i style="--c:${c};animation-delay:${i*60}ms"></i>`).join('')}</div><div class="disp">Session done</div><p class="muted">${T[tplOf(d)].n}, ${nice(d)}</p>
   <div class="grid2" style="text-align:left;margin:12px 0"><div class="stat"><b class="disp num">${pct}%</b><span>of the plan completed</span></div><div class="stat"><b class="disp num">${sets}</b><span>sets logged</span></div><div class="stat"><b class="disp num">${Math.round(vol)}</b><span>kg total volume</span></div><div class="stat"><b class="disp num">${dur&&dur<240?dur+'′':'–'}</b><span>since your first tick</span></div></div>
-  <button class="cta" style="--c:var(--upper)" data-a="wshare" data-d="${d}">📸 Share workout summary</button><button class="cta ghost" data-a="close">Nice</button></div>`);
+  <button class="cta" style="--c:var(--upper)" data-a="wshare" data-d="${d}">${IC.share} Share workout summary</button><button class="cta ghost" data-a="close">Nice</button></div>`);
 }
 

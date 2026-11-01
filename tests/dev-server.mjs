@@ -17,7 +17,7 @@ globalThis.__ironStore = (name) => {
   const m = stores.get(name);
   return { get: async (k, o) => (m.has(k) ? (o && o.type === 'json' ? JSON.parse(m.get(k)) : m.get(k)) : null), setJSON: async (k, v) => { m.set(k, JSON.stringify(v)); }, delete: async (k) => { m.delete(k); } };
 };
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'iron-fn-'));
+const tmp = path.join(root, '.fn-tmp'); fs.mkdirSync(tmp, { recursive: true }); // inside the repo so functions find node_modules
 const fns = {};
 for (const f of fs.readdirSync(path.join(root, 'netlify/functions'))) {
   if (!f.endsWith('.mjs')) continue;

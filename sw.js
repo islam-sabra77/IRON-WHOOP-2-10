@@ -1,12 +1,12 @@
 // IRON service worker: the app opens and works without a connection.
 // App files are network-first (always fresh when online) with the cache as the offline fallback.
 // API calls are never cached. Exercise thumbnails and fonts are cached as you view them.
-const VERSION = 'iron-2026-11-01-1';
+const VERSION = 'iron-2026-11-01-4';
 const SHELL = [
   './', 'index.html', 'css/app.css',
   'js/01-data-exercises-plan-generator.js', 'js/02-questionnaire-periodization-whoop.js', 'js/03-home-train-share.js',
   'js/04-plan-travel-whoop-inbody.js', 'js/05-progress-builder-coaching.js', 'js/06-supplement-guide.js',
-  'js/07-supps-habits-videos-sync.js', 'js/08-timer-helpers-display-actions.js', 'js/09-errors.js',
+  'js/07-supps-habits-videos-sync.js', 'js/08-timer-helpers-display-actions.js', 'js/09-errors.js', 'js/10-goals-nutrition.js', 'js/99-boot.js',
   'manifest.webmanifest', 'icon-512.png', 'apple-touch-icon.png', 'privacy.html',
 ];
 const EXTERNAL = ['i.ytimg.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
