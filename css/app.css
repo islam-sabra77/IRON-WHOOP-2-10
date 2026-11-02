@@ -576,3 +576,9 @@ html[dir="rtl"] .backlink svg{transform:scaleX(-1)}
 .goal .gnums{display:flex;align-items:baseline;gap:10px;margin:8px 0 6px}.goal .gnums b{font-size:30px}.goal .gnums span{color:var(--mu);font-size:15px;font-weight:700}
 .frings{display:flex;gap:14px;align-items:center}.frings>div{display:flex;flex-direction:column;gap:2px}
 .fbars{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:84px}.fbar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;border:0;background:none;font:inherit;color:var(--mu);font-size:11px;font-weight:800;cursor:pointer;height:100%}.fbar i{width:70%;border-radius:6px}.fbar.on span{color:var(--ink)}
+.injrow{border-top:1px solid var(--ln);padding:10px 0;display:grid;gap:8px}
+.injh{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.injrow .row2{display:flex;gap:8px}
+.injrow .fld.wide{width:100%}.injrow .fld.wide input{width:100%}
+.injsw{display:flex;align-items:center;gap:4px;width:fit-content;margin:6px 0 0}.injsw svg{width:13px;height:13px}
+.obopt[disabled]{opacity:.45}

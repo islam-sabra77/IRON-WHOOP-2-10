@@ -49,6 +49,7 @@ function obFinish(){
   const a=UI.ob.a,P=buildPlan(a);
   if(!UI.fresh&&!S.planBackup)S.planBackup={map:clone(S.map),start:S.start,end:S.end,moves:clone(S.moves),ext:clone(S.ext),prof:clone(S.prof)};
   S.prof={ans:a,plan:{tpls:P.tpls,mob:P.mob,wu:P.wu,rot:P.rot,target:P.target,cardioRange:P.cardioRange},sc:P.sc,created:todayS()};
+  if(typeof injList==='function'){const keep=injList().filter(x=>x.to);S.injuries=keep.concat((a.inj||[]).map((j,i)=>({id:'i'+Date.now()+i,j,from:'',to:'',note:''})))}
   S.map=P.map;S.start=a.start;S.end=addD(a.start,(+a.weeks||12)*7-1);S.moves={};S.custom=null;delete S.customPrev;S.ext=[];S.hist=[];S.swaps={};S.swapsAll={};
   if(a.supps==='empty')S.supps=[];
   if(a.supps==='quiz'&&a.sq){S.suppQ=clone(a.sq);S.supps=sqRecommend(a.sq).list.map(sqToSupp)}
@@ -317,7 +318,7 @@ function doSchedule(mode,target){
   save();return true}
 function resetSchedule(){const dates=Object.keys(S.moves);if(!dates.length&&JSON.stringify(S.map)===JSON.stringify(defaults().map)){toast('Your schedule is already the original');return false}
   snapSched('Reset schedule to the original plan',dates,dates,true);dates.forEach(d=>delete S.swaps[d]);S.moves={};S.map=defaults().map;save();return true}
-function exAt(d,slot,base){const p=S.swaps[d]&&S.swaps[d][slot];return p||S.swapsAll[base]||base}
+function exAt(d,slot,base){const p=S.swaps[d]&&S.swaps[d][slot];if(p)return p;const x=S.swapsAll[base]||base;return typeof injSwap==='function'?injSwap(d,x):x}
 function blocksFor(d){
   const k=tplOf(d);if(!k)return[];const t=T[k];if(!t.blocks)return[];
   if(readyOf(d)==='r')return[];

@@ -230,7 +230,7 @@ function mobRow(d,m,c){
     ${e.t?`<button class="mini play" data-a="mtimer" data-k="${m.slot}" aria-label="Start ${m.dose} second timer">${IC.play}${m.dose>=60?fmtT(m.dose):m.dose+'s'}</button>`:''}
     <button class="chevbtn" data-a="excol" data-k="${m.slot}" data-s="${shut?1:0}" aria-label="${shut?'Expand':'Collapse'}">${CHEV}</button></div>`;
   if(!shut){
-    h+=`<div class="mvb">${thumb(m.ex,c)}<div class="cue">${esc(cueOf(e))}${sideNote(e)}</div>${e.p?`<span class="chipinj" style="--c:${c}">${esc(protOf(e))}</span>`:''}
+    h+=`<div class="mvb">${thumb(m.ex,c)}<div class="cue">${esc(cueOf(e))}${sideNote(e)}</div>${e.p?`<span class="chipinj" style="--c:${c}">${esc(protOf(e))}</span>`:''}${injNote(UI.date,m)}
     <div class="tools" style="clear:both"><button class="mini demo" data-a="demo" data-e="${m.ex}">${IC.play} Demo</button>${m.base!=='rampUp'?`<button class="mini" data-a="swap" data-k="${m.slot}" data-b="${m.base}">${IC.swap} Replace</button>`:''}${sw?`<button class="mini" data-a="undoswap" data-k="${m.slot}" data-b="${m.base}">Undo swap</button>`:''}</div></div>`;
   }
   return h+'</div>';
@@ -269,7 +269,7 @@ function exCard(d,it,o){
   }
   hh+=`</div><div class="tools"><button class="mini demo" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button><button class="mini" data-a="swap" data-k="${it.slot}" data-b="${it.base}">${IC.swap} Replace</button><button class="mini" data-a="exinfo" data-k="${it.slot}">${IC.info} Form</button>${isBarbell(it.ex)?`<button class="mini" data-a="plates" data-e="${it.ex}" data-w="${(log.sets.find(q=>q.w!=='')||{}).w||(sug?sug.w:'')}">${IC.plate} Plates</button>`:''}${!e.bw&&!e.t&&(hist()[it.ex]||[]).length?`<button class="mini" data-a="lifthist" data-e="${it.ex}">History</button>`:''}</div>
   ${!e.t&&!isCore?`<div class="tools quick"><button class="mini" data-a="addset" data-k="${it.slot}">＋ Set</button>${!e.bw?`<button class="mini" data-a="dropset" data-k="${it.slot}">↓ Drop set</button><button class="mini ${log.wu?'on':''}" data-a="wuramp" data-k="${it.slot}">Warm-up sets</button>`:''}${log.x?`<button class="mini" data-a="rmset" data-k="${it.slot}" aria-label="Remove the last extra set">− Extra</button>`:''}${lp?'<span class="muted swipehint">Small numbers are last time · swipe a set right to finish it</span>':''}</div>`:''}
-  <div class="info hide" id="info-${it.slot}">${esc(cueOf(e))}${sideNote(e,1)}${e.p?`<div><span class="chipinj" style="--c:${o.c}">Protects: ${esc(protOf(e))}</span></div>`:''}</div>
+  ${injNote(UI.date,it)}<div class="info hide" id="info-${it.slot}">${esc(cueOf(e))}${sideNote(e,1)}${e.p?`<div><span class="chipinj" style="--c:${o.c}">Protects: ${esc(protOf(e))}</span></div>`:''}</div>
   </article>`;
   return hh;
 }

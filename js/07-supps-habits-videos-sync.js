@@ -291,7 +291,7 @@ function altsFor(slot,base,cur){
   add(base);(E[base].a||[]).forEach(add);
   const mb=META[base];
   if(mb){
-    const a=S.prof&&S.prof.ans,eqs=a?eqList(a.equip):null,inj=new Set((a&&a.inj)||[]);
+    const a=S.prof&&S.prof.ans,eqs=a?eqList(a.equip):null,inj=injOn(UI.date||todayS());
     const score=id=>{const m=META[id];return(eqs&&!eqs.includes(m.eq)?4:0)+(m.av.some(j=>inj.has(j))?3:0)+Math.abs(m.lvl-mb.lvl)+(YT[id]?0:1)+(m.eq===mb.eq?-.5:0)+(!!E[id].t!==!!E[base].t?2:0)};
     const rank=pats=>Object.keys(META).filter(id=>E[id]&&pats.includes(META[id].pat)).sort((x,y)=>score(x)-score(y));
     for(const id of rank([mb.pat])){if(out.length>=MAX)break;add(id)}
@@ -453,6 +453,7 @@ function settingsSheet(){
   openSheet(`<h4 class="disp">Settings</h4>
   <div class="srow"><b>Theme</b><select data-in="theme"><option value="auto" ${th==='auto'?'selected':''}>Match my device</option><option value="light" ${th==='light'?'selected':''}>Light</option><option value="dark" ${th==='dark'?'selected':''}>Dark</option></select></div>
   <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Your plan</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${S.prof?`Built from your questionnaire on ${nice(S.prof.created)}.`:'Answer the questionnaire and 7 quick self-tests to get a plan built around your goal, equipment, schedule and injuries.'}</p><button class="cta" style="--c:var(--upper);margin:0" data-a="obopen">${S.prof?'Retake the questionnaire':'Build my personal plan'}</button>${S.planBackup?'<button class="cta ghost" data-a="obrestore">Restore my previous plan</button>':''}</div>
+  ${injCard()}
   <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">WHOOP</h4>
   ${!WH_ON?`<p class="muted" style="font-size:14px;margin:0">WHOOP works once IRON is online on your Netlify site.</p>`:S.whoop.connected?`<p style="font-size:14px;margin:0 0 8px">Connected. Last sync ${S.whoop.last?new Date(S.whoop.last).toLocaleString([], {weekday:'short',hour:'2-digit',minute:'2-digit'}):'never'}.</p>
   <div class="srow"><b>Auto-adjust</b><button class="cta ${S.whoop.auto?'':'ghost'}" style="--c:var(--ok);margin:0;height:44px" data-a="wauto">${S.whoop.auto?'On: workouts follow WHOOP':'Off: I choose manually'}</button></div>

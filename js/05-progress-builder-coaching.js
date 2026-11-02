@@ -132,7 +132,7 @@ function mobPlanAt(d){const mp=(S.custom&&S.custom.mobPlan)||[];let m=null;for(c
 /* auto focus: injuries and screening first, then what today's session loads, then the stage of the cycle */
 function autoAreas(d,kind){
   const out=[],add=a=>{if(MOB_AREAS[a]&&!out.includes(a))out.push(a)};const a=S.prof&&S.prof.ans,sc=S.prof&&S.prof.sc,ph=phaseOf(d);
-  ((a&&a.inj)||[]).forEach(j=>add(INJ_AREA[j]));
+  [...injOn(d)].forEach(j=>add(INJ_AREA[j]));
   const f=(sc&&sc.focus)||[];if(f.includes('overhead'))add('overhead');if(f.includes('ham'))add('hams');if(f.includes('ankle'))add('ankles');if(f.includes('hip'))add('hips');
   if(kind==='upper'){add('tspine');add('shoulders');if(ph.s==='S')add('overhead');add('wrists')}
   else if(kind==='lower'){add('hips');add('ankles');if(ph.s!=='F')add('hams');add('lowback')}
@@ -157,7 +157,7 @@ function applyCustom(){const C=S.custom;if(!C)return;Object.assign(T,C.tpls||{})
 /* ---------- generate sessions for a draft week ---------- */
 function bdAns(bd){return Object.assign(obDefaults(),{len:bd.len,goal:bd.goal})}
 function genHiit(a,v){
-  const eqs=eqList(a.equip),inj=new Set(a.inj||[]);
+  const eqs=eqList(a.equip),inj=new Set([...(a.inj||[]),...injOn(todayS())]);
   let l=HIIT_POOL.filter(id=>E[id]&&META[id]&&eqs.includes(META[id].eq)&&!META[id].av.some(j=>inj.has(j)));if(v)l=l.slice(3).concat(l.slice(0,3));
   l=l.slice(0,a.len==45?4:6);const blocks=[];for(let i=0;i<l.length;i+=2)blocks.push({i:l.slice(i,i+2).map(id=>[id,'tw',E[id].t?(E[id].s||30):12])});
   const cp=['deadBug','plank','russianTwist','hollow','sidePlankK','bicycleCrunch','birdDog','mcgill'].filter(id=>E[id]&&META[id]&&!META[id].av.some(j=>inj.has(j)));
