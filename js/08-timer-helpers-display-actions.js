@@ -2,14 +2,18 @@
 /* ---------- timer ---------- */
 let TM=null,AC=null;
 function beep(f,len,n){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();for(let i=0;i<(n||1);i++){const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f||880;o.connect(g);g.connect(AC.destination);const t0=AC.currentTime+i*0.22;g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(0.35,t0+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+(len||0.18));o.start(t0);o.stop(t0+(len||0.18)+0.02)}}catch(e){}try{navigator.vibrate&&navigator.vibrate(n>1?[120,80,120]:80)}catch(e){}}
-function startTimer(title,phases,done){TM={title,phases,i:0,end:Date.now()+phases[0].s*1000,paused:false,left:0,done};beep(660,.08,1);drawTimer();}
+function startTimer(title,phases,done){TM={id:Date.now()+''+Math.random(),title,phases,i:0,end:Date.now()+phases[0].s*1000,paused:false,left:0,done};beep(660,.08,1);drawTimer();}
+/* The timer bar is built once per phase and afterwards only its text and ring are updated.
+   Rebuilding it several times a second made iPhone Safari drop taps anywhere on the page. */
 function drawTimer(){
-  const el=document.getElementById('timer');if(!TM){el.classList.add('hide');return}el.classList.remove('hide');
-  const p=TM.phases[TM.i],rem=TM.paused?TM.left:(TM.end-Date.now())/1000;const C=2*Math.PI*20,frac=Math.max(0,rem)/p.s;
-  const nxt=TM.phases[TM.i+1];
-  el.innerHTML=`<svg class="ringt" width="50" height="50" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(127,127,160,.35)" stroke-width="5"/><circle cx="25" cy="25" r="20" fill="none" stroke="${p.c||COLORS.cardio}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" transform="rotate(-90 25 25)"/></svg>
-  <div class="tt"><small>${esc(TM.title)}</small><small>${esc(p.l)}${nxt&&TM.phases.length<4?', then '+esc(nxt.l).toLowerCase():''}</small><b class="disp num">${fmtT(rem)}</b></div>
-  <button data-a="tadj" data-v="-15">−15</button><button data-a="tadj" data-v="15">+15</button><button data-a="tpause" aria-label="${TM.paused?'Resume':'Pause'}">${TM.paused?'▶':'❚❚'}</button><button data-a="tstop" aria-label="Stop timer">✕</button>`;
+  const el=document.getElementById('timer');if(!TM){if(!el.classList.contains('hide')){el.classList.add('hide');el.innerHTML='';el.dataset.sig=''}return}
+  const p=TM.phases[TM.i],rem=TM.paused?TM.left:(TM.end-Date.now())/1000;const C=2*Math.PI*20,frac=Math.max(0,Math.min(1,rem/p.s));
+  const nxt=TM.phases[TM.i+1],sig=TM.id+'|'+TM.i+'|'+(TM.paused?1:0);
+  if(el.dataset.sig!==sig){el.dataset.sig=sig;el.classList.remove('hide');
+    el.innerHTML=`<svg class="ringt" width="50" height="50" viewBox="0 0 50 50" aria-hidden="true"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(127,127,160,.35)" stroke-width="5"/><circle class="tprog" cx="25" cy="25" r="20" fill="none" stroke="${p.c||COLORS.cardio}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" transform="rotate(-90 25 25)"/></svg>
+  <div class="tt"><small>${esc(TM.title)}</small><small>${esc(p.l)}${nxt&&TM.phases.length<4?', then '+esc(nxt.l).toLowerCase():''}</small><b class="disp num" role="timer" aria-live="off">${fmtT(rem)}</b></div>
+  <button data-a="tadj" data-v="-15" aria-label="15 seconds less">−15</button><button data-a="tadj" data-v="15" aria-label="15 seconds more">+15</button><button data-a="tpause" aria-label="${TM.paused?'Resume':'Pause'}">${TM.paused?'▶':'❚❚'}</button><button data-a="tstop" aria-label="Stop timer">✕</button>`;el.dataset.txt='';}
+  const txt=fmtT(rem);if(el.dataset.txt!==txt){el.dataset.txt=txt;const b=el.querySelector('.tt b');if(b)b.textContent=txt;const c=el.querySelector('.tprog');if(c)c.setAttribute('stroke-dashoffset',String(C*(1-frac)))}
 }
 setInterval(()=>{if(!TM||TM.paused)return;const rem=(TM.end-Date.now())/1000;
   if(rem<=3.05&&rem>0&&Math.ceil(rem)!==TM.lastBeep){TM.lastBeep=Math.ceil(rem);beep(520,.07,1)}
@@ -85,7 +89,7 @@ function drawFocus(){
   <div id="fxtimer" class="fxtimer"></div></div>`);fxTimer();
 }
 function groupsTotal(d){let all=0,done=0;blocksFor(d).forEach(b=>b.items.forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)}));coreFor(d).forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)});return{all,done}}
-function fxTimer(){const el=document.getElementById('fxtimer');if(!el)return;if(!TM){el.innerHTML='';return}const rem=Math.max(0,Math.ceil((TM.end-Date.now())/1000));el.innerHTML=`<span>${esc(TM.phases[TM.i].l)}</span><b class="disp num">${fmtT(rem)}</b>`}
+function fxTimer(){const el=document.getElementById('fxtimer');if(!el)return;if(!TM){if(el.innerHTML)el.innerHTML='';el.dataset.sig='';return}const rem=Math.max(0,Math.ceil((TM.end-Date.now())/1000)),sig=TM.id+'|'+TM.i;if(el.dataset.sig!==sig){el.dataset.sig=sig;el.innerHTML=`<span>${esc(TM.phases[TM.i].l)}</span><b class="disp num">${fmtT(rem)}</b>`}else{const b=el.querySelector('b'),t=fmtT(rem);if(b&&b.textContent!==t)b.textContent=t}}
 setInterval(()=>{if(UI.fx)fxTimer();if(TM&&!TM.paused){document.title=fmtT(Math.max(0,(TM.end-Date.now())/1000))+' · '+TM.title+' · IRON'}else if(document.title!=='IRON')document.title='IRON'},500);
 
 /* =====================================================================
