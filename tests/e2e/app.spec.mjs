@@ -148,3 +148,16 @@ test('exercises show a muscle map and supplements show an evidence grade', async
   await expect(page.locator('#panel .grade.gA').first()).toBeVisible();
   noErrors(page);
 });
+
+test('Arabic translates exercise cues on demand, but never user-typed text', async ({ page }) => {
+  const sent = [];
+  await page.route('**/api/translate', async (r) => { const b = r.request().postDataJSON(); sent.push(...b.strings); r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ t: Object.fromEntries(b.strings.map((s) => [s, 'ترجمة ' + s.length])) }) }); });
+  await openApp(page);
+  await page.evaluate(() => { S.habits.push({ id: 'hx', n: 'My secret habit', e: '💧', c: '#00A3FF' }); prefs().lang = 'ar'; applyDisplay(); save(); UI.pl = { ex: 'bbBench' }; drawPlayer(); });
+  await expect.poll(() => sent.some((s) => s.startsWith('Shoulder blades pinned'))).toBe(true);
+  await expect(page.locator('#panel .cue')).toContainText('ترجمة');
+  await page.evaluate(() => { closeSheet(); UI.tab = 'habits'; rerender(); });
+  await page.waitForTimeout(600);
+  expect(sent.some((s) => s.includes('secret'))).toBe(false);
+  noErrors(page);
+});

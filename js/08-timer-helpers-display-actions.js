@@ -130,7 +130,7 @@ const AR={'Home':'الرئيسية','Train':'التمرين','Plan':'الخطة'
  'Build or improve my stack':'أنشئ أو حسّن مكمّلاتي','Supplement guide':'دليل المكمّلات','Morning':'الصباح','Pre-workout':'قبل التمرين','Post-workout':'بعد التمرين','With meals':'مع الوجبات','Evening':'المساء',
  'Workout summary':'ملخص التمرين','Share image':'مشاركة الصورة','Save image':'حفظ الصورة','Copy as text':'نسخ كنص','Nice':'رائع','Session done':'انتهت الجلسة'};
 const AR_PART=[[/^Cycle (\d+) · week (\d+)\/(\d+)$/,'الدورة $1 · الأسبوع $2/$3'],[/^(\d+) of (\d+) sessions$/,'$1 من $2 جلسات'],[/^Set (\d+) of (\d+)/,'المجموعة $1 من $2']];
-function trText(t){if(!isAr())return t;const k=t.trim();if(!k)return t;if(AR[k])return t.replace(k,AR[k]);for(const[re,to]of AR_PART)if(re.test(k))return t.replace(k,k.replace(re,to));return t}
+function trText(t){if(!isAr())return t;const k=t.trim();if(!k)return t;if(AR[k])return t.replace(k,AR[k]);for(const[re,to]of AR_PART)if(re.test(k))return t.replace(k,k.replace(re,to));if(typeof arDyn==='function'){const d=arDyn(k);if(d)return t.replace(k,d)}return t}
 const ICON_LABEL={close:'Close',tstop:'Stop timer',tpause:'Pause or resume timer',tadj:'Adjust timer',set:'Mark set done',tset:'Start set timer',mob:'Mark done',excol:'Show or hide details',col:'Show or hide section',wk:'Change week',day:'Open day',demo:'Play video',settings:'Settings',swap:'Replace exercise',bdmove:'Move',bddel:'Remove',fxadj:'Adjust',pl8w:'Adjust weight',rpe:'Rate set',supp:'Mark taken',habday:'Toggle day',sdaytoggle:'Toggle day',habm:'Change month',sm:'Change month',hcol:'Colour',hemo:'Emoji'};
 function localizeNode(root){
   const doU=imperial(),doA=isAr();
@@ -138,7 +138,7 @@ function localizeNode(root){
   if(root.nodeType!==1||root.closest&&root.closest('[data-raw]'))return;
   if(doU||doA){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentNode&&(n.parentNode.nodeName==='SCRIPT'||n.parentNode.nodeName==='STYLE'||n.parentNode.closest('[data-raw]'))?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});const list=[];while(w.nextNode())list.push(w.currentNode);
     list.forEach(n=>{let v=n.nodeValue;if(doU)v=convText(v);if(doA)v=trText(v);if(v!==n.nodeValue)n.nodeValue=v});
-    if(doA)root.querySelectorAll&&root.querySelectorAll('[placeholder]').forEach(e=>{const p=e.getAttribute('placeholder');if(AR[p])e.setAttribute('placeholder',AR[p])})}
+    if(doA)root.querySelectorAll&&root.querySelectorAll('[placeholder]').forEach(e=>{const p=e.getAttribute('placeholder');const d=AR[p]||(typeof arDyn==='function'&&arDyn(p));if(d)e.setAttribute('placeholder',d)})}
   const btns=root.matches&&root.matches('button')?[root]:root.querySelectorAll?[...root.querySelectorAll('button')]:[];
   btns.forEach(b=>{if(b.hasAttribute('aria-label'))return;const tx=b.textContent.replace(/[\s✕✓−＋↑↓‹›❚▶…]/g,'');if(tx.length)return;b.setAttribute('aria-label',ICON_LABEL[b.dataset.a]||b.title||(b.dataset.a||'button').replace(/([a-z])([A-Z])/g,'$1 $2'))});
   // weight inputs show the display unit

@@ -87,3 +87,17 @@ test('feedback stores short messages and keeps them private', async () => {
   assert.equal(list.at(-1).kind, 'problem');
   delete process.env.ERROR_LOG_KEY;
 });
+
+test('translate caches each string and only calls the model for new ones', async () => {
+  const tr = await load('translate.mjs');
+  let calls = 0;
+  globalThis.__ironTranslate = async (list) => { calls++; return Object.fromEntries(list.map((s) => [s, 'AR:' + s])); };
+  const post = (strings) => tr(new Request('http://x/api/translate', { method: 'POST', body: JSON.stringify({ lang: 'ar', strings }) }));
+  const a = await (await post(['Brace your core', 'Press up'])).json();
+  assert.equal(a.t['Brace your core'], 'AR:Brace your core');
+  const b = await (await post(['Brace your core', 'Press up'])).json();
+  assert.equal(b.t['Press up'], 'AR:Press up');
+  assert.equal(calls, 1);
+  assert.equal((await tr(new Request('http://x/api/translate', { method: 'POST', body: JSON.stringify({ lang: 'fr', strings: ['x'] }) }))).status, 400);
+  delete globalThis.__ironTranslate;
+});
