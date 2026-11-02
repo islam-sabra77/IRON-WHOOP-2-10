@@ -4,6 +4,7 @@
 applyProfile();applyCustom();prefs();applyDisplay();UI.fresh=FRESH;
 autoLinkHabits();
 rerender();
+if(typeof introStart==='function')introStart();
 remSync(false);
 if(FRESH)setTimeout(openOnboarding,250);
 if(WH_ON&&(S.whoop.connected||S.whoop.pending))whoopSync(false);

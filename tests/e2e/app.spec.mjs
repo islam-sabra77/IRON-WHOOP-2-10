@@ -14,12 +14,53 @@ test('every tab renders without errors', async ({ page }) => {
 
 test('home tiles open their tabs', async ({ page }) => {
   await openApp(page);
-  for (const v of ['plan', 'build', 'progress', 'supps', 'habits', 'travel']) {
+  for (const v of ['build', 'progress', 'travel']) {
     await page.evaluate(() => { UI.tab = 'home'; rerender(); });
     await page.locator(`[data-a="hgo"][data-v="${v}"]`).first().click();
     expect(await page.evaluate(() => UI.tab)).toBe(v);
   }
   noErrors(page);
+});
+
+test('home is interactive: day picker, supplements, protein and lifts', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => {
+    const t = todayS();
+    for (let i = 1; i <= 4; i++) S.logs[addD(t, -i * 3)] = { s0: { ex: 'bbBench', sets: [{ w: String(70 + i), r: '5', d: 1 }] }, s1: { ex: 'bbBackSquat' in E ? 'bbBackSquat' : 'bbBench', sets: [{ w: '100', r: '5', d: 1 }] } };
+    S.whoop.connected = true; S.wdata[t] = { rec: 45, hrv: 60, rhr: 55, sleep: { dur: 6.8, perf: 80 } };
+    save(); UI.tab = 'home'; rerender();
+  });
+  await expect(page.locator('.hg-hero')).toContainText('Yellow day');
+  await page.click('[data-a="hwhy"]');
+  await expect(page.locator('.hg-why')).toContainText('6h 48m');
+  // pick another day: the session card follows it
+  const other = await page.evaluate(() => { const ws = sunOf(todayS()); for (let i = 0; i < 7; i++) { const d = addD(ws, i); if (d !== todayS() && tplOf(d)) return { d, n: T[tplOf(d)].n }; } });
+  await page.click(`[data-a="hday"][data-d="${other.d}"]`);
+  await expect(page.locator('.hg-sess h3')).toHaveText(other.n);
+  // tick a supplement and add protein
+  const sid = await page.evaluate(() => S.supps[0].id);
+  await page.click(`[data-a="hsupp"][data-k="${sid}"]`);
+  expect(await page.evaluate((id) => !!(S.suppLog[todayS()] || {})[id], sid)).toBe(true);
+  await page.click('[data-a="hprot"]');
+  expect(await page.evaluate(() => nutDay(todayS()).p)).toBe(20);
+  // switch lifts
+  const tabs = page.locator('.hg-seg button');
+  if (await tabs.count() > 1) { await tabs.nth(1).click(); await expect(tabs.nth(1)).toHaveClass(/on/); }
+  noErrors(page);
+});
+
+test('intro plays for about 3 seconds on first open, then shows the app', async ({ page }) => {
+  const errors = []; page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/index.html?intro=1');
+  await expect(page.locator('#intro')).toBeVisible();
+  await expect(page.locator('#intro .in-logo')).toBeVisible();
+  await page.waitForTimeout(1500);
+  await expect(page.locator('#intro')).toBeVisible();
+  await expect(page.locator('#intro')).toHaveCount(0, { timeout: 4000 });
+  // not shown again in the same session
+  await page.goto('/index.html?intro=1');
+  await expect(page.locator('#intro')).toHaveCount(0);
+  expect(errors).toEqual([]);
 });
 
 test('weight and reps copy to the next sets', async ({ page }) => {
