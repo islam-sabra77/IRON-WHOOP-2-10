@@ -591,3 +591,6 @@ html[dir="rtl"] .backlink svg{transform:scaleX(-1)}
 #srq{width:100%;margin-bottom:6px}
 .pvl{padding-left:18px;font-size:14px;line-height:1.5;margin:6px 0 12px}.pvl li{margin:4px 0}
 #fbtext{border-radius:12px;border:1px solid var(--ln);background:var(--sf2);color:var(--ink);padding:10px;font:inherit;resize:vertical}
+.achart{position:relative;margin:6px 0 2px}.achart svg{display:block;overflow:visible}
+.ctip{position:absolute;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-size:12px;font-weight:700;padding:4px 8px;border-radius:8px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
+.chit{cursor:pointer}

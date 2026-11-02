@@ -114,3 +114,23 @@ test('five tabs, More opens the rest, back returns to More', async ({ page }) =>
   expect(await page.evaluate(() => UI.tab)).toBe('more');
   noErrors(page);
 });
+
+test('charts have axes and show a value when a point is tapped; recovery vs training card', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => {
+    const t = todayS();
+    for (let i = 1; i <= 6; i++) { const d = addD(t, -i * 3); S.logs[d] = { s0: { ex: 'bbBench', sets: [{ w: String(60 + i * 2.5), r: '5', d: 1 }, { w: '60', r: '5', d: 1 }] } }; }
+    S.whoop.connected = true; S.wdata = {}; for (let i = 0; i < 20; i++) S.wdata[addD(t, -i)] = { rec: 40 + (i % 5) * 10 };
+    save(); UI.tab = 'progress'; rerender();
+  });
+  await expect(page.locator('#rtc svg')).toBeVisible();
+  await expect(page.locator('#view')).toContainText('Recovery vs training');
+  await page.locator('#rtc [data-a="chartpt"]').last().dispatchEvent('click');
+  await expect(page.locator('#rtc .ctip')).toContainText('recovery');
+  await page.evaluate(() => liftSheet('bbBench'));
+  const ch = page.locator('#panel .achart').first();
+  await expect(ch.locator('text').first()).toBeVisible();
+  await ch.locator('.chit').last().dispatchEvent('click');
+  await expect(ch.locator('.ctip')).toContainText('kg');
+  noErrors(page);
+});

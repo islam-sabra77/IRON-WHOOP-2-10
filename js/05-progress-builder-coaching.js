@@ -68,6 +68,7 @@ function renderProgress(){
   // lifts
   const hs=hist();const liftsAll=Object.keys(hs).filter(ex=>E[ex]&&!E[ex].bw&&!E[ex].t).sort((a,b)=>hs[b].length-hs[a].length),lifts=UI.allLifts?liftsAll:liftsAll.slice(0,10);
   if(S.whoop.connected)h+=`<button class="card" style="display:block;width:100%;text-align:left" data-a="tab" data-v="whoop"><h4 class="disp" style="margin:0">WHOOP dashboard →</h4><span class="muted" style="font-size:14px">Recovery, sleep, strain and trends now live in the WHOOP tab.</span></button>`;
+  h+=recTrainCard();
   h+=`<div class="card"><h4 class="disp">Strength trends</h4>`;
   if(!lifts.length)h+=`<p class="muted" style="margin:0;font-size:14px">Log weights and reps on any exercise and its estimated one-rep max shows up here, session by session.</p>`;
   lifts.forEach(ex=>{const pts=hs[ex].map(x=>Math.max(...x.sets.map(s=>e1rm(+s.w,+s.r))));const best=Math.max(...hs[ex].map(x=>Math.max(...x.sets.map(s=>+s.w))));
@@ -86,18 +87,6 @@ function renderProgress(){
   <button class="cta" style="--c:var(--upper)" data-a="extend">Extend with these changes</button>
   ${S.ext.length?`<div style="margin-top:12px">${S.ext.map((x,i)=>`<div class="muted" style="font-size:13px">Extension ${i+1}: ${short(x.from)} to ${short(x.to)}, ${x.vol>0?'more volume':x.vol<0?'trimmed':'same volume'}</div>`).join('')}<button class="cta ghost" data-a="unextend">Remove the last extension</button></div>`:''}</div>`;
   v.innerHTML=h;
-}
-function whoopTrend(){
-  if(!S.whoop.connected)return'';const t=todayS(),days=[];for(let i=29;i>=0;i--){const d=addD(t,-i);days.push([d,S.wdata[d]])}
-  const have=days.filter(x=>x[1]&&x[1].rec!=null);if(!have.length)return`<div class="card"><h4 class="disp">WHOOP trends</h4><p class="muted" style="margin:0;font-size:14px">Your recovery, HRV and resting HR will chart here after the first sync.</p></div>`;
-  const W=300,H=110,bw=W/30;let bars='',hp='',rp='';const hv=have.map(x=>x[1].hrv).filter(v=>v!=null),rv=have.map(x=>x[1].rhr).filter(v=>v!=null);
-  const hmin=Math.min(...hv),hmax=Math.max(...hv),rmin=Math.min(...rv),rmax=Math.max(...rv);
-  days.forEach(([d,x],i)=>{if(!x||x.rec==null)return;const hh=x.rec/100*H;const c=x.rec>=67?'#12B76A':x.rec>=34?'#F59E0B':'#EF3B55';bars+=`<rect x="${(i*bw+1).toFixed(1)}" y="${(H-hh).toFixed(1)}" width="${(bw-2).toFixed(1)}" height="${hh.toFixed(1)}" rx="2" fill="${c}" opacity=".55"/>`;
-    const cx=(i*bw+bw/2).toFixed(1);if(x.hrv!=null)hp+=`${cx},${(H-8-(x.hrv-hmin)/((hmax-hmin)||1)*(H-24)).toFixed(1)} `;if(x.rhr!=null)rp+=`${cx},${(H-8-(x.rhr-rmin)/((rmax-rmin)||1)*(H-24)).toFixed(1)} `});
-  const avg=a=>a.length?Math.round(a.reduce((p,q)=>p+q,0)/a.length):'–';
-  return`<div class="card"><h4 class="disp">WHOOP trends</h4><div class="muted" style="font-size:13px;margin-bottom:6px">Last 30 days. Bars: recovery. Lines: <b style="color:#2F5BFF">HRV</b> and <b style="color:#FF2D78">resting HR</b>.</div>
-  <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">${bars}<polyline points="${hp}" fill="none" stroke="#2F5BFF" stroke-width="2.5" stroke-linejoin="round"/><polyline points="${rp}" fill="none" stroke="#FF2D78" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="4 3"/></svg>
-  <div class="grid2" style="grid-template-columns:repeat(3,1fr);margin-top:10px"><div class="stat"><b class="disp num">${avg(have.map(x=>x[1].rec))}%</b><span>Avg recovery</span></div><div class="stat"><b class="disp num">${avg(hv)}</b><span>Avg HRV ms</span></div><div class="stat"><b class="disp num">${avg(rv)}</b><span>Avg RHR</span></div></div></div>`;
 }
 function weekStreak(){const t=todayS();let w=sunOf(t),n=0;const cnt=s=>{let c=0;for(let i=0;i<7;i++)if(S.done[addD(s,i)])c++;return c};if(cnt(w)<4)w=addD(w,-7);while(w>=sunOf(S.start)&&cnt(w)>=4){n++;w=addD(w,-7)}return n}
 function ring(p,c,size,sw,label){const r=(size-sw)/2,C=2*Math.PI*r;return`<svg class="ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--sf2)" stroke-width="${sw}"/><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-Math.min(1,p))}" transform="rotate(-90 ${size/2} ${size/2})"/>${label?`<text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-size="${size/4.6}" font-weight="850" fill="var(--ink)" style="font-stretch:68%">${label}</text>`:''}</svg>`}
@@ -311,8 +300,7 @@ function pickList(){
 
 /* ---------- per-move weight history ---------- */
 function liftStats(x){const sets=x.sets.map(q=>({w:+q.w,r:+q.r}));const top=Math.max(...sets.map(q=>q.w));const vol=sets.reduce((a,q)=>a+q.w*q.r,0);const best=Math.max(...sets.map(q=>e1rm(q.w,q.r)));return{sets,top,vol,best,reps:sets.reduce((a,q)=>a+q.r,0)}}
-function bigChart(pts,c,u){u=u||'kg';const W=320,H=120;if(pts.length<2)return'';const mn=Math.min(...pts),mx=Math.max(...pts),rg=mx-mn||1;const xy=pts.map((v,i)=>[(i/(pts.length-1)*(W-16)+8),(H-10-(v-mn)/rg*(H-28))]);
-  return`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;margin:6px 0 2px"><polyline points="${xy.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${xy.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="${c}"/>`).join('')}<text x="8" y="12" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mx)} ${u}</text><text x="8" y="${H-1}" font-size="10.5" fill="var(--mu)" font-weight="700">${Math.round(mn)} ${u}</text></svg>`}
+function bigChart(pts,c,u,dates){return axisChart(pts,c,u||'kg',dates)}
 /* =====================================================================
    COACHING: plateau detection, weekly report, readiness check
    ===================================================================== */
@@ -392,6 +380,6 @@ function liftSheet(ex){
   const plt=plateauOf(ex);
   openSheet(`<h4 class="disp">${esc(e.n)}</h4><p class="muted" style="font-size:14px;margin:0 0 8px">Every session you logged, newest first. Tap a session to see each set.</p>${plt?plateauHTML(plt):''}
   <div class="grid2" style="margin-bottom:6px"><div class="stat"><b class="disp num">${bestW} kg</b><span>Heaviest set</span></div><div class="stat"><b class="disp num">${Math.round(bestE)} kg</b><span>Best est. 1RM</span></div><div class="stat"><b class="disp num">${all.length}</b><span>Sessions logged</span></div><div class="stat"><b class="disp num">${fvol(totV)}</b><span>Total volume</span></div></div>
-  ${all.length>1?`<div class="card" style="margin:8px 0"><b style="font-size:14px">Estimated 1RM by session</b> <span class="muted num" style="font-size:13px">${chg>=0?'+':''}${Math.round(chg*100)}% since ${short(all[0].d)}</span>${bigChart(st.map(x=>x.best),c)}</div>`:''}
+  ${all.length>1?`<div class="card" style="margin:8px 0"><b style="font-size:14px">Estimated 1RM by session</b> <span class="muted num" style="font-size:13px">${chg>=0?'+':''}${Math.round(chg*100)}% since ${short(all[0].d)}</span>${bigChart(st.map(x=>x.best),c,'kg',all.map(x=>x.d))}</div>`:''}
   ${rows}<button class="cta ghost" data-a="close">Close</button>`);
 }

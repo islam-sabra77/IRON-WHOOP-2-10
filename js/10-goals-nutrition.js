@@ -35,7 +35,7 @@ function renderGoals(){
     h+=`<div class="card goal" style="--c:${c}"><div class="ctop"><div><span class="hlab">${GOAL_TYPES[g.type].l}</span><h4 class="disp" style="margin:2px 0 0">${esc(goalName(g))}</h4></div><button class="mini" data-a="goaldel" data-v="${g.id}" aria-label="Remove goal">✕</button></div>
     <div class="gnums num"><b class="disp">${goalFmt(g,st.cur)}</b><span>→ ${goalFmt(g,g.target)}${g.by?' by '+short(g.by):''}</span></div>
     <div class="hbar" style="height:10px"><i style="width:${Math.round(st.pct*100)}%"></i></div>
-    <p style="font-size:14px;margin:8px 0 0">${st.eta?`<b>Projected: ${nice(st.eta)}</b><br>`:''}${esc(st.msg)}</p>${pts.length>1?bigChart(pts.slice(-20).map(p=>p.v),c,GOAL_TYPES[g.type].u):''}</div>`});
+    <p style="font-size:14px;margin:8px 0 0">${st.eta?`<b>Projected: ${nice(st.eta)}</b><br>`:''}${esc(st.msg)}</p>${pts.length>1?bigChart(pts.slice(-20).map(p=>p.v),c,GOAL_TYPES[g.type].u,pts.slice(-20).map(p=>p.d)):''}</div>`});
   document.getElementById('view').innerHTML=h;
 }
 function goalSheet(){
