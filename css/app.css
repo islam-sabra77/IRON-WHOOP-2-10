@@ -594,3 +594,8 @@ html[dir="rtl"] .backlink svg{transform:scaleX(-1)}
 .achart{position:relative;margin:6px 0 2px}.achart svg{display:block;overflow:visible}
 .ctip{position:absolute;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-size:12px;font-weight:700;padding:4px 8px;border-radius:8px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s}
 .chit{cursor:pointer}
+.mmap{margin:10px 0}.mmap svg{display:block;width:100%;max-width:300px;margin:0 auto}.mmap p{font-size:13px;margin:6px 0 0;text-align:center}
+.mkey{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin:0 4px -1px 0}.mkey.s{opacity:.38}
+.grade{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;font-size:12px;font-weight:800;color:#fff;margin-right:6px;vertical-align:1px}
+.grade.gA{background:var(--ok)}.grade.gB{background:#2F9BFF}.grade.gC{background:var(--warn)}.grade.gD{background:var(--bad)}
+.grow b{display:flex;align-items:center}

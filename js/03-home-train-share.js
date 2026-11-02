@@ -269,7 +269,7 @@ function exCard(d,it,o){
   }
   hh+=`</div><div class="tools"><button class="mini demo" data-a="demo" data-e="${it.ex}">${IC.play} Demo</button><button class="mini" data-a="swap" data-k="${it.slot}" data-b="${it.base}">${IC.swap} Replace</button><button class="mini" data-a="exinfo" data-k="${it.slot}">${IC.info} Form</button>${isBarbell(it.ex)?`<button class="mini" data-a="plates" data-e="${it.ex}" data-w="${(log.sets.find(q=>q.w!=='')||{}).w||(sug?sug.w:'')}">${IC.plate} Plates</button>`:''}${!e.bw&&!e.t&&(hist()[it.ex]||[]).length?`<button class="mini" data-a="lifthist" data-e="${it.ex}">History</button>`:''}</div>
   ${!e.t&&!isCore?`<div class="tools quick"><button class="mini" data-a="addset" data-k="${it.slot}">＋ Set</button>${!e.bw?`<button class="mini" data-a="dropset" data-k="${it.slot}">↓ Drop set</button><button class="mini ${log.wu?'on':''}" data-a="wuramp" data-k="${it.slot}">Warm-up sets</button>`:''}${log.x?`<button class="mini" data-a="rmset" data-k="${it.slot}" aria-label="Remove the last extra set">− Extra</button>`:''}${lp?'<span class="muted swipehint">Small numbers are last time · swipe a set right to finish it</span>':''}</div>`:''}
-  ${injNote(UI.date,it)}<div class="info hide" id="info-${it.slot}">${esc(cueOf(e))}${sideNote(e,1)}${e.p?`<div><span class="chipinj" style="--c:${o.c}">Protects: ${esc(protOf(e))}</span></div>`:''}</div>
+  ${injNote(UI.date,it)}<div class="info hide" id="info-${it.slot}">${muscleMap(it.ex,o.c)}${esc(cueOf(e))}${sideNote(e,1)}${e.p?`<div><span class="chipinj" style="--c:${o.c}">Protects: ${esc(protOf(e))}</span></div>`:''}</div>
   </article>`;
   return hh;
 }

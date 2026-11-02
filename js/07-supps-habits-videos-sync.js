@@ -160,9 +160,9 @@ function suppStreak(){let t=todayS(),n=0;const full=d=>S.supps.length&&S.supps.e
 function guideSheet(q){
   q=(q||'').toLowerCase().trim();const list=SUPP_DB.filter(e=>!q||e.n.toLowerCase().includes(q)||e.a.some(a=>a.includes(q))).sort((a,b)=>a.n.localeCompare(b.n));
   const inStack=e=>S.supps.some(s=>suppInfo(s.n)===e);
-  openSheet(`<h4 class="disp">Supplement guide</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${SUPP_DB.length} common supplements with benefits, dose and best time. Tap one to read more and add it to your stack.</p>
+  openSheet(`<h4 class="disp">Supplement guide</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${SUPP_DB.length} common supplements with benefits, dose and best time. Tap one to read more and add it to your stack.</p><p class="muted gleg" style="font-size:13px;margin:0 0 8px">Evidence: <span class="grade gA">A</span>strong <span class="grade gB">B</span>good <span class="grade gC">C</span>mixed <span class="grade gD">D</span>little</p>
   <input type="text" id="gq" data-in="gq" placeholder="Search, e.g. magnesium" value="${esc(q)}" autocomplete="off">
-  <div id="glist">${list.map(e=>`<details class="gitem"><summary><b>${esc(e.n)}</b><span>${esc(e.d)}</span>${inStack(e)?'<em>In your stack</em>':''}</summary>${suppInfoHTML(e)}${inStack(e)?'':`<button class="cta" style="--c:var(--cardio);margin-top:8px" data-a="gadd" data-v="${e.id}">${IC.plus} Add to my stack</button>`}</details>`).join('')||'<p class="muted">No match. Try another name.</p>'}</div>
+  <div id="glist">${list.map(e=>`<details class="gitem"><summary><b>${typeof gradeBadge==='function'?gradeBadge(e):''}${esc(e.n)}</b><span>${esc(e.d)}</span>${inStack(e)?'<em>In your stack</em>':''}</summary>${suppInfoHTML(e)}${inStack(e)?'':`<button class="cta" style="--c:var(--cardio);margin-top:8px" data-a="gadd" data-v="${e.id}">${IC.plus} Add to my stack</button>`}</details>`).join('')||'<p class="muted">No match. Try another name.</p>'}</div>
   <button class="cta ghost" data-a="close">Close</button>`);
 }
 function suppSheet(id,pre){
@@ -253,7 +253,7 @@ function drawPlayer(){
   const ex=UI.pl.ex,e=E[ex],id=ytId(ex),c=playerColor();
   openSheet(`<h4 class="disp">${esc(e.n)}</h4>
   <div class="stage vid">${id?`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1" title="${esc(e.n)} demo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`:`<p style="padding:24px;color:#fff">No video saved for this move yet. <a style="color:#fff;text-decoration:underline" href="${esc(vidUrl(ex))}" target="_blank" rel="noopener">Find one on YouTube</a>, then tap “Use a different video” below and paste its link.</p>`}</div>
-  <div class="cue" style="margin-top:10px;font-size:15px">${esc(cueOf(e))}${sideNote(e,1)}</div>${e.p?`<span class="chipinj" style="--c:${c}">Protects: ${esc(protOf(e))}</span>`:''}
+  <div class="cue" style="margin-top:10px;font-size:15px">${esc(cueOf(e))}${sideNote(e,1)}</div>${e.p?`<span class="chipinj" style="--c:${c}">Protects: ${esc(protOf(e))}</span>`:''}${muscleMap(ex,c)}
   <div class="pctl" style="--c:${c};margin-top:12px"><button data-a="vidchange" data-e="${ex}">Use a different video</button>${S.vids[ex]?`<button data-a="vidreset" data-e="${ex}">Back to default</button>`:''}</div>
   ${id?`<div class="pnote">If this video won't play here, <a href="https://www.youtube.com/shorts/${id}" target="_blank" rel="noopener">open it on YouTube</a>.</div>`:''}
   <button class="cta ghost" data-a="close">Close</button>`);

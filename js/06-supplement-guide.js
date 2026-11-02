@@ -207,7 +207,7 @@ const SUPP_DB=[
 ];
 const SUPP_GENERIC=new Set(['protein','isolate','protein powder','protein shake','fiber','fibre','cherry','sodium','potassium','hydration','beet','iron','multi vitamin']);
 function suppInfo(name){const n=(name||'').toLowerCase();if(!n.trim())return null;for(const pass of [0,1]){let best=null,bl=0;for(const e of SUPP_DB)for(const al of e.a){if((pass===0)===SUPP_GENERIC.has(al))continue;if(n.includes(al)&&al.length>bl){best=e;bl=al.length}}if(best)return best}return null}
-function suppInfoHTML(e,c){if(!e)return'';return`<div class="sinfo" style="--c:${c||'var(--cardio)'}">
+function suppInfoHTML(e,c){if(!e)return'';return`<div class="sinfo" style="--c:${c||'var(--cardio)'}">${typeof gradeRow==='function'?gradeRow(e):''}
   <div class="sirow"><span>💊 Typical dose</span><b>${esc(e.d)}</b></div>
   <div class="sirow"><span>⏰ Best time</span><b>${esc(e.w)}</b></div>
   <div class="sib"><span>✅ Benefits</span><ul>${e.b.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>

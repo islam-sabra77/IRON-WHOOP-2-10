@@ -134,3 +134,17 @@ test('charts have axes and show a value when a point is tapped; recovery vs trai
   await expect(ch.locator('.ctip')).toContainText('kg');
   noErrors(page);
 });
+
+test('exercises show a muscle map and supplements show an evidence grade', async ({ page }) => {
+  await openApp(page);
+  const r = await page.evaluate(() => ({ m: musclesOf('bbBench'), graded: SUPP_DB.filter((e) => e.g).length, n: SUPP_DB.length, cr: SUPP_DB.find((e) => e.id === 'creatine').g, tr: SUPP_DB.find((e) => e.id === 'tribulus').g }));
+  expect(r.m.p).toContain('chest');
+  expect(r.graded).toBe(r.n);
+  expect(r.cr).toBe('A');
+  expect(r.tr).toBe('D');
+  await page.evaluate(() => openPlayer('bbBench'));
+  await expect(page.locator('#panel .mmap')).toContainText('Chest');
+  await page.evaluate(() => guideSheet('creatine'));
+  await expect(page.locator('#panel .grade.gA').first()).toBeVisible();
+  noErrors(page);
+});
