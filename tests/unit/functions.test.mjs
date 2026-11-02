@@ -74,3 +74,16 @@ test('timer alerts: exact send by the background function, cancel stops it, tick
   assert.deepEqual(sent, ['Rest is over', 'Supplements']);
   delete globalThis.__ironPushSend;
 });
+
+test('feedback stores short messages and keeps them private', async () => {
+  const fb = await load('feedback.mjs');
+  const post = (b) => fb(new Request('http://x/api/feedback', { method: 'POST', body: JSON.stringify(b) }));
+  assert.equal((await post({ kind: 'idea', text: 'hi' })).status, 400);
+  assert.equal((await post({ kind: 'problem', text: 'Timer froze', tab: 'train' })).status, 200);
+  assert.equal((await fb(new Request('http://x/api/feedback?key=nope'))).status, 403);
+  process.env.ERROR_LOG_KEY = 'k1';
+  const list = await (await fb(new Request('http://x/api/feedback?key=k1'))).json();
+  assert.equal(list.at(-1).text, 'Timer froze');
+  assert.equal(list.at(-1).kind, 'problem');
+  delete process.env.ERROR_LOG_KEY;
+});
