@@ -34,3 +34,4 @@ document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if
   if(a==='wipe1'){openSheet(`<h4 class="disp">Delete everything?</h4><p style="font-size:15px">This removes your plan, every logged workout, body data, supplements and habits from this phone${syncOn()?', deletes your cloud backup':''}${S.whoop&&S.whoop.connected?', disconnects WHOOP':''} and stops reminders. It can’t be undone.</p><p class="muted" style="font-size:14px">Tip: download your data first.</p><button class="cta ghost" data-a="bkfile">Download my data</button><button class="cta" style="--c:var(--bad)" data-a="wipe2">Yes, delete everything</button><button class="cta ghost" data-a="close">Keep my data</button>`)}
   if(a==='wipe2')wipeAll();
 });
+document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a="setjump"]');if(!el)return;const t=document.getElementById(el.dataset.v);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})});
