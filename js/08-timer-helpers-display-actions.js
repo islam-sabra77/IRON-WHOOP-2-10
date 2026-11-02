@@ -148,7 +148,7 @@ function applyDisplay(){const p=prefs(),h=document.documentElement;h.lang=p.lang
 new MutationObserver(ms=>{if(!S||!S.prefs)return;for(const m of ms)m.addedNodes.forEach(n=>localizeNode(n))}).observe(document.body,{childList:true,subtree:true});
 
 /* ---------- actions ---------- */
-function rerender(){HISTCACHE=null;INJCACHE={};WICACHE={};renderTop();renderTabs();const R2={home:renderHome,train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits,more:renderMore,goals:typeof renderGoals==='function'?renderGoals:renderMore,food:typeof renderFood==='function'?renderFood:renderMore};(R2[UI.tab]||renderHome)();
+function rerender(){HISTCACHE=null;INJCACHE={};PHC={};WICACHE={};renderTop();renderTabs();const R2={home:renderHome,train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits,more:renderMore,goals:typeof renderGoals==='function'?renderGoals:renderMore,food:typeof renderFood==='function'?renderFood:renderMore};(R2[UI.tab]||renderHome)();
   const v=document.getElementById('view');if(MORE_TABS.includes(UI.tab)&&UI.tab!=='more')v.insertAdjacentHTML('afterbegin',`<button class="backlink" data-a="tab" data-v="more">${IC.back}<span>More</span></button>`);
   if(UI.lastTab!==UI.tab){v.classList.remove('fadein');void v.offsetWidth;v.classList.add('fadein');UI.lastTab=UI.tab}}
 function markStart(d){const l=L(d);if(!l._t0){l._t0=Date.now();askAlerts()}if(d===todayS())wakeOn()}

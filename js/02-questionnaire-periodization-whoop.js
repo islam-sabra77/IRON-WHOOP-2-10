@@ -146,7 +146,10 @@ function defaultPhase(c){
   const gs=S.prof&&S.prof.ans&&S.prof.ans.goal==='strength'&&S.prof.sc&&S.prof.sc.lvl>=2;return gs?(c%2===0?'H':'S'):(c===0?'F':(c%2===1?'H':'S'))}
 function phaseForCycle(c){const dec=cycleDecision(c);if(dec)return dec.s;if(c<=0)return defaultPhase(0);
   if(S.custom&&S.custom.adapt!==false&&Object.keys(S.custom.cycles||{}).some(k=>+k<c))return nextPhase(phaseForCycle(c-1));return defaultPhase(c)}
-function phaseOf(d){
+/* phase per day is pure for a given plan, so it is cached until the next save or re-render */
+let PHC={};
+function phaseOf(d){const c=PHC[d];return c||(PHC[d]=phaseOfRaw(d))}
+function phaseOfRaw(d){
   const w=Math.max(1,weekNo(d)),cy=cycleOf(d),c=cy.c,pos=cy.pos,CL=cy.CL,n=CL-1,deload=pos===n;
   const s=phaseForCycle(c),dec=cycleDecision(c),fi=deload?5:FOCUS_SEQ[n][pos];
   return {w,c,b:c,pos,n,CL,s,deload,cw:pos+1,fi,off:deload?0:OFF_SEQ[n][pos],mainset:!deload&&pos>=3?1:0,vol:dec?dec.vol:0,dec,name:deload?'Deload':SCH[s].name,focus:WK_FOCUS[fi],rir:deload?'4':rirAt(s,pos,n)};

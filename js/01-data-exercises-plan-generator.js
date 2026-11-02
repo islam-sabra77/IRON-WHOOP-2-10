@@ -29,7 +29,7 @@ try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
 const FRESH=!S||typeof S!=='object';
 if(!S||typeof S!=='object')S=defaults();
 S=Object.assign(defaults(),S);
-function save(){S._u=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof syncSoon==='function')syncSoon()}
+function save(){S._u=Date.now();try{PHC={}}catch(e){}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof syncSoon==='function')syncSoon()}
 
 /* ---------- dates ---------- */
 const pad=n=>String(n).padStart(2,'0');
