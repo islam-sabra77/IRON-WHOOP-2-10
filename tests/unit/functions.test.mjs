@@ -64,7 +64,7 @@ test('timer alerts: exact send by the background function, cancel stops it, tick
   assert.equal((await post('schedule', { id: 'timerA1', sub, items: [{ at: t0 + 300, title: 'Rest is over' }] })).status, 200);
   await wait(new Request('http://x/', { method: 'POST', body: JSON.stringify({ key: 'job:timerA1' }) }));
   assert.deepEqual(sent, ['Rest is over']);
-  assert.ok(Date.now() - t0 >= 250, 'sent no earlier than due');
+  assert.ok(Date.now() - t0 >= 300, 'sent no earlier than due');
   await post('schedule', { id: 'timerB1', sub, items: [{ at: Date.now() + 200, title: 'Should not send' }] });
   await post('cancel', { id: 'timerB1' });
   await new Promise((r) => setTimeout(r, 300)); await tick();
