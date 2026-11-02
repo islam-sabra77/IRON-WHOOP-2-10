@@ -2,14 +2,18 @@
 /* ---------- timer ---------- */
 let TM=null,AC=null;
 function beep(f,len,n){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();for(let i=0;i<(n||1);i++){const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f||880;o.connect(g);g.connect(AC.destination);const t0=AC.currentTime+i*0.22;g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(0.35,t0+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+(len||0.18));o.start(t0);o.stop(t0+(len||0.18)+0.02)}}catch(e){}try{navigator.vibrate&&navigator.vibrate(n>1?[120,80,120]:80)}catch(e){}}
-function startTimer(title,phases,done){TM={title,phases,i:0,end:Date.now()+phases[0].s*1000,paused:false,left:0,done};beep(660,.08,1);drawTimer();}
+function startTimer(title,phases,done){TM={id:Date.now()+''+Math.random(),title,phases,i:0,end:Date.now()+phases[0].s*1000,paused:false,left:0,done};beep(660,.08,1);drawTimer();if(typeof timerChanged==='function')timerChanged();}
+/* The timer bar is built once per phase and afterwards only its text and ring are updated.
+   Rebuilding it several times a second made iPhone Safari drop taps anywhere on the page. */
 function drawTimer(){
-  const el=document.getElementById('timer');if(!TM){el.classList.add('hide');return}el.classList.remove('hide');
-  const p=TM.phases[TM.i],rem=TM.paused?TM.left:(TM.end-Date.now())/1000;const C=2*Math.PI*20,frac=Math.max(0,rem)/p.s;
-  const nxt=TM.phases[TM.i+1];
-  el.innerHTML=`<svg class="ringt" width="50" height="50" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(127,127,160,.35)" stroke-width="5"/><circle cx="25" cy="25" r="20" fill="none" stroke="${p.c||COLORS.cardio}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" transform="rotate(-90 25 25)"/></svg>
-  <div class="tt"><small>${esc(TM.title)}</small><small>${esc(p.l)}${nxt&&TM.phases.length<4?', then '+esc(nxt.l).toLowerCase():''}</small><b class="disp num">${fmtT(rem)}</b></div>
-  <button data-a="tadj" data-v="-15">−15</button><button data-a="tadj" data-v="15">+15</button><button data-a="tpause" aria-label="${TM.paused?'Resume':'Pause'}">${TM.paused?'▶':'❚❚'}</button><button data-a="tstop" aria-label="Stop timer">✕</button>`;
+  const el=document.getElementById('timer');if(!TM){if(!el.classList.contains('hide')){el.classList.add('hide');el.innerHTML='';el.dataset.sig=''}return}
+  const p=TM.phases[TM.i],rem=TM.paused?TM.left:(TM.end-Date.now())/1000;const C=2*Math.PI*20,frac=Math.max(0,Math.min(1,rem/p.s));
+  const nxt=TM.phases[TM.i+1],sig=TM.id+'|'+TM.i+'|'+(TM.paused?1:0);
+  if(el.dataset.sig!==sig){el.dataset.sig=sig;el.classList.remove('hide');
+    el.innerHTML=`<svg class="ringt" width="50" height="50" viewBox="0 0 50 50" aria-hidden="true"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(127,127,160,.35)" stroke-width="5"/><circle class="tprog" cx="25" cy="25" r="20" fill="none" stroke="${p.c||COLORS.cardio}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" transform="rotate(-90 25 25)"/></svg>
+  <div class="tt"><small>${esc(TM.title)}</small><small>${esc(p.l)}${nxt&&TM.phases.length<4?', then '+esc(nxt.l).toLowerCase():''}</small><b class="disp num" role="timer" aria-live="off">${fmtT(rem)}</b></div>
+  <button data-a="tadj" data-v="-15" aria-label="15 seconds less">−15</button><button data-a="tadj" data-v="15" aria-label="15 seconds more">+15</button><button data-a="tpause" aria-label="${TM.paused?'Resume':'Pause'}">${TM.paused?'▶':'❚❚'}</button><button data-a="tstop" aria-label="Stop timer">✕</button>`;el.dataset.txt='';}
+  const txt=fmtT(rem);if(el.dataset.txt!==txt){el.dataset.txt=txt;const b=el.querySelector('.tt b');if(b)b.textContent=txt;const c=el.querySelector('.tprog');if(c)c.setAttribute('stroke-dashoffset',String(C*(1-frac)))}
 }
 setInterval(()=>{if(!TM||TM.paused)return;const rem=(TM.end-Date.now())/1000;
   if(rem<=3.05&&rem>0&&Math.ceil(rem)!==TM.lastBeep){TM.lastBeep=Math.ceil(rem);beep(520,.07,1)}
@@ -44,8 +48,8 @@ function drawPlates(){
 let WAKE=null;
 async function wakeOn(){if(!prefs().wake||!('wakeLock' in navigator)||document.hidden)return;try{if(!WAKE){WAKE=await navigator.wakeLock.request('screen');WAKE.addEventListener('release',()=>{WAKE=null})}}catch(e){}}
 function wakeOff(){try{WAKE&&WAKE.release()}catch(e){}WAKE=null}
-function askAlerts(){if(prefs().alerts&&'Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}}
-function restAlert(title,body){if(!prefs().alerts)return;try{if('Notification' in window&&Notification.permission==='granted'){if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:'iron-rest',renotify:true,vibrate:[200,100,200],icon:'icon-512.png'}));else new Notification(title,{body,tag:'iron-rest'})}}catch(e){}}
+function askAlerts(){if(typeof pushSub==='function'&&prefs().alerts&&pushSupported()){pushSub(true)}if(prefs().alerts&&'Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}}
+function restAlert(title,body){if(!prefs().alerts||(TM&&TM.pushOk))return;try{if('Notification' in window&&Notification.permission==='granted'){if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:'iron-rest',renotify:true,vibrate:[200,100,200],icon:'icon-512.png'}));else new Notification(title,{body,tag:'iron-rest'})}}catch(e){}}
 let BGT=null;
 document.addEventListener('visibilitychange',()=>{clearTimeout(BGT);if(document.hidden&&TM&&!TM.paused){const ms=TM.end-Date.now(),ph=TM.phases[TM.i];if(ms>0)BGT=setTimeout(()=>restAlert(TM?TM.title+' is over':'Time is up',ph&&ph.l||''),ms)}if(!document.hidden&&(TM||(S.logs[todayS()]&&S.logs[todayS()]._t0&&!S.done[todayS()])))wakeOn()});
 /* RPE: how hard the set felt, 6 (easy) to 10 (nothing left) */
@@ -85,7 +89,7 @@ function drawFocus(){
   <div id="fxtimer" class="fxtimer"></div></div>`);fxTimer();
 }
 function groupsTotal(d){let all=0,done=0;blocksFor(d).forEach(b=>b.items.forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)}));coreFor(d).forEach(it=>{all+=it.rx.sets;done+=setsDone(d,it)});return{all,done}}
-function fxTimer(){const el=document.getElementById('fxtimer');if(!el)return;if(!TM){el.innerHTML='';return}const rem=Math.max(0,Math.ceil((TM.end-Date.now())/1000));el.innerHTML=`<span>${esc(TM.phases[TM.i].l)}</span><b class="disp num">${fmtT(rem)}</b>`}
+function fxTimer(){const el=document.getElementById('fxtimer');if(!el)return;if(!TM){if(el.innerHTML)el.innerHTML='';el.dataset.sig='';return}const rem=Math.max(0,Math.ceil((TM.end-Date.now())/1000)),sig=TM.id+'|'+TM.i;if(el.dataset.sig!==sig){el.dataset.sig=sig;el.innerHTML=`<span>${esc(TM.phases[TM.i].l)}</span><b class="disp num">${fmtT(rem)}</b>`}else{const b=el.querySelector('b'),t=fmtT(rem);if(b&&b.textContent!==t)b.textContent=t}}
 setInterval(()=>{if(UI.fx)fxTimer();if(TM&&!TM.paused){document.title=fmtT(Math.max(0,(TM.end-Date.now())/1000))+' · '+TM.title+' · IRON'}else if(document.title!=='IRON')document.title='IRON'},500);
 
 /* =====================================================================
@@ -111,7 +115,7 @@ function convText(t){
 }
 /* Arabic interface labels (exercise descriptions and the supplement guide stay in English) */
 const AR={'Home':'الرئيسية','Train':'التمرين','Plan':'الخطة','Builder':'المُنشئ','Progress':'التقدّم','Supps':'المكمّلات','Habits':'العادات','Travel':'السفر',
- 'Settings':'الإعدادات','Close':'إغلاق','Cancel':'إلغاء','Save':'حفظ','Done':'تم','Back':'رجوع','Next':'التالي','Undo':'تراجع','Add':'إضافة','Share':'مشاركة','Upload':'رفع','Sync now':'مزامنة الآن','↻ Sync':'↻ مزامنة',
+ 'Settings':'الإعدادات','Close':'إغلاق','Cancel':'إلغاء','Save':'حفظ','Done':'تم','Back':'رجوع','Next':'التالي','Undo':'تراجع','Add':'إضافة','Upload':'رفع','Sync now':'مزامنة الآن','↻ Sync':'↻ مزامنة',
  'Good morning':'صباح الخير','Good afternoon':'مساء الخير','Good evening':'مساء الخير','Today':'اليوم','This week':'هذا الأسبوع','Last workout':'آخر تمرين','Recovery':'التعافي','Sleep':'النوم','Strain':'الإجهاد','Workouts':'التمارين',
  'Volume this week':'الحجم هذا الأسبوع','Top lift':'أفضل رفعة','Strength':'القوة','Supplements':'المكمّلات','Streaks':'السلاسل','Body weight':'وزن الجسم','Weekly report':'التقرير الأسبوعي','Start session ›':'ابدأ الجلسة ›','Continue ›':'تابع ›','Rest day ›':'يوم راحة ›',
  'Mobility':'المرونة','Warm-up':'الإحماء','Core':'الجذع','Cardio':'الكارديو','Long cardio':'كارديو طويل','Rest day':'يوم راحة','Finish session':'إنهاء الجلسة','Session complete':'اكتملت الجلسة','Demo':'فيديو','Replace':'استبدال','Form':'الأداء','History':'السجل','Plates':'الأقراص',
@@ -126,7 +130,7 @@ const AR={'Home':'الرئيسية','Train':'التمرين','Plan':'الخطة'
  'Build or improve my stack':'أنشئ أو حسّن مكمّلاتي','Supplement guide':'دليل المكمّلات','Morning':'الصباح','Pre-workout':'قبل التمرين','Post-workout':'بعد التمرين','With meals':'مع الوجبات','Evening':'المساء',
  'Workout summary':'ملخص التمرين','Share image':'مشاركة الصورة','Save image':'حفظ الصورة','Copy as text':'نسخ كنص','Nice':'رائع','Session done':'انتهت الجلسة'};
 const AR_PART=[[/^Cycle (\d+) · week (\d+)\/(\d+)$/,'الدورة $1 · الأسبوع $2/$3'],[/^(\d+) of (\d+) sessions$/,'$1 من $2 جلسات'],[/^Set (\d+) of (\d+)/,'المجموعة $1 من $2']];
-function trText(t){if(!isAr())return t;const k=t.trim();if(!k)return t;if(AR[k])return t.replace(k,AR[k]);for(const[re,to]of AR_PART)if(re.test(k))return t.replace(k,k.replace(re,to));return t}
+function trText(t){if(!isAr())return t;const k=t.trim();if(!k)return t;if(AR[k])return t.replace(k,AR[k]);for(const[re,to]of AR_PART)if(re.test(k))return t.replace(k,k.replace(re,to));if(typeof arDyn==='function'){const d=arDyn(k);if(d)return t.replace(k,d)}return t}
 const ICON_LABEL={close:'Close',tstop:'Stop timer',tpause:'Pause or resume timer',tadj:'Adjust timer',set:'Mark set done',tset:'Start set timer',mob:'Mark done',excol:'Show or hide details',col:'Show or hide section',wk:'Change week',day:'Open day',demo:'Play video',settings:'Settings',swap:'Replace exercise',bdmove:'Move',bddel:'Remove',fxadj:'Adjust',pl8w:'Adjust weight',rpe:'Rate set',supp:'Mark taken',habday:'Toggle day',sdaytoggle:'Toggle day',habm:'Change month',sm:'Change month',hcol:'Colour',hemo:'Emoji'};
 function localizeNode(root){
   const doU=imperial(),doA=isAr();
@@ -134,7 +138,7 @@ function localizeNode(root){
   if(root.nodeType!==1||root.closest&&root.closest('[data-raw]'))return;
   if(doU||doA){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentNode&&(n.parentNode.nodeName==='SCRIPT'||n.parentNode.nodeName==='STYLE'||n.parentNode.closest('[data-raw]'))?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});const list=[];while(w.nextNode())list.push(w.currentNode);
     list.forEach(n=>{let v=n.nodeValue;if(doU)v=convText(v);if(doA)v=trText(v);if(v!==n.nodeValue)n.nodeValue=v});
-    if(doA)root.querySelectorAll&&root.querySelectorAll('[placeholder]').forEach(e=>{const p=e.getAttribute('placeholder');if(AR[p])e.setAttribute('placeholder',AR[p])})}
+    if(doA)root.querySelectorAll&&root.querySelectorAll('[placeholder]').forEach(e=>{const p=e.getAttribute('placeholder');const d=AR[p]||(typeof arDyn==='function'&&arDyn(p));if(d)e.setAttribute('placeholder',d)})}
   const btns=root.matches&&root.matches('button')?[root]:root.querySelectorAll?[...root.querySelectorAll('button')]:[];
   btns.forEach(b=>{if(b.hasAttribute('aria-label'))return;const tx=b.textContent.replace(/[\s✕✓−＋↑↓‹›❚▶…]/g,'');if(tx.length)return;b.setAttribute('aria-label',ICON_LABEL[b.dataset.a]||b.title||(b.dataset.a||'button').replace(/([a-z])([A-Z])/g,'$1 $2'))});
   // weight inputs show the display unit
@@ -144,7 +148,7 @@ function applyDisplay(){const p=prefs(),h=document.documentElement;h.lang=p.lang
 new MutationObserver(ms=>{if(!S||!S.prefs)return;for(const m of ms)m.addedNodes.forEach(n=>localizeNode(n))}).observe(document.body,{childList:true,subtree:true});
 
 /* ---------- actions ---------- */
-function rerender(){HISTCACHE=null;WICACHE={};renderTop();renderTabs();const R2={home:renderHome,train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits,more:renderMore,goals:typeof renderGoals==='function'?renderGoals:renderMore,food:typeof renderFood==='function'?renderFood:renderMore};(R2[UI.tab]||renderHome)();
+function rerender(){HISTCACHE=null;INJCACHE={};PHC={};WICACHE={};renderTop();renderTabs();const R2={home:renderHome,train:renderTrain,whoop:renderWhoop,travel:renderTravel,plan:renderPlan,build:renderBuild,progress:renderProgress,supps:renderSupps,habits:renderHabits,more:renderMore,goals:typeof renderGoals==='function'?renderGoals:renderMore,food:typeof renderFood==='function'?renderFood:renderMore};(R2[UI.tab]||renderHome)();
   const v=document.getElementById('view');if(MORE_TABS.includes(UI.tab)&&UI.tab!=='more')v.insertAdjacentHTML('afterbegin',`<button class="backlink" data-a="tab" data-v="more">${IC.back}<span>More</span></button>`);
   if(UI.lastTab!==UI.tab){v.classList.remove('fadein');void v.offsetWidth;v.classList.add('fadein');UI.lastTab=UI.tab}}
 function markStart(d){const l=L(d);if(!l._t0){l._t0=Date.now();askAlerts()}if(d===todayS())wakeOn()}
@@ -249,6 +253,7 @@ document.addEventListener('click',ev=>{
   case'obopen':closeSheet();openOnboarding();break;
   case'obclose':closeOnboarding();break;
   case'oblink':{const c=window.prompt('Paste the sync code from your other phone (Settings → Cloud backup):','');if(c)syncLink(c);break}
+  case'obquick':obQuick();break;
   case'obskip':closeOnboarding();UI.fresh=false;save();toast('Using the sample plan. Build your own anytime in Settings.');break;
   case'obrestore':if(window.confirm('Go back to your previous plan? Your logs stay.'))restorePlan();break;
   case'obback':UI.ob.step=Math.max(0,UI.ob.step-1);if(OB_STEPS[UI.ob.step]==='suppq'&&UI.ob.a.supps!=='quiz')UI.ob.step--;drawOb();break;
@@ -273,9 +278,9 @@ document.addEventListener('click',ev=>{
   case'resetsched':{if(resetSchedule()){rerender();toast('Schedule reset',()=>{undoSched()})}break}
   case'settings':settingsSheet();break;
   case'close':closeSheet();break;
-  case'tadj':if(TM){const dv=+el.dataset.v;if(TM.paused)TM.left=Math.max(1,TM.left+dv);else TM.end=Math.max(Date.now()+1000,TM.end+dv*1000);drawTimer()}break;
-  case'tpause':if(TM){if(TM.paused){TM.end=Date.now()+TM.left*1000;TM.paused=false}else{TM.left=(TM.end-Date.now())/1000;TM.paused=true}drawTimer()}break;
-  case'tstop':TM=null;drawTimer();break;
+  case'tadj':if(TM){const dv=+el.dataset.v;if(TM.paused)TM.left=Math.max(1,TM.left+dv);else TM.end=Math.max(Date.now()+1000,TM.end+dv*1000);drawTimer();timerChanged()}break;
+  case'tpause':if(TM){if(TM.paused){TM.end=Date.now()+TM.left*1000;TM.paused=false}else{TM.left=(TM.end-Date.now())/1000;TM.paused=true}drawTimer();timerChanged()}break;
+  case'tstop':{const old=TM;TM=null;drawTimer();if(old&&old.pushId){TM=old;timerChanged();TM=null}}break;
   case'prefset':{prefs()[el.dataset.f]=el.dataset.v;save();applyDisplay();rerender();settingsSheet();break}
   case'preftog':{const p2=prefs(),f2=el.dataset.f;p2[f2]=!p2[f2];if(f2==='alerts'&&p2.alerts)askAlerts();if(f2==='wake'&&!p2.wake)wakeOff();save();settingsSheet();break}
   case'plates':plateSheet(el.dataset.e,el.dataset.w);break;

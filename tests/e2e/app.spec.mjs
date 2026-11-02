@@ -114,3 +114,50 @@ test('five tabs, More opens the rest, back returns to More', async ({ page }) =>
   expect(await page.evaluate(() => UI.tab)).toBe('more');
   noErrors(page);
 });
+
+test('charts have axes and show a value when a point is tapped; recovery vs training card', async ({ page }) => {
+  await openApp(page);
+  await page.evaluate(() => {
+    const t = todayS();
+    for (let i = 1; i <= 6; i++) { const d = addD(t, -i * 3); S.logs[d] = { s0: { ex: 'bbBench', sets: [{ w: String(60 + i * 2.5), r: '5', d: 1 }, { w: '60', r: '5', d: 1 }] } }; }
+    S.whoop.connected = true; S.wdata = {}; for (let i = 0; i < 20; i++) S.wdata[addD(t, -i)] = { rec: 40 + (i % 5) * 10 };
+    save(); UI.tab = 'progress'; rerender();
+  });
+  await expect(page.locator('#rtc svg')).toBeVisible();
+  await expect(page.locator('#view')).toContainText('Recovery vs training');
+  await page.locator('#rtc [data-a="chartpt"]').last().dispatchEvent('click');
+  await expect(page.locator('#rtc .ctip')).toContainText('recovery');
+  await page.evaluate(() => liftSheet('bbBench'));
+  const ch = page.locator('#panel .achart').first();
+  await expect(ch.locator('text').first()).toBeVisible();
+  await ch.locator('.chit').last().dispatchEvent('click');
+  await expect(ch.locator('.ctip')).toContainText('kg');
+  noErrors(page);
+});
+
+test('exercises show a muscle map and supplements show an evidence grade', async ({ page }) => {
+  await openApp(page);
+  const r = await page.evaluate(() => ({ m: musclesOf('bbBench'), graded: SUPP_DB.filter((e) => e.g).length, n: SUPP_DB.length, cr: SUPP_DB.find((e) => e.id === 'creatine').g, tr: SUPP_DB.find((e) => e.id === 'tribulus').g }));
+  expect(r.m.p).toContain('chest');
+  expect(r.graded).toBe(r.n);
+  expect(r.cr).toBe('A');
+  expect(r.tr).toBe('D');
+  await page.evaluate(() => openPlayer('bbBench'));
+  await expect(page.locator('#panel .mmap')).toContainText('Chest');
+  await page.evaluate(() => guideSheet('creatine'));
+  await expect(page.locator('#panel .grade.gA').first()).toBeVisible();
+  noErrors(page);
+});
+
+test('Arabic translates exercise cues on demand, but never user-typed text', async ({ page }) => {
+  const sent = [];
+  await page.route('**/api/translate', async (r) => { const b = r.request().postDataJSON(); sent.push(...b.strings); r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ t: Object.fromEntries(b.strings.map((s) => [s, 'ترجمة ' + s.length])) }) }); });
+  await openApp(page);
+  await page.evaluate(() => { S.habits.push({ id: 'hx', n: 'My secret habit', e: '💧', c: '#00A3FF' }); prefs().lang = 'ar'; applyDisplay(); save(); UI.pl = { ex: 'bbBench' }; drawPlayer(); });
+  await expect.poll(() => sent.some((s) => s.startsWith('Shoulder blades pinned'))).toBe(true);
+  await expect(page.locator('#panel .cue')).toContainText('ترجمة');
+  await page.evaluate(() => { closeSheet(); UI.tab = 'habits'; rerender(); });
+  await page.waitForTimeout(600);
+  expect(sent.some((s) => s.includes('secret'))).toBe(false);
+  noErrors(page);
+});

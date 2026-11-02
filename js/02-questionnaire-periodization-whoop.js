@@ -2,9 +2,11 @@
 /* =====================================================================
    WELCOME QUESTIONNAIRE + ASSESSMENT
    ===================================================================== */
-const OB_STEPS=['welcome','about','goal','exp','schedule','equip','inj','test1','test2','stack','suppq','review'];
+const OB_STEPS=['welcome','about','goal','exp','schedule','equip','inj','test1','test2','stack','suppq','review'],OB_FULL=OB_STEPS.slice(),OB_QUICK=['welcome','goal','schedule','equip','inj','review'];
+function obFull(){OB_STEPS.length=0;OB_FULL.forEach(x=>OB_STEPS.push(x))}
+function obQuick(){OB_STEPS.length=0;OB_QUICK.forEach(x=>OB_STEPS.push(x));UI.ob.quick=true;if(UI.fresh){UI.ob.a.supps='starter';UI.ob.a.habits='starter'}UI.ob.step=1;drawOb()}
 function obDefaults(){const p=S.prof&&S.prof.ans;return p?JSON.parse(JSON.stringify(p)):{name:'',age:'',weight:'',goal:'muscle',exp:1,days:[0,1,3,4],longDay:6,len:60,weeks:12,start:addD(sunOf(todayS()),8),equip:'gym',cardio:'walk',inj:[],side:'none',pushups:'',squats:'',plank:'',toe:2,overhead:3,deepsq:3,balL:'',balR:'',supps:UI.fresh?'quiz':'keep',habits:UI.fresh?'starter':'keep'}}
-function openOnboarding(){UI.ob={step:UI.fresh?0:1,a:obDefaults()};drawOb();document.getElementById('onb').classList.remove('hide');document.body.style.overflow='hidden'}
+function openOnboarding(){obFull();UI.ob={step:UI.fresh?0:1,a:obDefaults()};drawOb();document.getElementById('onb').classList.remove('hide');document.body.style.overflow='hidden'}
 function closeOnboarding(){document.getElementById('onb').classList.add('hide');document.body.style.overflow='';UI.ob=null}
 const ch=(f,v,label,sub,multi)=>{const a=UI.ob.a;const on=multi?(a[f]||[]).includes(v):a[f]==v;return`<button class="obopt ${on?'on':''}" data-a="${multi?'obtog':'obpick'}" data-f="${f}" data-v="${v}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`};
 const inp=(f,label,ph,type,unit)=>`<label class="fl2">${label}</label><div class="obin"><input type="${type||'text'}" ${type==='number'?'inputmode="decimal"':''} data-in="ob" data-f="${f}" value="${esc(UI.ob.a[f]??'')}" placeholder="${ph||''}">${unit?`<em>${unit}</em>`:''}</div>`;
@@ -12,7 +14,7 @@ function drawOb(){
   const st=OB_STEPS[UI.ob.step],a=UI.ob.a,n=OB_STEPS.length;let h='';
   const head=(t,s)=>`<div class="obbar"><span style="width:${Math.round(UI.ob.step/(n-1)*100)}%"></span></div><h2 class="disp obh">${t}</h2>${s?`<p class="sub">${s}</p>`:''}`;
   if(st==='welcome')h=`<div class="obwelcome"><img src="${document.querySelector('.brandlogo img')?document.querySelector('.brandlogo img').src:''}" alt="IRON" class="obwm"><h2 class="disp obh" style="font-size:44px">Your training, built around you</h2><p class="sub" style="font-size:16px">Answer a few questions and do 7 quick self-tests (about 5 minutes). IRON then builds a progressive plan from ${EXDB_COUNT} exercises, matched to your goal, equipment, schedule and any injuries.</p>
-    <div class="obfeat"><span>🎯 Goal-based program</span><span>🎥 Video for every move</span><span>📈 Progresses every 6 weeks</span><span>⌚ Adjusts to WHOOP</span></div></div>`;
+    <div class="obfeat"><span>🎯 Goal-based program</span><span>🎥 Video for every move</span><span>📈 Progresses every 6 weeks</span><span>⌚ Adjusts to WHOOP</span></div><button class="cta ghost obquick" data-a="obquick"><b>Quick start · 1 minute</b><br><span class="muted" style="font-size:13px;font-weight:500">Just goal, days, equipment and injuries. Skip the self-tests.</span></button></div>`;
   if(st==='about')h=head('About you','So IRON can personalise loads and advice.')+inp('name','Your name','e.g. Omar')+`<div class="grid2">${inp('age','Age','e.g. 34','number','years')}${inp('weight','Weight','e.g. 82','number','kg')}</div>`;
   if(st==='goal')h=head('Main goal','Pick the one that matters most right now.')+ch('goal','muscle','💪 Build muscle','More size and shape, steady strength gains')+ch('goal','strength',''+IC.plate+' Get stronger','Heavier lifts, lower reps on the main moves')+ch('goal','fat','🔥 Lose fat','Keep muscle, add a bit more cardio')+ch('goal','health','❤️ Health and fitness','Feel good, move well, stay consistent');
   if(st==='exp')h=head('Training experience','How long have you trained with weights consistently?')+ch('exp',1,'Beginner','Less than 6 months, or coming back after a long break')+ch('exp',2,'Intermediate','6 months to 3 years, comfortable with the main lifts')+ch('exp',3,'Advanced','3+ years of structured training');
@@ -49,6 +51,7 @@ function obFinish(){
   const a=UI.ob.a,P=buildPlan(a);
   if(!UI.fresh&&!S.planBackup)S.planBackup={map:clone(S.map),start:S.start,end:S.end,moves:clone(S.moves),ext:clone(S.ext),prof:clone(S.prof)};
   S.prof={ans:a,plan:{tpls:P.tpls,mob:P.mob,wu:P.wu,rot:P.rot,target:P.target,cardioRange:P.cardioRange},sc:P.sc,created:todayS()};
+  if(typeof injList==='function'){const keep=injList().filter(x=>x.to);S.injuries=keep.concat((a.inj||[]).map((j,i)=>({id:'i'+Date.now()+i,j,from:'',to:'',note:''})))}
   S.map=P.map;S.start=a.start;S.end=addD(a.start,(+a.weeks||12)*7-1);S.moves={};S.custom=null;delete S.customPrev;S.ext=[];S.hist=[];S.swaps={};S.swapsAll={};
   if(a.supps==='empty')S.supps=[];
   if(a.supps==='quiz'&&a.sq){S.suppQ=clone(a.sq);S.supps=sqRecommend(a.sq).list.map(sqToSupp)}
@@ -143,7 +146,10 @@ function defaultPhase(c){
   const gs=S.prof&&S.prof.ans&&S.prof.ans.goal==='strength'&&S.prof.sc&&S.prof.sc.lvl>=2;return gs?(c%2===0?'H':'S'):(c===0?'F':(c%2===1?'H':'S'))}
 function phaseForCycle(c){const dec=cycleDecision(c);if(dec)return dec.s;if(c<=0)return defaultPhase(0);
   if(S.custom&&S.custom.adapt!==false&&Object.keys(S.custom.cycles||{}).some(k=>+k<c))return nextPhase(phaseForCycle(c-1));return defaultPhase(c)}
-function phaseOf(d){
+/* phase per day is pure for a given plan, so it is cached until the next save or re-render */
+let PHC={};
+function phaseOf(d){const c=PHC[d];return c||(PHC[d]=phaseOfRaw(d))}
+function phaseOfRaw(d){
   const w=Math.max(1,weekNo(d)),cy=cycleOf(d),c=cy.c,pos=cy.pos,CL=cy.CL,n=CL-1,deload=pos===n;
   const s=phaseForCycle(c),dec=cycleDecision(c),fi=deload?5:FOCUS_SEQ[n][pos];
   return {w,c,b:c,pos,n,CL,s,deload,cw:pos+1,fi,off:deload?0:OFF_SEQ[n][pos],mainset:!deload&&pos>=3?1:0,vol:dec?dec.vol:0,dec,name:deload?'Deload':SCH[s].name,focus:WK_FOCUS[fi],rir:deload?'4':rirAt(s,pos,n)};
@@ -317,7 +323,7 @@ function doSchedule(mode,target){
   save();return true}
 function resetSchedule(){const dates=Object.keys(S.moves);if(!dates.length&&JSON.stringify(S.map)===JSON.stringify(defaults().map)){toast('Your schedule is already the original');return false}
   snapSched('Reset schedule to the original plan',dates,dates,true);dates.forEach(d=>delete S.swaps[d]);S.moves={};S.map=defaults().map;save();return true}
-function exAt(d,slot,base){const p=S.swaps[d]&&S.swaps[d][slot];return p||S.swapsAll[base]||base}
+function exAt(d,slot,base){const p=S.swaps[d]&&S.swaps[d][slot];if(p)return p;const x=S.swapsAll[base]||base;return typeof injSwap==='function'?injSwap(d,x):x}
 function blocksFor(d){
   const k=tplOf(d);if(!k)return[];const t=T[k];if(!t.blocks)return[];
   if(readyOf(d)==='r')return[];
@@ -426,7 +432,6 @@ bolt:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 more:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>',
 body:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><path d="M6 9.5l6 1.5 6-1.5M12 11v5M9 21l3-5 3 5"/></svg>',
 back:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
-gear:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
 target:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>',
 food:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v5M9 3v5M17 21V3c-2 1-3 4-3 8h3"/></svg>',
 home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v8a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H5.5A1.5 1.5 0 0 1 4 19z"/></svg>',

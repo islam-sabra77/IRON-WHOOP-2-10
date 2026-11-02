@@ -17,7 +17,7 @@ globalThis.__ironStore = (name) => {
   const m = stores.get(name);
   return { get: async (k, o) => (m.has(k) ? (o && o.type === 'json' ? JSON.parse(m.get(k)) : m.get(k)) : null), setJSON: async (k, v) => { m.set(k, JSON.stringify(v)); }, delete: async (k) => { m.delete(k); } };
 };
-const tmp = path.join(root, '.fn-tmp'); fs.mkdirSync(tmp, { recursive: true }); // inside the repo so functions find node_modules
+const tmp = path.join(root, 'netlify', '.fn-tmp'); fs.mkdirSync(tmp, { recursive: true }); // inside netlify/ so functions find node_modules and ../lib
 const fns = {};
 for (const f of fs.readdirSync(path.join(root, 'netlify/functions'))) {
   if (!f.endsWith('.mjs')) continue;
@@ -26,7 +26,10 @@ for (const f of fs.readdirSync(path.join(root, 'netlify/functions'))) {
   const out = path.join(tmp, f);
   fs.writeFileSync(out, src);
   const mod = await import(pathToFileURL(out).href);
+  const name = f.replace(/\.mjs$/, '');
   if (mod.config && mod.config.path) fns[mod.config.path] = mod.default;
+  else if (name.endsWith('-background')) fns['/.netlify/functions/' + name] = async (req) => { mod.default(req).catch(() => {}); return new Response(null, { status: 202 }); };
+  else fns['/.netlify/functions/' + name] = mod.default; // scheduled functions can be triggered by hand in tests
 }
 
 http.createServer(async (req, res) => {

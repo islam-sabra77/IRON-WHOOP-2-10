@@ -160,9 +160,9 @@ function suppStreak(){let t=todayS(),n=0;const full=d=>S.supps.length&&S.supps.e
 function guideSheet(q){
   q=(q||'').toLowerCase().trim();const list=SUPP_DB.filter(e=>!q||e.n.toLowerCase().includes(q)||e.a.some(a=>a.includes(q))).sort((a,b)=>a.n.localeCompare(b.n));
   const inStack=e=>S.supps.some(s=>suppInfo(s.n)===e);
-  openSheet(`<h4 class="disp">Supplement guide</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${SUPP_DB.length} common supplements with benefits, dose and best time. Tap one to read more and add it to your stack.</p>
+  openSheet(`<h4 class="disp">Supplement guide</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${SUPP_DB.length} common supplements with benefits, dose and best time. Tap one to read more and add it to your stack.</p><p class="muted gleg" style="font-size:13px;margin:0 0 8px">Evidence: <span class="grade gA">A</span>strong <span class="grade gB">B</span>good <span class="grade gC">C</span>mixed <span class="grade gD">D</span>little</p>
   <input type="text" id="gq" data-in="gq" placeholder="Search, e.g. magnesium" value="${esc(q)}" autocomplete="off">
-  <div id="glist">${list.map(e=>`<details class="gitem"><summary><b>${esc(e.n)}</b><span>${esc(e.d)}</span>${inStack(e)?'<em>In your stack</em>':''}</summary>${suppInfoHTML(e)}${inStack(e)?'':`<button class="cta" style="--c:var(--cardio);margin-top:8px" data-a="gadd" data-v="${e.id}">${IC.plus} Add to my stack</button>`}</details>`).join('')||'<p class="muted">No match. Try another name.</p>'}</div>
+  <div id="glist">${list.map(e=>`<details class="gitem"><summary><b>${typeof gradeBadge==='function'?gradeBadge(e):''}${esc(e.n)}</b><span>${esc(e.d)}</span>${inStack(e)?'<em>In your stack</em>':''}</summary>${suppInfoHTML(e)}${inStack(e)?'':`<button class="cta" style="--c:var(--cardio);margin-top:8px" data-a="gadd" data-v="${e.id}">${IC.plus} Add to my stack</button>`}</details>`).join('')||'<p class="muted">No match. Try another name.</p>'}</div>
   <button class="cta ghost" data-a="close">Close</button>`);
 }
 function suppSheet(id,pre){
@@ -253,7 +253,7 @@ function drawPlayer(){
   const ex=UI.pl.ex,e=E[ex],id=ytId(ex),c=playerColor();
   openSheet(`<h4 class="disp">${esc(e.n)}</h4>
   <div class="stage vid">${id?`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1" title="${esc(e.n)} demo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`:`<p style="padding:24px;color:#fff">No video saved for this move yet. <a style="color:#fff;text-decoration:underline" href="${esc(vidUrl(ex))}" target="_blank" rel="noopener">Find one on YouTube</a>, then tap “Use a different video” below and paste its link.</p>`}</div>
-  <div class="cue" style="margin-top:10px;font-size:15px">${esc(cueOf(e))}${sideNote(e,1)}</div>${e.p?`<span class="chipinj" style="--c:${c}">Protects: ${esc(protOf(e))}</span>`:''}
+  <div class="cue" style="margin-top:10px;font-size:15px">${esc(cueOf(e))}${sideNote(e,1)}</div>${e.p?`<span class="chipinj" style="--c:${c}">Protects: ${esc(protOf(e))}</span>`:''}${muscleMap(ex,c)}
   <div class="pctl" style="--c:${c};margin-top:12px"><button data-a="vidchange" data-e="${ex}">Use a different video</button>${S.vids[ex]?`<button data-a="vidreset" data-e="${ex}">Back to default</button>`:''}</div>
   ${id?`<div class="pnote">If this video won't play here, <a href="https://www.youtube.com/shorts/${id}" target="_blank" rel="noopener">open it on YouTube</a>.</div>`:''}
   <button class="cta ghost" data-a="close">Close</button>`);
@@ -291,7 +291,7 @@ function altsFor(slot,base,cur){
   add(base);(E[base].a||[]).forEach(add);
   const mb=META[base];
   if(mb){
-    const a=S.prof&&S.prof.ans,eqs=a?eqList(a.equip):null,inj=new Set((a&&a.inj)||[]);
+    const a=S.prof&&S.prof.ans,eqs=a?eqList(a.equip):null,inj=injOn(UI.date||todayS());
     const score=id=>{const m=META[id];return(eqs&&!eqs.includes(m.eq)?4:0)+(m.av.some(j=>inj.has(j))?3:0)+Math.abs(m.lvl-mb.lvl)+(YT[id]?0:1)+(m.eq===mb.eq?-.5:0)+(!!E[id].t!==!!E[base].t?2:0)};
     const rank=pats=>Object.keys(META).filter(id=>E[id]&&pats.includes(META[id].pat)).sort((x,y)=>score(x)-score(y));
     for(const id of rank([mb.pat])){if(out.length>=MAX)break;add(id)}
@@ -451,22 +451,28 @@ function bkLoad(){const inp=document.createElement('input');inp.type='file';inp.
 function settingsSheet(){
   const th=document.documentElement.getAttribute('data-theme')||'auto';
   openSheet(`<h4 class="disp">Settings</h4>
+  <nav class="setnav" aria-label="Settings sections">${[['display','Display'],['workouts','Workouts'],['remcard','Reminders'],['set-plan','Plan'],['injcard','Injuries'],['set-whoop','WHOOP'],['set-data','Data']].map(([k,l])=>`<button class="pill" data-a="setjump" data-v="${k.startsWith('set-')||k.endsWith('card')?k:'set-'+k}">${l}</button>`).join('')}</nav>
+  <div class="card" id="set-display" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Display</h4>
   <div class="srow"><b>Theme</b><select data-in="theme"><option value="auto" ${th==='auto'?'selected':''}>Match my device</option><option value="light" ${th==='light'?'selected':''}>Light</option><option value="dark" ${th==='dark'?'selected':''}>Dark</option></select></div>
-  <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Your plan</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${S.prof?`Built from your questionnaire on ${nice(S.prof.created)}.`:'Answer the questionnaire and 7 quick self-tests to get a plan built around your goal, equipment, schedule and injuries.'}</p><button class="cta" style="--c:var(--upper);margin:0" data-a="obopen">${S.prof?'Retake the questionnaire':'Build my personal plan'}</button>${S.planBackup?'<button class="cta ghost" data-a="obrestore">Restore my previous plan</button>':''}</div>
-  <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">WHOOP</h4>
+  <label class="fl2">Units</label><div class="obrow"><button class="obopt ${!imperial()?'on':''}" data-a="prefset" data-f="unit" data-v="kg"><b>Metric (kg, cm)</b></button><button class="obopt ${imperial()?'on':''}" data-a="prefset" data-f="unit" data-v="lb"><b>Imperial (lb, in)</b></button></div>
+  <label class="fl2">Language</label><div class="obrow"><button class="obopt ${!isAr()?'on':''}" data-a="prefset" data-f="lang" data-v="en"><b>English</b></button><button class="obopt ${isAr()?'on':''}" data-a="prefset" data-f="lang" data-v="ar"><b>العربية</b></button></div>
+  ${isAr()?'<p class="muted" style="font-size:13px;margin:4px 0 0">تُترجم أوصاف التمارين ودليل المكمّلات تلقائيًا عند فتحها أول مرة.</p>':''}
+  <label class="fl2">Text size</label><div class="obrow"><button class="obopt ${(prefs().ts||'n')==='n'?'on':''}" data-a="prefset" data-f="ts" data-v="n"><b>Normal</b></button><button class="obopt ${prefs().ts==='l'?'on':''}" data-a="prefset" data-f="ts" data-v="l"><b>Large</b></button><button class="obopt ${prefs().ts==='xl'?'on':''}" data-a="prefset" data-f="ts" data-v="xl"><b>Larger</b></button></div></div>
+  <div class="card" id="set-workouts" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Workouts</h4>
+  ${[['rpe','Ask how hard each set felt (RPE)','Rate sets 6–10; weight suggestions use it'],['wake','Keep the screen on during a session','So the timer and sets stay visible'],['alerts','Alert me when rest is over','Sound, vibration and a notification if the app is in the background']].map(([f,l,sub])=>`<button class="obopt ${prefs()[f]?'on':''}" data-a="preftog" data-f="${f}"><b>${prefs()[f]?'✓ ':''}${l}</b><span>${sub}</span></button>`).join('')}
+  <div class="note" style="margin-top:8px"><b>Background alerts:</b> ${pushStatus()}</div><div class="grid2"><button class="cta ghost" style="margin:0" data-a="pushon">Turn on alerts</button><button class="cta ghost" style="margin:0" data-a="pushtest">Test in 10 s</button></div>
+  <button class="cta ghost" data-a="plates" data-e="">${IC.plate} Plate calculator</button></div>
+  ${remCard()}
+  <div class="card" id="set-plan" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Your plan</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${S.prof?`Built from your questionnaire on ${nice(S.prof.created)}.`:'Answer the questionnaire and 7 quick self-tests to get a plan built around your goal, equipment, schedule and injuries.'}</p><button class="cta" style="--c:var(--upper);margin:0" data-a="obopen">${S.prof?'Retake the questionnaire':'Build my personal plan'}</button>${S.planBackup?'<button class="cta ghost" data-a="obrestore">Restore my previous plan</button>':''}</div>
+  ${injCard()}
+  <div class="card" id="set-whoop" style="margin-top:12px"><h4 class="disp" style="font-size:22px">WHOOP</h4>
   ${!WH_ON?`<p class="muted" style="font-size:14px;margin:0">WHOOP works once IRON is online on your Netlify site.</p>`:S.whoop.connected?`<p style="font-size:14px;margin:0 0 8px">Connected. Last sync ${S.whoop.last?new Date(S.whoop.last).toLocaleString([], {weekday:'short',hour:'2-digit',minute:'2-digit'}):'never'}.</p>
   <div class="srow"><b>Auto-adjust</b><button class="cta ${S.whoop.auto?'':'ghost'}" style="--c:var(--ok);margin:0;height:44px" data-a="wauto">${S.whoop.auto?'On: workouts follow WHOOP':'Off: I choose manually'}</button></div>
   <div class="grid2" style="margin-top:8px"><button class="cta ghost" style="margin:0" data-a="wsync">Sync now</button><button class="cta ghost" style="margin:0;color:var(--bad)" data-a="wdisconnect">Disconnect</button></div>`:`${S.whoop.pending?`<p style="font-size:14px;margin:0 0 8px"><b>Waiting for WHOOP approval.</b> If the login finished in Safari, come back here and tap Check connection.</p><button class="cta ghost" style="margin:0 0 8px" data-a="wsync">Check connection</button>`:''}<p class="muted" style="font-size:14px;margin:0 0 8px">Pull your recovery, HRV and resting heart rate every morning and adjust each workout automatically.</p><button class="cta" style="--c:var(--ink);color:var(--bg);margin:0" data-a="wconnect">Connect WHOOP</button>`}
   <p class="muted" style="font-size:13px;margin:8px 0 0">Green 67%+ full session. Yellow 34–66% lighter. Red 33% or less recovery only. HRV 10%+ below your 30-day average, or resting HR 5+ bpm above it, drops the day one level.</p></div>
-  <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Display</h4>
-  <label class="fl2">Units</label><div class="obrow"><button class="obopt ${!imperial()?'on':''}" data-a="prefset" data-f="unit" data-v="kg"><b>Metric (kg, cm)</b></button><button class="obopt ${imperial()?'on':''}" data-a="prefset" data-f="unit" data-v="lb"><b>Imperial (lb, in)</b></button></div>
-  <label class="fl2">Language</label><div class="obrow"><button class="obopt ${!isAr()?'on':''}" data-a="prefset" data-f="lang" data-v="en"><b>English</b></button><button class="obopt ${isAr()?'on':''}" data-a="prefset" data-f="lang" data-v="ar"><b>العربية</b></button></div>
-  ${isAr()?'<p class="muted" style="font-size:13px;margin:4px 0 0">تبقى أوصاف التمارين ودليل المكمّلات باللغة الإنجليزية.</p>':''}
-  <label class="fl2">Text size</label><div class="obrow"><button class="obopt ${(prefs().ts||'n')==='n'?'on':''}" data-a="prefset" data-f="ts" data-v="n"><b>Normal</b></button><button class="obopt ${prefs().ts==='l'?'on':''}" data-a="prefset" data-f="ts" data-v="l"><b>Large</b></button><button class="obopt ${prefs().ts==='xl'?'on':''}" data-a="prefset" data-f="ts" data-v="xl"><b>Larger</b></button></div></div>
-  <div class="card" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Workouts</h4>
-  ${[['rpe','Ask how hard each set felt (RPE)','Rate sets 6–10; weight suggestions use it'],['wake','Keep the screen on during a session','So the timer and sets stay visible'],['alerts','Alert me when rest is over','Sound, vibration and a notification if the app is in the background']].map(([f,l,sub])=>`<button class="obopt ${prefs()[f]?'on':''}" data-a="preftog" data-f="${f}"><b>${prefs()[f]?'✓ ':''}${l}</b><span>${sub}</span></button>`).join('')}
-  <button class="cta ghost" data-a="plates" data-e="">${IC.plate} Plate calculator</button></div>
+  <h4 class="disp" id="set-data" style="font-size:22px;margin:18px 0 6px">Your data</h4>
   <button class="card setlink" style="margin-top:12px" data-a="syncopen"><h4 class="disp" style="font-size:22px;margin:0">${IC.cloud} Cloud backup ›</h4><span class="muted" style="font-size:14px">${syncOn()?'On'+(S.sync.at?' · last backup '+new Date(S.sync.at).toLocaleString([],{weekday:'short',hour:'2-digit',minute:'2-digit'}):''):'Off. Turn it on so you never lose your logs.'}</span></button>
+  <button class="cta ghost" data-a="privacy">Privacy and your data</button><button class="cta ghost" data-a="feedback">Send feedback</button>
   <button class="cta ghost" data-a="errlog">${IC.alert} Error log${(typeof errList==='function'&&errList().length)?' ('+errList().length+')':''}</button>
   <button class="cta ghost" style="color:var(--bad)" data-a="reset">Reset everything</button>`);
 }
