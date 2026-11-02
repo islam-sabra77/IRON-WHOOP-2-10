@@ -39,3 +39,25 @@ Object.assign(AR,{
  'Quick start · 1 minute':'بداية سريعة · دقيقة واحدة','Display':'العرض','Workouts':'التمارين','Plan':'الخطة','Injuries':'الإصابات','Data':'البيانات','Your data':'بياناتك',
  'Background alerts:':'التنبيهات في الخلفية:','Turn on alerts':'فعّل التنبيهات','Test in 10 s':'تجربة خلال 10 ث','Evidence':'الأدلة','Strong evidence':'أدلة قوية','Good evidence':'أدلة جيدة','Mixed evidence':'أدلة متباينة','Little evidence':'أدلة قليلة',
  'FRONT':'أمام','BACK':'خلف'});
+/* the new Home */
+Object.assign(AR,{
+ 'Green day':'يوم أخضر','Yellow day':'يوم أصفر','Red day':'يوم أحمر','Recovery':'التعافي','Today':'اليوم','Yesterday':'أمس','Tomorrow':'غدًا','Done':'تم','Recover':'تعافٍ','Missed':'فائت','Planned':'مخطط',
+ 'Full session today. Tap to see why':'جلسة كاملة اليوم. اضغط لمعرفة السبب','Lighter session today. Tap to see why':'جلسة أخف اليوم. اضغط لمعرفة السبب','Recovery only today. Tap to see why':'تعافٍ فقط اليوم. اضغط لمعرفة السبب',
+ 'Full session today. Tap to hide':'جلسة كاملة اليوم. اضغط للإخفاء','Lighter session today. Tap to hide':'جلسة أخف اليوم. اضغط للإخفاء','Recovery only today. Tap to hide':'تعافٍ فقط اليوم. اضغط للإخفاء',
+ 'Open Body ›':'افتح الجسم ›','How do you feel today?':'كيف تشعر اليوم؟','A 10-second readiness check sets today’s intensity':'فحص جاهزية في 10 ثوانٍ يحدد شدة اليوم','Connect WHOOP to do this automatically ›':'اربط WHOOP ليتم ذلك تلقائيًا ›',
+ 'No recovery yet':'لا يوجد تعافٍ بعد','Outside your plan':'خارج خطتك','Open the plan':'افتح الخطة','Walk, stretch and sleep well':'امشِ وتمدد ونم جيدًا',
+ 'See today’s session':'اعرض جلسة اليوم','See this session':'اعرض هذه الجلسة','Log it now':'سجّلها الآن','Preview this day':'اعرض هذا اليوم','Share this workout':'شارك هذا التمرين',
+ 'Today’s checks':'مهام اليوم','All done. Nice work.':'أنجزت كل شيء. عمل رائع.','Build your supplement stack':'أنشئ قائمة مكمّلاتك','Estimated 1-rep max':'أقصى تكرار تقديري',
+ 'At a glance':'لمحة سريعة','Volume this week':'الحجم هذا الأسبوع','Weekly report':'التقرير الأسبوعي','Goal':'الهدف','Goals':'الأهداف','Set one':'حدّد هدفًا','A target with a date':'هدف بموعد',
+ 'Body':'الجسم','Upload InBody':'ارفع InBody','Photo or PDF':'صورة أو PDF','Latest weight':'آخر وزن','Travel':'السفر','No trips':'لا رحلات','On a trip':'في رحلة','Plan a hotel workout':'خطط لتمرين في الفندق',
+ 'Sun':'أحد','Mon':'اثنين','Tue':'ثلاثاء','Wed':'أربعاء','Thu':'خميس','Fri':'جمعة','Sat':'سبت','This week already counts.':'هذا الأسبوع محسوب بالفعل.'});
+AR_PART.push(
+ [/^Good morning, (.+)$/,'صباح الخير، $1'],[/^Good afternoon, (.+)$/,'مساء الخير، $1'],[/^Good evening, (.+)$/,'مساء الخير، $1'],
+ [/^Good morning$/,'صباح الخير'],[/^Good afternoon$/,'مساء الخير'],[/^Good evening$/,'مساء الخير'],
+ [/^(\d+) moves · about (.+?)( · trimmed for recovery)?$/,(m,a,b,c)=>a+' تمارين · نحو '+b+(c?' · مخففة للتعافي':'')],
+ [/^Start ([A-Z][^ ]* [A-Z0-9])$/,'ابدأ $1'],[/^Continue · (\d+)% done$/,'تابع · $1% منجز'],
+ [/^Protein (\d+) of (\d+) g$/,'البروتين $1 من $2 غ'],[/^(.+) to go$/,'متبقٍ: $1'],
+ [/^(\d+)-week streak\.$/,'سلسلة $1 أسابيع.'],[/^(\d+) more sessions? this week keeps it going\.$/,'$1 جلسات إضافية هذا الأسبوع تحافظ عليها.'],
+ [/^([+-]?\d+) kg since (.+)$/,'$1 كغ منذ $2'],[/^Cycle (\d+) · week (\d+)\/(\d+)$/,'الدورة $1 · الأسبوع $2/$3'],[/^(\d+) sets$/,'$1 مجموعات']);
+Object.assign(AR,{'Weekly report · new':'التقرير الأسبوعي · جديد','+20 g':'+20 غ'});
+AR_PART.push([/^sessions last week · (\d+) PRs?$/,'جلسات الأسبوع الماضي · $1 أرقام قياسية'],[/^\+(\d+) more$/,'+$1 أخرى']);

@@ -20,7 +20,7 @@ export async function sendPush(store, sub, msg) {
 export async function flushJob(store, key, now = Date.now()) {
   const job = await store.get(key, { type: 'json' });
   if (!job || job.cancelled) return { done: true };
-  const due = job.items.filter((it) => !it.sent && it.at <= now + 250);
+  const due = job.items.filter((it) => !it.sent && it.at <= now);
   if (due.length) {
     due.forEach((it) => { it.sent = now; });
     await store.setJSON(key, job);

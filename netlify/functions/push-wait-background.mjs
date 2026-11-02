@@ -11,6 +11,6 @@ export default async (req) => {
   for (;;) {
     const r = await flushJob(store, key);
     if (r.done || !r.next || r.next > stop) return;
-    await sleep(Math.max(200, r.next - Date.now()));
+    await sleep(Math.max(20, r.next - Date.now() + 5));
   }
 };
