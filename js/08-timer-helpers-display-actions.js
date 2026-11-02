@@ -115,7 +115,7 @@ function convText(t){
 }
 /* Arabic interface labels (exercise descriptions and the supplement guide stay in English) */
 const AR={'Home':'الرئيسية','Train':'التمرين','Plan':'الخطة','Builder':'المُنشئ','Progress':'التقدّم','Supps':'المكمّلات','Habits':'العادات','Travel':'السفر',
- 'Settings':'الإعدادات','Close':'إغلاق','Cancel':'إلغاء','Save':'حفظ','Done':'تم','Back':'رجوع','Next':'التالي','Undo':'تراجع','Add':'إضافة','Share':'مشاركة','Upload':'رفع','Sync now':'مزامنة الآن','↻ Sync':'↻ مزامنة',
+ 'Settings':'الإعدادات','Close':'إغلاق','Cancel':'إلغاء','Save':'حفظ','Done':'تم','Back':'رجوع','Next':'التالي','Undo':'تراجع','Add':'إضافة','Upload':'رفع','Sync now':'مزامنة الآن','↻ Sync':'↻ مزامنة',
  'Good morning':'صباح الخير','Good afternoon':'مساء الخير','Good evening':'مساء الخير','Today':'اليوم','This week':'هذا الأسبوع','Last workout':'آخر تمرين','Recovery':'التعافي','Sleep':'النوم','Strain':'الإجهاد','Workouts':'التمارين',
  'Volume this week':'الحجم هذا الأسبوع','Top lift':'أفضل رفعة','Strength':'القوة','Supplements':'المكمّلات','Streaks':'السلاسل','Body weight':'وزن الجسم','Weekly report':'التقرير الأسبوعي','Start session ›':'ابدأ الجلسة ›','Continue ›':'تابع ›','Rest day ›':'يوم راحة ›',
  'Mobility':'المرونة','Warm-up':'الإحماء','Core':'الجذع','Cardio':'الكارديو','Long cardio':'كارديو طويل','Rest day':'يوم راحة','Finish session':'إنهاء الجلسة','Session complete':'اكتملت الجلسة','Demo':'فيديو','Replace':'استبدال','Form':'الأداء','History':'السجل','Plates':'الأقراص',

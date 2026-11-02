@@ -19,5 +19,12 @@ jobs:
         working-directory: .
       - run: npm install
       - run: npx playwright install --with-deps chromium
+      - run: npm run lint
       - run: npm run unit
       - run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screens
+          path: tests/screens/
+          if-no-files-found: ignore

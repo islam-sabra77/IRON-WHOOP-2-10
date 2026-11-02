@@ -5,9 +5,12 @@
   "scripts": {
     "unit": "node --test \"unit/*.test.mjs\"",
     "e2e": "playwright test",
-    "test": "npm run unit && playwright test"
+    "test": "npm run lint && npm run unit && playwright test",
+    "lint": "node lint.mjs"
   },
   "devDependencies": {
-    "@playwright/test": "~1.63.0"
+    "@playwright/test": "~1.63.0",
+    "eslint": "^9.39.5",
+    "globals": "^15.15.0"
   }
 }
