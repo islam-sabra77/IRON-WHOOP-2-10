@@ -1,12 +1,12 @@
 // IRON service worker: the app opens and works without a connection.
 // App files are network-first (always fresh when online) with the cache as the offline fallback.
 // API calls are never cached. Exercise thumbnails and fonts are cached as you view them.
-const VERSION = 'iron-2026-11-01-4';
+const VERSION = 'iron-2026-11-02-1';
 const SHELL = [
   './', 'index.html', 'css/app.css',
   'js/01-data-exercises-plan-generator.js', 'js/02-questionnaire-periodization-whoop.js', 'js/03-home-train-share.js',
   'js/04-plan-travel-whoop-inbody.js', 'js/05-progress-builder-coaching.js', 'js/06-supplement-guide.js',
-  'js/07-supps-habits-videos-sync.js', 'js/08-timer-helpers-display-actions.js', 'js/09-errors.js', 'js/10-goals-nutrition.js', 'js/99-boot.js',
+  'js/07-supps-habits-videos-sync.js', 'js/08-timer-helpers-display-actions.js', 'js/09-errors.js', 'js/10-goals-nutrition.js', 'js/11-push.js', 'js/99-boot.js',
   'manifest.webmanifest', 'icon-512.png', 'apple-touch-icon.png', 'privacy.html',
 ];
 const EXTERNAL = ['i.ytimg.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
@@ -34,6 +34,16 @@ self.addEventListener('fetch', (e) => {
       return hit || net;
     })));
   }
+});
+// Push messages: rest-timer alerts and reminders sent by the server.
+self.addEventListener('push', (e) => {
+  let m = {}; try { m = e.data ? e.data.json() : {}; } catch { m = { title: 'IRON', body: e.data ? e.data.text() : '' }; }
+  const ios = /iPhone|iPad|iPod/.test(self.navigator.userAgent);
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((cs) => {
+    const open = cs.some((c) => c.visibilityState === 'visible' && c.focused);
+    if (open && !ios) { cs.forEach((c) => c.postMessage({ type: 'push', m })); return; } // the app on screen already beeped
+    return self.registration.showNotification(m.title || 'IRON', { body: m.body || '', tag: m.tag || 'iron', renotify: true, vibrate: [200, 100, 200, 100, 300], icon: 'icon-512.png', badge: 'icon-512.png', requireInteraction: false });
+  }));
 });
 // Tapping a rest-timer notification brings the app back.
 self.addEventListener('notificationclick', (e) => {

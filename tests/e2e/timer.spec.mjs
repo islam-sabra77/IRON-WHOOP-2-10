@@ -20,3 +20,21 @@ test('timer bar stays still while counting, so taps always land', async ({ page 
   await expect(page.locator('#timer')).toBeHidden();
   noErrors(page);
 });
+
+test('rest timer schedules a background alert, reschedules on +15 and cancels on stop', async ({ page }) => {
+  const calls = [];
+  await page.route('**/api/push?step=*', async (r) => { const u = new URL(r.request().url()); calls.push({ step: u.searchParams.get('step'), body: r.request().postDataJSON() }); r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }); });
+  await openApp(page);
+  await page.evaluate(() => { PUSH_SUB = { endpoint: 'https://push.example/x', keys: { p256dh: 'a', auth: 'b' } }; });
+  await page.evaluate(() => startTimer('Rest', [{ l: 'Set 2 is next', s: 90, c: '#2F5BFF' }]));
+  await expect.poll(() => calls.filter((c) => c.step === 'schedule').length).toBe(1);
+  const first = calls.find((c) => c.step === 'schedule').body.items[0];
+  expect(first.title).toBe('Rest is over');
+  expect(Math.abs(first.at - Date.now() - 90000)).toBeLessThan(3000);
+  await page.click('#timer [data-a="tadj"][data-v="15"]');
+  await expect.poll(() => calls.filter((c) => c.step === 'schedule').length).toBe(2);
+  expect(calls.filter((c) => c.step === 'cancel').length).toBe(1);
+  await page.click('#timer [data-a="tstop"]');
+  await expect.poll(() => calls.filter((c) => c.step === 'cancel').length).toBe(2);
+  noErrors(page);
+});

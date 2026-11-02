@@ -11,7 +11,7 @@ const stores = new Map();
 globalThis.__ironStore = (n) => { if (!stores.has(n)) stores.set(n, new Map()); const m = stores.get(n); return { get: async (k, o) => (m.has(k) ? (o && o.type === 'json' ? JSON.parse(m.get(k)) : m.get(k)) : null), setJSON: async (k, v) => m.set(k, JSON.stringify(v)), delete: async (k) => m.delete(k) }; };
 async function load(name) {
   const src = fs.readFileSync(path.join(root, 'netlify/functions', name), 'utf8').replace(/^import \{ getStore \} from '@netlify\/blobs';/m, 'const getStore = (n) => globalThis.__ironStore(n);');
-  const dir = path.join(root, '.fn-tmp'); fs.mkdirSync(dir, { recursive: true }); const f = path.join(dir, 'unit-' + name); fs.writeFileSync(f, src);
+  const dir = path.join(root, 'netlify', '.fn-tmp'); fs.mkdirSync(dir, { recursive: true }); const f = path.join(dir, 'unit-' + name); fs.writeFileSync(f, src);
   return (await import(pathToFileURL(f).href)).default;
 }
 const key = 'a'.repeat(64);
@@ -52,4 +52,25 @@ test('passkey endpoints reject a foreign origin', async () => {
   const ok = await pk(new Request('http://x/api/passkey?step=reg-options', { method: 'POST', headers: { host: 'iron.example', origin: 'https://iron.example' }, body: '{}' }));
   assert.equal(ok.status, 200);
   assert.ok((await ok.json()).options.challenge);
+});
+
+test('timer alerts: exact send by the background function, cancel stops it, tick is the fallback', async () => {
+  const sent = []; globalThis.__ironPushSend = async (sub, msg) => { sent.push(msg.title); return 'ok'; };
+  const push = await load('push.mjs'), wait = await load('push-wait-background.mjs'), tick = await load('push-tick.mjs');
+  const sub = { endpoint: 'https://push.example/abc', keys: { p256dh: 'x', auth: 'y' } };
+  const post = (step, body) => push(new Request('http://x/api/push?step=' + step, { method: 'POST', body: JSON.stringify(body) }));
+  assert.equal((await push(new Request('http://x/api/push?step=key'))).status, 200);
+  const t0 = Date.now();
+  assert.equal((await post('schedule', { id: 'timerA1', sub, items: [{ at: t0 + 300, title: 'Rest is over' }] })).status, 200);
+  await wait(new Request('http://x/', { method: 'POST', body: JSON.stringify({ key: 'job:timerA1' }) }));
+  assert.deepEqual(sent, ['Rest is over']);
+  assert.ok(Date.now() - t0 >= 250, 'sent no earlier than due');
+  await post('schedule', { id: 'timerB1', sub, items: [{ at: Date.now() + 200, title: 'Should not send' }] });
+  await post('cancel', { id: 'timerB1' });
+  await new Promise((r) => setTimeout(r, 300)); await tick();
+  assert.deepEqual(sent, ['Rest is over']);
+  await post('reminders', { device: 'device01', sub, items: [{ at: Date.now() - 1000, title: 'Supplements' }, { at: Date.now() + 3600_000, title: 'Later' }] });
+  await tick(); await tick();
+  assert.deepEqual(sent, ['Rest is over', 'Supplements']);
+  delete globalThis.__ironPushSend;
 });

@@ -2,7 +2,7 @@
 /* ---------- timer ---------- */
 let TM=null,AC=null;
 function beep(f,len,n){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();for(let i=0;i<(n||1);i++){const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f||880;o.connect(g);g.connect(AC.destination);const t0=AC.currentTime+i*0.22;g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(0.35,t0+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+(len||0.18));o.start(t0);o.stop(t0+(len||0.18)+0.02)}}catch(e){}try{navigator.vibrate&&navigator.vibrate(n>1?[120,80,120]:80)}catch(e){}}
-function startTimer(title,phases,done){TM={id:Date.now()+''+Math.random(),title,phases,i:0,end:Date.now()+phases[0].s*1000,paused:false,left:0,done};beep(660,.08,1);drawTimer();}
+function startTimer(title,phases,done){TM={id:Date.now()+''+Math.random(),title,phases,i:0,end:Date.now()+phases[0].s*1000,paused:false,left:0,done};beep(660,.08,1);drawTimer();if(typeof timerChanged==='function')timerChanged();}
 /* The timer bar is built once per phase and afterwards only its text and ring are updated.
    Rebuilding it several times a second made iPhone Safari drop taps anywhere on the page. */
 function drawTimer(){
@@ -48,8 +48,8 @@ function drawPlates(){
 let WAKE=null;
 async function wakeOn(){if(!prefs().wake||!('wakeLock' in navigator)||document.hidden)return;try{if(!WAKE){WAKE=await navigator.wakeLock.request('screen');WAKE.addEventListener('release',()=>{WAKE=null})}}catch(e){}}
 function wakeOff(){try{WAKE&&WAKE.release()}catch(e){}WAKE=null}
-function askAlerts(){if(prefs().alerts&&'Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}}
-function restAlert(title,body){if(!prefs().alerts)return;try{if('Notification' in window&&Notification.permission==='granted'){if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:'iron-rest',renotify:true,vibrate:[200,100,200],icon:'icon-512.png'}));else new Notification(title,{body,tag:'iron-rest'})}}catch(e){}}
+function askAlerts(){if(typeof pushSub==='function'&&prefs().alerts&&pushSupported()){pushSub(true)}if(prefs().alerts&&'Notification' in window&&Notification.permission==='default'){try{Notification.requestPermission()}catch(e){}}}
+function restAlert(title,body){if(!prefs().alerts||(TM&&TM.pushOk))return;try{if('Notification' in window&&Notification.permission==='granted'){if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.ready.then(r=>r.showNotification(title,{body,tag:'iron-rest',renotify:true,vibrate:[200,100,200],icon:'icon-512.png'}));else new Notification(title,{body,tag:'iron-rest'})}}catch(e){}}
 let BGT=null;
 document.addEventListener('visibilitychange',()=>{clearTimeout(BGT);if(document.hidden&&TM&&!TM.paused){const ms=TM.end-Date.now(),ph=TM.phases[TM.i];if(ms>0)BGT=setTimeout(()=>restAlert(TM?TM.title+' is over':'Time is up',ph&&ph.l||''),ms)}if(!document.hidden&&(TM||(S.logs[todayS()]&&S.logs[todayS()]._t0&&!S.done[todayS()])))wakeOn()});
 /* RPE: how hard the set felt, 6 (easy) to 10 (nothing left) */
@@ -277,9 +277,9 @@ document.addEventListener('click',ev=>{
   case'resetsched':{if(resetSchedule()){rerender();toast('Schedule reset',()=>{undoSched()})}break}
   case'settings':settingsSheet();break;
   case'close':closeSheet();break;
-  case'tadj':if(TM){const dv=+el.dataset.v;if(TM.paused)TM.left=Math.max(1,TM.left+dv);else TM.end=Math.max(Date.now()+1000,TM.end+dv*1000);drawTimer()}break;
-  case'tpause':if(TM){if(TM.paused){TM.end=Date.now()+TM.left*1000;TM.paused=false}else{TM.left=(TM.end-Date.now())/1000;TM.paused=true}drawTimer()}break;
-  case'tstop':TM=null;drawTimer();break;
+  case'tadj':if(TM){const dv=+el.dataset.v;if(TM.paused)TM.left=Math.max(1,TM.left+dv);else TM.end=Math.max(Date.now()+1000,TM.end+dv*1000);drawTimer();timerChanged()}break;
+  case'tpause':if(TM){if(TM.paused){TM.end=Date.now()+TM.left*1000;TM.paused=false}else{TM.left=(TM.end-Date.now())/1000;TM.paused=true}drawTimer();timerChanged()}break;
+  case'tstop':{const old=TM;TM=null;drawTimer();if(old&&old.pushId){TM=old;timerChanged();TM=null}}break;
   case'prefset':{prefs()[el.dataset.f]=el.dataset.v;save();applyDisplay();rerender();settingsSheet();break}
   case'preftog':{const p2=prefs(),f2=el.dataset.f;p2[f2]=!p2[f2];if(f2==='alerts'&&p2.alerts)askAlerts();if(f2==='wake'&&!p2.wake)wakeOff();save();settingsSheet();break}
   case'plates':plateSheet(el.dataset.e,el.dataset.w);break;
