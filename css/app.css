@@ -602,3 +602,8 @@ html[dir="rtl"] .backlink svg{transform:scaleX(-1)}
 .setnav{position:sticky;top:-1px;z-index:2;display:flex;gap:6px;overflow-x:auto;padding:8px 0;margin:0 0 4px;background:inherit;scrollbar-width:none}.setnav::-webkit-scrollbar{display:none}
 .setnav .pill{flex:0 0 auto;border:1px solid var(--ln);background:var(--sf);color:var(--ink);padding:7px 12px;border-radius:99px;font:inherit;font-size:14px;font-weight:650}
 #panel [id^="set-"],#panel #injcard,#panel #remcard{scroll-margin-top:56px}
+.obquick{display:block;width:100%;margin-top:16px;text-align:center;line-height:1.35;padding:12px;height:auto}
+.fwg .fwi{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 0;border:0;border-top:1px solid var(--ln);background:none;color:var(--ink);font:inherit;min-height:48px}
+.fwg .fwi i{flex:0 0 24px;height:24px;border-radius:50%;border:2px solid var(--ln);display:grid;place-items:center;font-style:normal;font-size:13px;color:#fff}
+.fwg .fwi.ok i{background:var(--ok);border-color:var(--ok)}.fwg .fwi.ok b{text-decoration:line-through;opacity:.6}
+.fwg .fwi span{display:block;font-size:13px;color:var(--mu)}

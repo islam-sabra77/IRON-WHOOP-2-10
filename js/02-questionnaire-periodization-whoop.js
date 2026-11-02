@@ -2,9 +2,11 @@
 /* =====================================================================
    WELCOME QUESTIONNAIRE + ASSESSMENT
    ===================================================================== */
-const OB_STEPS=['welcome','about','goal','exp','schedule','equip','inj','test1','test2','stack','suppq','review'];
+const OB_STEPS=['welcome','about','goal','exp','schedule','equip','inj','test1','test2','stack','suppq','review'],OB_FULL=OB_STEPS.slice(),OB_QUICK=['welcome','goal','schedule','equip','inj','review'];
+function obFull(){OB_STEPS.length=0;OB_FULL.forEach(x=>OB_STEPS.push(x))}
+function obQuick(){OB_STEPS.length=0;OB_QUICK.forEach(x=>OB_STEPS.push(x));UI.ob.quick=true;if(UI.fresh){UI.ob.a.supps='starter';UI.ob.a.habits='starter'}UI.ob.step=1;drawOb()}
 function obDefaults(){const p=S.prof&&S.prof.ans;return p?JSON.parse(JSON.stringify(p)):{name:'',age:'',weight:'',goal:'muscle',exp:1,days:[0,1,3,4],longDay:6,len:60,weeks:12,start:addD(sunOf(todayS()),8),equip:'gym',cardio:'walk',inj:[],side:'none',pushups:'',squats:'',plank:'',toe:2,overhead:3,deepsq:3,balL:'',balR:'',supps:UI.fresh?'quiz':'keep',habits:UI.fresh?'starter':'keep'}}
-function openOnboarding(){UI.ob={step:UI.fresh?0:1,a:obDefaults()};drawOb();document.getElementById('onb').classList.remove('hide');document.body.style.overflow='hidden'}
+function openOnboarding(){obFull();UI.ob={step:UI.fresh?0:1,a:obDefaults()};drawOb();document.getElementById('onb').classList.remove('hide');document.body.style.overflow='hidden'}
 function closeOnboarding(){document.getElementById('onb').classList.add('hide');document.body.style.overflow='';UI.ob=null}
 const ch=(f,v,label,sub,multi)=>{const a=UI.ob.a;const on=multi?(a[f]||[]).includes(v):a[f]==v;return`<button class="obopt ${on?'on':''}" data-a="${multi?'obtog':'obpick'}" data-f="${f}" data-v="${v}"><b>${label}</b>${sub?`<span>${sub}</span>`:''}</button>`};
 const inp=(f,label,ph,type,unit)=>`<label class="fl2">${label}</label><div class="obin"><input type="${type||'text'}" ${type==='number'?'inputmode="decimal"':''} data-in="ob" data-f="${f}" value="${esc(UI.ob.a[f]??'')}" placeholder="${ph||''}">${unit?`<em>${unit}</em>`:''}</div>`;
@@ -12,7 +14,7 @@ function drawOb(){
   const st=OB_STEPS[UI.ob.step],a=UI.ob.a,n=OB_STEPS.length;let h='';
   const head=(t,s)=>`<div class="obbar"><span style="width:${Math.round(UI.ob.step/(n-1)*100)}%"></span></div><h2 class="disp obh">${t}</h2>${s?`<p class="sub">${s}</p>`:''}`;
   if(st==='welcome')h=`<div class="obwelcome"><img src="${document.querySelector('.brandlogo img')?document.querySelector('.brandlogo img').src:''}" alt="IRON" class="obwm"><h2 class="disp obh" style="font-size:44px">Your training, built around you</h2><p class="sub" style="font-size:16px">Answer a few questions and do 7 quick self-tests (about 5 minutes). IRON then builds a progressive plan from ${EXDB_COUNT} exercises, matched to your goal, equipment, schedule and any injuries.</p>
-    <div class="obfeat"><span>🎯 Goal-based program</span><span>🎥 Video for every move</span><span>📈 Progresses every 6 weeks</span><span>⌚ Adjusts to WHOOP</span></div></div>`;
+    <div class="obfeat"><span>🎯 Goal-based program</span><span>🎥 Video for every move</span><span>📈 Progresses every 6 weeks</span><span>⌚ Adjusts to WHOOP</span></div><button class="cta ghost obquick" data-a="obquick"><b>Quick start · 1 minute</b><br><span class="muted" style="font-size:13px;font-weight:500">Just goal, days, equipment and injuries. Skip the self-tests.</span></button></div>`;
   if(st==='about')h=head('About you','So IRON can personalise loads and advice.')+inp('name','Your name','e.g. Omar')+`<div class="grid2">${inp('age','Age','e.g. 34','number','years')}${inp('weight','Weight','e.g. 82','number','kg')}</div>`;
   if(st==='goal')h=head('Main goal','Pick the one that matters most right now.')+ch('goal','muscle','💪 Build muscle','More size and shape, steady strength gains')+ch('goal','strength',''+IC.plate+' Get stronger','Heavier lifts, lower reps on the main moves')+ch('goal','fat','🔥 Lose fat','Keep muscle, add a bit more cardio')+ch('goal','health','❤️ Health and fitness','Feel good, move well, stay consistent');
   if(st==='exp')h=head('Training experience','How long have you trained with weights consistently?')+ch('exp',1,'Beginner','Less than 6 months, or coming back after a long break')+ch('exp',2,'Intermediate','6 months to 3 years, comfortable with the main lifts')+ch('exp',3,'Advanced','3+ years of structured training');

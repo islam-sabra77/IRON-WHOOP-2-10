@@ -37,6 +37,7 @@ function renderHome(){
   const v=document.getElementById('view'),t=todayS(),d=inPlan(t)?t:(t<S.start?S.start:S.end),k=tplOf(d),tp=k&&T[k];
   const name=(S.prof&&S.prof.ans&&S.prof.ans.name)||'';const hr=new Date().getHours();
   let h=`<h2 class="pagetitle disp">${hr<12?'Good morning':hr<18?'Good afternoon':'Good evening'}${name?', '+esc(name):''}</h2><p class="sub">${nice(t)}. Tap any box to open it.</p>`;
+  if(typeof fwCard==='function')h+=fwCard();
   // today
   if(tp){const u=units(d),pct=pctOf(u),est=estimate(d),c=KCOLOR(tp.k),r=readyOf(d);
     h+=`<button class="htile hbig" style="--c:${c}" data-a="hgo" data-v="train" data-d="${d}"><div class="hrow2">${ring(pct,c,92,10,Math.round(pct*100)+'%')}<div style="min-width:0"><span class="hlab">${d===t?'Today':nice(d)}</span><b class="disp hval">${esc(tp.n)}</b><span class="hsub">${esc(tp.f)}${tp.k!=='rest'?' · about '+mins(est.total):''}${r?' · '+({g:'Green',y:'Yellow',r:'Red'}[r])+' day':''}</span><span class="hgo">${S.done[d]?'✓ Done. See it ›':tp.k==='rest'?'Rest day ›':pct>0?'Continue ›':'Start session ›'}</span></div></div></button>`}

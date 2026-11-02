@@ -253,6 +253,7 @@ document.addEventListener('click',ev=>{
   case'obopen':closeSheet();openOnboarding();break;
   case'obclose':closeOnboarding();break;
   case'oblink':{const c=window.prompt('Paste the sync code from your other phone (Settings → Cloud backup):','');if(c)syncLink(c);break}
+  case'obquick':obQuick();break;
   case'obskip':closeOnboarding();UI.fresh=false;save();toast('Using the sample plan. Build your own anytime in Settings.');break;
   case'obrestore':if(window.confirm('Go back to your previous plan? Your logs stay.'))restorePlan();break;
   case'obback':UI.ob.step=Math.max(0,UI.ob.step-1);if(OB_STEPS[UI.ob.step]==='suppq'&&UI.ob.a.supps!=='quiz')UI.ob.step--;drawOb();break;
