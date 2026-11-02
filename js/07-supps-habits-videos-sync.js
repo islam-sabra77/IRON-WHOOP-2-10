@@ -468,6 +468,7 @@ function settingsSheet(){
   ${[['rpe','Ask how hard each set felt (RPE)','Rate sets 6–10; weight suggestions use it'],['wake','Keep the screen on during a session','So the timer and sets stay visible'],['alerts','Alert me when rest is over','Sound, vibration and a notification if the app is in the background']].map(([f,l,sub])=>`<button class="obopt ${prefs()[f]?'on':''}" data-a="preftog" data-f="${f}"><b>${prefs()[f]?'✓ ':''}${l}</b><span>${sub}</span></button>`).join('')}
   <div class="note" style="margin-top:8px"><b>Background alerts:</b> ${pushStatus()}</div><div class="grid2"><button class="cta ghost" style="margin:0" data-a="pushon">Turn on alerts</button><button class="cta ghost" style="margin:0" data-a="pushtest">Test in 10 s</button></div>
   <button class="cta ghost" data-a="plates" data-e="">${IC.plate} Plate calculator</button></div>
+  ${remCard()}
   <button class="card setlink" style="margin-top:12px" data-a="syncopen"><h4 class="disp" style="font-size:22px;margin:0">${IC.cloud} Cloud backup ›</h4><span class="muted" style="font-size:14px">${syncOn()?'On'+(S.sync.at?' · last backup '+new Date(S.sync.at).toLocaleString([],{weekday:'short',hour:'2-digit',minute:'2-digit'}):''):'Off. Turn it on so you never lose your logs.'}</span></button>
   <button class="cta ghost" data-a="errlog">${IC.alert} Error log${(typeof errList==='function'&&errList().length)?' ('+errList().length+')':''}</button>
   <button class="cta ghost" style="color:var(--bad)" data-a="reset">Reset everything</button>`);

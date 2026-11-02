@@ -38,3 +38,20 @@ test('rest timer schedules a background alert, reschedules on +15 and cancels on
   await expect.poll(() => calls.filter((c) => c.step === 'cancel').length).toBe(2);
   noErrors(page);
 });
+
+test('daily reminders are sent to the server with the right times', async ({ page }) => {
+  const calls = [];
+  await page.route('**/api/push?step=*', async (r) => { calls.push(r.request().postDataJSON()); r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }); });
+  await openApp(page);
+  await page.evaluate(() => { PUSH_SUB = { endpoint: 'https://push.example/x', keys: { p256dh: 'a', auth: 'b' } }; settingsSheet(); });
+  await page.click('#remcard [data-a="remtog"][data-f="bed"]');
+  await expect.poll(() => calls.length).toBeGreaterThan(0);
+  const body = calls.at(-1);
+  expect(body.device).toMatch(/^d/);
+  const bed = body.items.filter((i) => i.tag === 'iron-bed');
+  expect(bed.length).toBeGreaterThanOrEqual(7);
+  const h = await page.evaluate((at) => new Date(at).getHours() + ':' + new Date(at).getMinutes(), bed[0].at);
+  expect(h).toBe('22:30');
+  await expect(page.locator('#remcard [data-f="bed"]')).toHaveClass(/on/);
+  noErrors(page);
+});

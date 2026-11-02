@@ -39,3 +39,27 @@ document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if
   if(el.dataset.a==='pushtest'){pushSub(true).then(async sub=>{if(!sub){toast('Turn on alerts first');return}const r=await fetch('/api/push?step=schedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:'test'+Date.now(),sub,items:[{at:Date.now()+10000,title:'IRON test alert',body:'Background alerts work. Lock your phone next time to try it.',tag:'iron-test'}]})});toast(r.ok?'Test alert coming in 10 seconds. Lock your phone or switch apps.':'Couldn’t schedule the test')})}
 });
 navigator.serviceWorker&&navigator.serviceWorker.addEventListener('message',ev=>{if(ev.data&&ev.data.type==='push'&&ev.data.m&&ev.data.m.tag!=='iron-rest')toast(ev.data.m.title+(ev.data.m.body?': '+ev.data.m.body:''))});
+
+/* ---------- daily reminders: the next 8 days are sent to the server, which pushes them on time ---------- */
+const REM_KINDS=[['work','Workout','17:30','A reminder on training days with the session name'],['supp','Supplements','08:00','What to take today'],['bed','Bedtime','22:30','Wind down for 7+ hours of sleep']];
+function remPrefs(){const p=prefs();p.rem=p.rem||{};REM_KINDS.forEach(([k,,t])=>{p.rem[k]=p.rem[k]||{on:false,t}});return p.rem}
+function remDevice(){let id='';try{id=localStorage.getItem('iron-dev')||''}catch(e){}if(!id){id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,10);try{localStorage.setItem('iron-dev',id)}catch(e){}}return id}
+function remItems(){
+  const R=remPrefs(),out=[],now=Date.now(),t0=todayS();
+  for(let i=0;i<8;i++){const d=addD(t0,i),at=hm=>{const[h,m]=hm.split(':').map(Number);const x=pd(d);x.setHours(h,m,0,0);return x.getTime()};
+    if(R.work.on){const k=tplOf(d),t=k&&T[k];if(t&&t.k!=='rest'&&!S.done[d]){const a=at(R.work.t);if(a>now)out.push({at:a,title:'Today: '+t.n,body:t.f+(readyOf(d)==='r'?' (recovery day)':''),tag:'iron-work'})}}
+    if(R.supp.on&&(S.supps||[]).length){const a=at(R.supp.t);if(a>now)out.push({at:a,title:'Supplements',body:S.supps.slice(0,6).map(s=>s.n+(s.d?' '+s.d:'')).join(', ').slice(0,150),tag:'iron-supp'})}
+    if(R.bed.on){const a=at(R.bed.t);if(a>now)out.push({at:a,title:'Time to wind down',body:'Screens off soon. 7+ hours of sleep helps tomorrow’s recovery.',tag:'iron-bed'})}}
+  return out}
+let REM_T=null;
+function remSync(ask){clearTimeout(REM_T);REM_T=setTimeout(async()=>{
+  const R=remPrefs(),any=REM_KINDS.some(([k])=>R[k].on);if(!any&&!prefs().remSent)return;
+  const sub=await pushSub(!!ask);if(!sub)return;
+  try{const r=await fetch('/api/push?step=reminders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({device:remDevice(),sub,items:remItems()})});if(r.ok){prefs().remSent=any?Date.now():0;save()}}catch(e){}
+},ask?0:1500)}
+function remCard(){const R=remPrefs();return`<div class="card" id="remcard" style="margin-top:12px"><h4 class="disp" style="font-size:22px">Reminders</h4>
+  <p class="muted" style="font-size:14px;margin:0 0 8px">Sent as notifications, even when IRON is closed.</p>
+  ${REM_KINDS.map(([k,l,,sub])=>`<div class="remrow"><button class="obopt ${R[k].on?'on':''}" data-a="remtog" data-f="${k}"><b>${R[k].on?'✓ ':''}${l}</b><span>${sub}</span></button><input type="time" data-in="remt" data-k="${k}" value="${R[k].t}" aria-label="${l} time"></div>`).join('')}</div>`}
+document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a="remtog"]');if(!el)return;const R=remPrefs(),k=el.dataset.f;R[k].on=!R[k].on;save();
+  if(R[k].on&&!pushSupported()){toast(pushStatus())}remSync(true);const c=document.getElementById('remcard');if(c)c.outerHTML=remCard()});
+document.addEventListener('change',ev=>{const el=ev.target;if(el.dataset&&el.dataset.in==='remt'&&el.value){remPrefs()[el.dataset.k].t=el.value;save();remSync(false)}});
