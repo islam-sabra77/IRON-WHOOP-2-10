@@ -683,3 +683,5 @@ html[dir="rtl"] .backlink svg{transform:scaleX(-1)}
 body.onhome .top{background:#191A4A;backdrop-filter:none;-webkit-backdrop-filter:none}
 body.onhome .top .wm-l{display:none!important}body.onhome .top .wm-d{display:block!important}
 body.onhome .top .icbtn{background:#23265C;border-color:#2D3170;color:#EEF0FF}
+.obterms{font-size:12.5px;line-height:1.45;color:var(--mu);text-align:center;margin:14px auto 0;max-width:420px}.obterms a{color:inherit;text-decoration:underline}
+.protect{border:2px solid var(--upper);display:flex;flex-direction:column;gap:10px}.protect b{display:flex;align-items:center;gap:8px;font-size:16px}.protect b svg{width:20px;height:20px}.protect p{margin:4px 0 0;font-size:14px;color:var(--mu)}

@@ -1,10 +1,12 @@
 // Starts the WHOOP login. IRON calls /api/whoop-login?k=<device key>
 import { getStore } from '@netlify/blobs';
+import { rateLimit } from '../lib/guard.mjs';
 // WHOOP app keys. The secret must live in Netlify environment variables.
 const CLIENT_ID = process.env.WHOOP_CLIENT_ID || '7cd8e320-a15a-42d9-a4e8-c913b1eff798';
 const CLIENT_SECRET = process.env.WHOOP_CLIENT_SECRET; // set in Netlify → Environment variables (never in code)
 
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'whoop-login', 10, 50); if (lim) return lim; }
   const id = CLIENT_ID;
   if (!process.env.WHOOP_CLIENT_SECRET) return new Response('WHOOP_CLIENT_SECRET is missing. Add it in Netlify: Site configuration → Environment variables, then trigger a new deploy.', { status: 500 });
   if (!id) return new Response('WHOOP_CLIENT_ID is missing. Add it in Netlify: Site configuration → Environment variables, then redeploy.', { status: 500 });

@@ -1,5 +1,6 @@
 // Returns your recent WHOOP recovery, sleep, cycles, workouts and body measurements.
 import { getStore } from '@netlify/blobs';
+import { rateLimit } from '../lib/guard.mjs';
 // WHOOP app keys. The secret must live in Netlify environment variables.
 const CLIENT_ID = process.env.WHOOP_CLIENT_ID || '7cd8e320-a15a-42d9-a4e8-c913b1eff798';
 const CLIENT_SECRET = process.env.WHOOP_CLIENT_SECRET; // set in Netlify → Environment variables (never in code)
@@ -8,6 +9,7 @@ const TOKEN = 'https://api.prod.whoop.com/oauth/oauth2/token';
 const API = 'https://api.prod.whoop.com/developer';
 const hash = async (s) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, '0')).join('');
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'whoop-data', 30, 600); if (lim) return lim; }
   const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
   const k = req.headers.get('x-iron-key') || '';
   if (k.length < 32) return json({ connected: false }, 401);

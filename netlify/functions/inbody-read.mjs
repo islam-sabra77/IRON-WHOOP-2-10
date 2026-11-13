@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { getStore } from '@netlify/blobs';
+import { rateLimit, aiBudget } from '../lib/guard.mjs';
 
 const num = () => z.number().nullable();
 const Segments = z.object({ left_arm: num(), right_arm: num(), trunk: num(), left_leg: num(), right_leg: num() });
@@ -34,6 +35,7 @@ const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, header
 const hash = async (s) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, '0')).join('');
 
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'inbody-read', 5, 30); if (lim) return lim; }
   if (req.method !== 'POST') return json({ error: 'method' }, 405);
   if (!process.env.ANTHROPIC_API_KEY) return json({ error: 'not_configured' }, 501);
   const k = req.headers.get('x-iron-key') || '';
@@ -54,6 +56,7 @@ export default async (req) => {
   else if (IMAGE_TYPES.includes(media_type)) block = { type: 'image', source: { type: 'base64', media_type, data } };
   else return json({ error: 'type' }, 415);
 
+  if (!(await aiBudget(getStore('limits'), 1))) return json({ error: 'busy' }, 429);
   await store.setJSON(id, used + 1);
   const client = new Anthropic();
   try {

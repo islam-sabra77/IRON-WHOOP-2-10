@@ -101,3 +101,16 @@ test('translate caches each string and only calls the model for new ones', async
   assert.equal((await tr(new Request('http://x/api/translate', { method: 'POST', body: JSON.stringify({ lang: 'fr', strings: ['x'] }) }))).status, 400);
   delete globalThis.__ironTranslate;
 });
+
+test('rate limits stop a flood from one device but not other devices, and the AI budget caps paid calls', async () => {
+  const fb = await load('feedback.mjs');
+  const post = (ip) => fb(new Request('http://x/api/feedback', { method: 'POST', headers: { 'x-nf-client-connection-ip': ip }, body: JSON.stringify({ kind: 'idea', text: 'More squats' }) }));
+  const codes = []; for (let i = 0; i < 7; i++) codes.push((await post('203.0.113.9')).status);
+  assert.deepEqual(codes, [200, 200, 200, 200, 200, 429, 429]);
+  assert.equal((await post('198.51.100.4')).status, 200);
+  const { aiBudget } = await import(pathToFileURL(path.join(root, 'netlify/lib/guard.mjs')).href);
+  process.env.AI_MONTHLY_CAP = '2';
+  const st = globalThis.__ironStore('limits-test');
+  assert.equal(await aiBudget(st), true); assert.equal(await aiBudget(st), true); assert.equal(await aiBudget(st), false);
+  delete process.env.AI_MONTHLY_CAP;
+});

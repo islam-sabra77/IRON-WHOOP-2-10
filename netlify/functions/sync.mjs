@@ -4,11 +4,13 @@
 //   PUT  /api/sync  body { updated, enc }     -> { ok, updated }   (older apps sent { updated, state })
 //   DELETE /api/sync                          -> removes the stored copy (used after moving to encrypted storage)
 import { getStore } from '@netlify/blobs';
+import { rateLimit } from '../lib/guard.mjs';
 
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 const hash = async (s) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map(b => b.toString(16).padStart(2, '0')).join('');
 
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'sync', 60, 3000); if (lim) return lim; }
   const k = (req.headers.get('x-iron-sync') || '').trim();
   if (!/^[a-f0-9]{48,128}$/.test(k)) return json({ error: 'code' }, 401);
   const store = getStore('sync'), id = 'v1:' + (await hash(k));

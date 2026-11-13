@@ -6,6 +6,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { getStore } from '@netlify/blobs';
+import { rateLimit, aiBudget } from '../lib/guard.mjs';
 
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 const hash = async (s) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))).map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -25,6 +26,7 @@ async function translateBatch(list) {
 }
 
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'translate', 30, 600); if (lim) return lim; }
   if (req.method !== 'POST') return json({ error: 'method' }, 405);
   let b; try { b = await req.json(); } catch { return json({ error: 'bad_body' }, 400); }
   if (!b || b.lang !== 'ar' || !Array.isArray(b.strings)) return json({ error: 'bad_body' }, 400);
@@ -37,6 +39,7 @@ export default async (req) => {
     const day = 'n:' + new Date().toISOString().slice(0, 10), used = (await store.get(day, { type: 'json' })) || 0;
     if (used > 20000) return json({ t, error: 'limit' }, 200);
     await store.setJSON(day, used + miss.length);
+    if (!(await aiBudget(getStore('limits'), 1))) return json({ t, error: 'budget' }, 200);
     try {
       const got = await translateBatch(miss);
       for (const s of miss) if (got[s]) { t[s] = got[s]; await store.setJSON('ar:' + (await hash(s)), got[s]); }

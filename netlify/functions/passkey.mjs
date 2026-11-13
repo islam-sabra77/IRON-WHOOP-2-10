@@ -7,6 +7,7 @@
 //   POST /api/passkey?step=auth-options            -> sign-in options
 //   POST /api/passkey?step=auth-verify  {response, wrapped?} -> { ok, wrapped }
 import { getStore } from '@netlify/blobs';
+import { rateLimit } from '../lib/guard.mjs';
 import { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse } from '@simplewebauthn/server';
 
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
@@ -15,6 +16,7 @@ const unb64 = (s) => new Uint8Array(Buffer.from(s, 'base64'));
 const okWrapped = (w) => w == null || (typeof w === 'object' && typeof w.iv === 'string' && typeof w.ct === 'string' && w.ct.length < 2000);
 
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'passkey', 20, 200); if (lim) return lim; }
   if (req.method !== 'POST') return json({ error: 'method' }, 405);
   const step = new URL(req.url).searchParams.get('step');
   const rpID = (req.headers.get('host') || '').split(':')[0];

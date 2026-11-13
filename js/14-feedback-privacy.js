@@ -12,6 +12,7 @@ function privacySheet(){const so=typeof syncOn==='function'&&syncOn();openSheet(
   <li><b>InBody photos</b> are read once to fill in your numbers, then discarded.</li>
   <li><b>Reminders and alerts</b> store only the notification text and time until it is sent.</li></ul>
   <a class="cta ghost" style="text-decoration:none;display:block;text-align:center" href="privacy.html" target="_blank" rel="noopener">Read the full privacy policy</a>
+  <a class="cta ghost" style="text-decoration:none;display:block;text-align:center" href="terms.html" target="_blank" rel="noopener">Terms of use</a>
   <button class="cta ghost" data-a="bkfile">Download all my data</button>
   <button class="cta" style="--c:var(--bad)" data-a="wipe1">Delete my data</button>
   <button class="cta ghost" data-a="close">Close</button>`)}
@@ -35,3 +36,27 @@ document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if
   if(a==='wipe2')wipeAll();
 });
 document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a="setjump"]');if(!el)return;const t=document.getElementById(el.dataset.v);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})});
+/* ---------- TERMS: agreed on the first setup screen; existing users are asked once ---------- */
+const TERMS_V=1;
+document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if(!el||!el.closest('#onb'))return;
+  if(['obnext','obquick','obskip','obfinish','pksignin','oblink'].includes(el.dataset.a)&&!(S.terms&&S.terms.v>=TERMS_V)){S.terms={v:TERMS_V,at:todayS()};save()}});
+function termsCheck(){if(FRESH||(S.terms&&S.terms.v>=TERMS_V))return;
+  openSheet(`<h4 class="disp">Before you train</h4><p style="font-size:15px">IRON gives general fitness, recovery and supplement guidance. It is <b>not medical advice</b>. Check with a doctor before a new programme or supplement, and stop if you feel chest pain, dizziness or sharp pain.</p>
+  <p class="muted" style="font-size:14px">Please read and agree to the <a href="terms.html" target="_blank" rel="noopener">Terms of use</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a>. You must be 16 or older.</p>
+  <button class="cta" style="--c:var(--upper)" data-a="termsok">I agree</button>`)}
+document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a="termsok"]');if(!el)return;S.terms={v:TERMS_V,at:todayS()};save();closeSheet()});
+/* ---------- DATA SAFETY ----------
+   Everything lives on the phone, and browsers can clear website storage (Safari after weeks unused,
+   or when space is low). So: ask the browser to keep IRON's storage, warn loudly if a save fails,
+   and keep nudging until encrypted cloud backup is on. */
+(async function(){try{if(navigator.storage&&navigator.storage.persist&&!(await navigator.storage.persisted()))await navigator.storage.persist()}catch(e){}})();
+let SAVE_WARNED=0;
+function saveFailed(e){if(Date.now()-SAVE_WARNED<60000)return;SAVE_WARNED=Date.now();
+  if(typeof logError==='function')logError('save failed: '+(e&&e.name),'storage');
+  if(typeof toast==='function')toast(syncOn()?'This phone is out of storage. Your cloud backup has your latest data':'This phone is out of storage and IRON couldn’t save. Turn on cloud backup or download your data now')}
+function protectCard(){
+  if(typeof syncOn!=='function'||syncOn())return'';const t=todayS(),days=Object.keys(S.logs||{}).length;
+  if(!days&&!S.prof)return'';if(S.bkNag&&diffD(S.bkNag,t)<14)return'';
+  return`<section class="card protect"><div><b>${IC.cloud||''} Your data is only on this phone</b><p>If the phone is lost or the browser clears its storage, ${days?days+' logged day'+(days>1?'s':'')+' and ':''}your plan would be gone. Encrypted cloud backup takes 20 seconds.</p></div>
+  <div class="grid2"><button class="cta" style="margin:0;--c:var(--upper)" data-a="syncopen">Turn on backup</button><button class="cta ghost" style="margin:0" data-a="bklater">Remind me later</button></div></section>`}
+document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a="bklater"]');if(!el)return;S.bkNag=todayS();save();rerender()});

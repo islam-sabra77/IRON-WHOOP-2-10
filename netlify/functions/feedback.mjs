@@ -2,9 +2,11 @@
 //   POST /api/feedback  body { kind, text, tab, v, ua }
 //   GET  /api/feedback?key=<ERROR_LOG_KEY>  -> latest 300 messages (same key as error reports)
 import { getStore } from '@netlify/blobs';
+import { rateLimit } from '../lib/guard.mjs';
 
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'feedback', 5, 30); if (lim) return lim; }
   const store = getStore('feedback');
   if (req.method === 'GET') {
     const key = new URL(req.url).searchParams.get('key');

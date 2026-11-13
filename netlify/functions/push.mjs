@@ -4,12 +4,14 @@
 //   POST /api/push?step=cancel   {id}
 //   POST /api/push?step=reminders {device, sub, items} -> replaces this device's reminder list (sent by the minute)
 import { getStore } from '@netlify/blobs';
+import { rateLimit } from '../lib/guard.mjs';
 import { vapid, validSub, cleanItems } from '../lib/push-core.mjs';
 
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 const okId = (s) => typeof s === 'string' && /^[A-Za-z0-9._-]{6,80}$/.test(s);
 
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'push', 60, 3000); if (lim) return lim; }
   const store = getStore('push'), url = new URL(req.url), step = url.searchParams.get('step');
   if (req.method === 'GET' && step === 'key') return json({ publicKey: (await vapid(store)).publicKey });
   if (req.method !== 'POST') return json({ error: 'method' }, 405);

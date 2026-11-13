@@ -3,7 +3,23 @@
    Each injury has a start date and, once healed, an end date. On days an injury is active,
    moves that load that joint are swapped for safe ones and its mobility is added.
    Healing it brings the normal moves back from that day on; past days stay as they were logged. */
-const INJ_SHORT={lb:'lower back',sh:'shoulder',kn:'knee',el:'elbow',wr:'wrist',hp:'hip',an:'ankle'};
+const INJ_SHORT={nk:'neck',sh:'shoulder',sc:'shoulder blade',ub:'upper back',pc:'chest',el:'elbow',wr:'wrist',lb:'lower back',hp:'hip',gr:'groin',hm:'hamstring',kn:'knee',ac:'calf or Achilles',an:'ankle',ft:'foot'};
+/* the full list of injury areas, top of the body to the bottom */
+(function(){const names={nk:'Neck',sh:'Shoulder',sc:'Shoulder blade (scapula)',ub:'Upper back',pc:'Chest or pec',el:'Elbow',wr:'Wrist',lb:'Lower back',hp:'Hip',gr:'Groin or adductor',hm:'Hamstring',kn:'Knee',ac:'Calf or Achilles',an:'Ankle',ft:'Foot (plantar fasciitis)'};
+  Object.keys(INJ).forEach(k=>delete INJ[k]);Object.assign(INJ,names);
+  Object.assign(INJ_AREA,{nk:'tspine',sc:'shoulders',ub:'tspine',pc:'shoulders',gr:'hips',hm:'hams',ac:'ankles',ft:'ankles'})})();
+/* which moves load the newer areas: by movement pattern, then by name for impact and overhead work */
+const INJ_PAT={nk:['shrug','vpush','carry','coreFlex'],sc:['vpush','lat','vpull','shrug','fly'],ub:['hinge','shrug','carry','hpull'],pc:['hpush','fly'],gr:['add','lunge'],hm:['ham','hinge'],ac:['calf'],ft:[]};
+(function injAugment(){
+  const impact=/\b(run|running|sprint|jump|jumping|skip|skipping|burpee|box jump|hop|bound|jack|plyo|broad)/i,sprint=/\b(sprint|run|running|bound|broad jump)/i,overhead=/(overhead|military|push press|snatch|jerk|thruster)/i,dip=/\bdips?\b/i,crunch=/(crunch|sit-up|situp|v-up|toes to bar)/i;
+  Object.keys(META).forEach(id=>{const m=META[id],n=(E[id]&&E[id].n)||'',add=j=>{if(!m.av.includes(j))m.av.push(j)};
+    Object.keys(INJ_PAT).forEach(j=>{if(INJ_PAT[j].includes(m.pat))add(j)});
+    if(impact.test(n)||m.pat==='power'){add('ac');add('ft')}
+    if(sprint.test(n)||m.pat==='power')add('hm');
+    if(overhead.test(n)){add('nk');add('sc')}
+    if(dip.test(n)){add('pc');add('sc')}
+    if(crunch.test(n))add('nk');
+    if(m.pat==='power')add('gr')})})();
 let INJCACHE={};
 function injList(){
   if(!Array.isArray(S.injuries)){const a=S.prof&&S.prof.ans;S.injuries=((a&&a.inj)||[]).map((j,i)=>({id:'i'+Date.now()+i,j,from:'',to:'',note:''}))}
@@ -41,7 +57,7 @@ function injCard(){
     <div class="srow"><b>Started</b><input type="date" data-in="injfrom" data-k="${x.id}" value="${x.from||''}"></div>`}
     <div class="row2">${x.to?`<button class="mini" data-a="injunheal" data-k="${x.id}">Still hurts</button>`:`<button class="mini p" data-a="injheal" data-k="${x.id}">${IC.check} Healed</button>`}<button class="mini" data-a="injdel" data-k="${x.id}">Remove</button></div></div>`;
   return`<div class="card" id="injcard"><h4 class="disp" style="font-size:22px;margin:0 0 4px">Injuries and limits</h4>
-  <p class="muted" style="font-size:14px;margin:0 0 8px">While an injury is active, IRON swaps moves that load it for safe ones and adds mobility for that area. Mark it healed and your normal moves come back from that day.</p>
+  <p class="note" style="font-size:13px;margin:0 0 8px">IRON adapts training around an injury but is not medical advice. If pain is sharp, getting worse, or follows a fall or a pop, see a doctor or physiotherapist first.</p><p class="muted" style="font-size:14px;margin:0 0 8px">While an injury is active, IRON swaps moves that load it for safe ones and adds mobility for that area. Mark it healed and your normal moves come back from that day.</p>
   ${act.length?act.map(row).join(''):'<p class="muted" style="font-size:14px">No active injuries. All moves are in.</p>'}
   ${soon.map(row).join('')}
   <label class="fl2">Add an injury from today</label><div class="obrow wrap">${Object.keys(INJ).map(k=>`<button class="obopt" data-a="injadd" data-v="${k}" ${act.some(x=>x.j===k)?'disabled':''}><b>${INJ[k]}</b></button>`).join('')}</div>

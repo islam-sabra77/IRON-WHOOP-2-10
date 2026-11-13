@@ -1,7 +1,9 @@
 "use strict";
 /* ---------- storage ---------- */
 const KEY='stronghold-plan-v1';
-const PLAN_START='2026-09-28', PLAN_END='2026-12-31';
+/* the sample plan runs 12 weeks from the Monday of the week you first open IRON */
+const PLAN_START=(()=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})(),
+  PLAN_END=(()=>{const d=new Date(PLAN_START+'T12:00:00');d.setDate(d.getDate()+12*7-1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})();
 const COLORS={upper:'#2F5BFF',lower:'#FF6A13',mob:'#00B39A',core:'#E8A900',cardio:'#FF2D78',long:'#7B4DFF',rest:'#8E97BF',travel:'#00A3FF',warm:'#43A512',full:'#E11D74',hiit:'#F04438'};
 const HAB_COLORS=['#2F5BFF','#FF6A13','#00B39A','#FF2D78','#7B4DFF','#E8A900','#12B76A','#00A3FF'];
 const EMOJIS=['💧','👟','🌙','📖','🧘','🥗','☀️','🚭','🧊','📵','🙏','✍️','🦷','💤','🍎','🏃'];
@@ -29,7 +31,7 @@ try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
 const FRESH=!S||typeof S!=='object';
 if(!S||typeof S!=='object')S=defaults();
 S=Object.assign(defaults(),S);
-function save(){S._u=Date.now();try{PHC={}}catch(e){}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(typeof syncSoon==='function')syncSoon()}
+function save(){S._u=Date.now();try{PHC={}}catch(e){}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){if(typeof saveFailed==='function')saveFailed(e)}if(typeof syncSoon==='function')syncSoon()}
 
 /* ---------- dates ---------- */
 const pad=n=>String(n).padStart(2,'0');
@@ -47,39 +49,39 @@ const nice=s=>{const d=pd(s);return DN[d.getDay()]+', '+d.getDate()+' '+MN[d.get
 const short=s=>{const d=pd(s);return d.getDate()+' '+MN[d.getMonth()].slice(0,3)};
 
 /* ---------- exercise library ----------
- n name, c cue, p protects, a alternatives, t time-based, u one side at a time (left first), s default seconds, bw bodyweight */
+ n name, c cue, p protects, a alternatives, t time-based, u one side at a time (the weaker side first, from setup), s default seconds, bw bodyweight */
 const E={
 /* upper */
-incDB:{n:'Incline DB press (30°)',c:'Bench at 30°, elbows about 45°, ribs down. Stop 1–2 reps before form breaks.',p:'Right shoulder',a:['incMach','floorPress','machChest']},
-incMach:{n:'Machine incline press',c:'Seat so handles line up with upper chest. Neutral handles if available.',p:'Right shoulder',a:['incDB','floorPress']},
-floorPress:{n:'Neutral-grip DB floor press',c:'The floor limits depth, which keeps the shoulder in a safe range.',p:'Right shoulder',a:['incDB','machChest']},
-machChest:{n:'Neutral-grip machine chest press',c:'Handles at mid-chest, wrists straight, no hard lockout.',p:'Right shoulder',a:['floorPress','cFly','pushup']},
+incDB:{n:'Incline DB press (30°)',c:'Bench at 30°, elbows about 45°, ribs down. Stop 1–2 reps before form breaks.',p:'Shoulders',a:['incMach','floorPress','machChest']},
+incMach:{n:'Machine incline press',c:'Seat so handles line up with upper chest. Neutral handles if available.',p:'Shoulders',a:['incDB','floorPress']},
+floorPress:{n:'Neutral-grip DB floor press',c:'The floor limits depth, which keeps the shoulder in a safe range.',p:'Shoulders',a:['incDB','machChest']},
+machChest:{n:'Neutral-grip machine chest press',c:'Handles at mid-chest, wrists straight, no hard lockout.',p:'Shoulders',a:['floorPress','cFly','pushup']},
 cFly:{n:'Cable fly (mid height)',c:'Soft elbows, hug a tree, stop when hands meet.',a:['machChest','pushup']},
 pushup:{n:'Push-up (hands elevated if needed)',c:'Body in one line, elbows at 45°, full control.',bw:1,a:['machChest','floorPress']},
-flatDBng:{n:'Flat DB press (neutral grip)',c:'Palms face each other, lower to chest level, not below.',p:'Right shoulder',a:['machChest','floorPress','incMach']},
+flatDBng:{n:'Flat DB press (neutral grip)',c:'Palms face each other, lower to chest level, not below.',p:'Shoulders',a:['machChest','floorPress','incMach']},
 csRow:{n:'Chest-supported DB row',c:'Chest glued to the pad. Row to the hip pocket, no low-back yank.',p:'Lower back',a:['sealRow','machRow','saCableRow']},
 sealRow:{n:'Chest-supported T-bar row',c:'Chest stays on the pad the whole set. Squeeze, pause, lower slowly.',p:'Lower back',a:['csRow','machRow']},
 machRow:{n:'Machine row (neutral grip)',c:'Chest on the pad, pull elbows back, 1-second squeeze.',p:'Lower back',a:['csRow','sealRow']},
-saCableRow:{n:'Single-arm cable row',c:'Left arm first. Elbow tight to the ribs, no torso twist.',p:'Lower back',u:1,a:['csRow','machRow']},
-lmPress:{n:'Half-kneeling landmine press',c:'Left side first. Press up and forward, squeeze the glute of the down knee.',p:'Right shoulder, pelvic tilt',u:1,a:['saDBPress','machShoulder']},
-saDBPress:{n:'Single-arm DB press (neutral, angled)',c:'Arm slightly forward of the body (scapular plane). Stop at ear height if the shoulder complains.',p:'Right shoulder',u:1,a:['lmPress','machShoulder']},
-machShoulder:{n:'Machine shoulder press (neutral)',c:'Stop the bottom at ear level. Never behind the neck.',p:'Right shoulder',a:['lmPress','saDBPress']},
-ngPulldown:{n:'Neutral-grip lat pulldown',c:'Pull to upper chest, elbows to pockets. Never behind the neck.',p:'Right shoulder',a:['assistPull','saPulldown','straightArm']},
+saCableRow:{n:'Single-arm cable row',c:'Elbow tight to the ribs, no torso twist.',p:'Lower back',u:1,a:['csRow','machRow']},
+lmPress:{n:'Half-kneeling landmine press',c:'Press up and forward, squeeze the glute of the down knee.',p:'Shoulders, pelvic tilt',u:1,a:['saDBPress','machShoulder']},
+saDBPress:{n:'Single-arm DB press (neutral, angled)',c:'Arm slightly forward of the body (scapular plane). Stop at ear height if the shoulder complains.',p:'Shoulders',u:1,a:['lmPress','machShoulder']},
+machShoulder:{n:'Machine shoulder press (neutral)',c:'Stop the bottom at ear level. Never behind the neck.',p:'Shoulders',a:['lmPress','saDBPress']},
+ngPulldown:{n:'Neutral-grip lat pulldown',c:'Pull to upper chest, elbows to pockets. Never behind the neck.',p:'Shoulders',a:['assistPull','saPulldown','straightArm']},
 assistPull:{n:'Assisted pull-up (neutral grip)',c:'Full hang, chest to the handles, slow way down.',a:['ngPulldown','saPulldown']},
-saPulldown:{n:'Single-arm cable pulldown',c:'Left arm first. Drive the elbow down to the hip.',u:1,a:['ngPulldown','straightArm']},
+saPulldown:{n:'Single-arm cable pulldown',c:'Drive the elbow down to the hip.',u:1,a:['ngPulldown','straightArm']},
 straightArm:{n:'Straight-arm cable pulldown',c:'Arms long, sweep the bar to the thighs, ribs down.',a:['ngPulldown','saPulldown']},
 cLat:{n:'Cable lateral raise',c:'Lead with the elbow, stop at shoulder height, slight lean away.',u:1,a:['dbLat','machLat']},
 dbLat:{n:'DB lateral raise (light)',c:'Thumbs level, raise to shoulder height, 2-second lower.',a:['cLat','machLat']},
 machLat:{n:'Machine lateral raise',c:'Pads on the outside of the elbows, smooth tempo.',a:['cLat','dbLat']},
-facePull:{n:'Face pull (rope)',c:'Pull to eye level, thumbs point back, finish in external rotation.',p:'Right shoulder, upper back',a:['bandPA','revPec']},
-revPec:{n:'Reverse pec deck',c:'Chest on the pad, arms soft, sweep wide. No shrugging.',p:'Right shoulder',a:['cRearFly','proneT']},
+facePull:{n:'Face pull (rope)',c:'Pull to eye level, thumbs point back, finish in external rotation.',p:'Shoulders, upper back',a:['bandPA','revPec']},
+revPec:{n:'Reverse pec deck',c:'Chest on the pad, arms soft, sweep wide. No shrugging.',p:'Shoulders',a:['cRearFly','proneT']},
 cRearFly:{n:'Cable rear-delt fly',c:'Cross the cables, pull wide at shoulder height.',a:['revPec','proneT']},
 proneT:{n:'Prone T raise (incline bench)',c:'Chest on bench, thumbs up, raise arms out to a T.',a:['revPec','cRearFly']},
-yRaise:{n:'Cable Y-raise (lower traps)',c:'Thumb up, raise in a Y. Feel the low trap, not the neck.',p:'Right shoulder',u:1,a:['proneY','facePull']},
-proneY:{n:'Prone Y raise (incline bench)',c:'Chest on bench, raise light plates in a Y, pause at top.',p:'Right shoulder',a:['yRaise','facePull']},
-sideER:{n:'Side-lying DB external rotation',c:'Towel under the elbow. Rotate up slowly, 3 seconds down.',p:'Right shoulder',u:1,a:['cableER','bandER']},
-cableER:{n:'Cable external rotation',c:'Elbow glued to the side, rotate out, slow return.',p:'Right shoulder',u:1,a:['sideER','bandER']},
-/* arms — neutral grips favoured for the tennis elbow */
+yRaise:{n:'Cable Y-raise (lower traps)',c:'Thumb up, raise in a Y. Feel the low trap, not the neck.',p:'Shoulders',u:1,a:['proneY','facePull']},
+proneY:{n:'Prone Y raise (incline bench)',c:'Chest on bench, raise light plates in a Y, pause at top.',p:'Shoulders',a:['yRaise','facePull']},
+sideER:{n:'Side-lying DB external rotation',c:'Towel under the elbow. Rotate up slowly, 3 seconds down.',p:'Shoulders',u:1,a:['cableER','bandER']},
+cableER:{n:'Cable external rotation',c:'Elbow glued to the side, rotate out, slow return.',p:'Shoulders',u:1,a:['sideER','bandER']},
+/* arms — neutral grips are kinder to the elbows */
 ropePush:{n:'Rope triceps pushdown',c:'Elbows pinned, split the rope at the bottom, 2-second return.',p:'Elbow',a:['vbarPush','kickback']},
 vbarPush:{n:'V-bar triceps pushdown',c:'Elbows by the ribs, full extension, soft lockout.',a:['ropePush','kickback']},
 kickback:{n:'Cable triceps kickback',c:'Upper arm parallel to the floor, straighten the elbow fully.',u:1,a:['ropePush','crossExt']},
@@ -92,100 +94,100 @@ cableCurl:{n:'Cable curl (EZ handle)',c:'Elbows at the sides, slow lower, no hip
 dbCurl:{n:'DB curl (supinating)',c:'Start neutral, turn palm up as you curl. Light enough for zero swing.',a:['cableCurl','hammer']},
 /* lower */
 trapDL:{n:'Trap-bar deadlift (high handles)',c:'Brace, push the floor away, spine stays neutral. End the set if the low back takes over.',p:'Lower back',a:['gobletBox','beltSquat','legPress']},
-gobletBox:{n:'Goblet squat to box',c:'Sit back to the box, chest tall, knees track over toes.',p:'Lower back, left knee',a:['trapDL','beltSquat']},
+gobletBox:{n:'Goblet squat to box',c:'Sit back to the box, chest tall, knees track over toes.',p:'Lower back, knees',a:['trapDL','beltSquat']},
 beltSquat:{n:'Belt squat',c:'Loads the legs with zero spinal compression.',p:'Lower back',a:['gobletBox','legPress']},
-rfess:{n:'Rear-foot elevated split squat',c:'Left leg first. Front heel heavy, knee tracks over the 2nd toe.',p:'Left knee (ACL), hips',u:1,a:['splitSq','revLunge','stepUp']},
-splitSq:{n:'Split squat',c:'Left leg first. Both feet down, straight down and up.',p:'Left knee (ACL)',u:1,a:['rfess','revLunge']},
-revLunge:{n:'Reverse lunge',c:'Left leg first. Step back, front heel heavy, torso tall.',p:'Left knee (ACL)',u:1,a:['splitSq','stepUp']},
-seatHam:{n:'Seated hamstring curl',c:'Thigh pad snug, curl fully, 3-second return.',p:'Left knee (ACL)',a:['lyingHam','ballCurl']},
+rfess:{n:'Rear-foot elevated split squat',c:'Front heel heavy, knee tracks over the 2nd toe.',p:'Knees, hips',u:1,a:['splitSq','revLunge','stepUp']},
+splitSq:{n:'Split squat',c:'Both feet down, straight down and up.',p:'Knees',u:1,a:['rfess','revLunge']},
+revLunge:{n:'Reverse lunge',c:'Step back, front heel heavy, torso tall.',p:'Knees',u:1,a:['splitSq','stepUp']},
+seatHam:{n:'Seated hamstring curl',c:'Thigh pad snug, curl fully, 3-second return.',p:'Knees',a:['lyingHam','ballCurl']},
 lyingHam:{n:'Lying hamstring curl',c:'Hips stay glued to the pad.',a:['seatHam','ballCurl']},
 ballCurl:{n:'Stability-ball hamstring curl',c:'Hips up, roll the ball in with the heels.',bw:1,a:['seatHam','lyingHam']},
 legPress:{n:'Leg press (feet high)',c:'Stop before the pelvis tucks under. Low back stays on the pad.',p:'Lower back',a:['hackSq','gobletBox']},
 hackSq:{n:'Hack squat (moderate depth)',c:'Controlled depth, back flat on the pad.',a:['legPress','gobletBox']},
 standCalf:{n:'Standing calf raise',c:'2-second pause in the bottom stretch. Builds ankle range.',p:'Ankle',a:['smithCalf','slCalf']},
 smithCalf:{n:'Smith machine calf raise',c:'Full stretch, full squeeze, no bouncing.',p:'Ankle',a:['standCalf','slCalf']},
-slCalf:{n:'Single-leg calf raise',c:'Left leg first. Hold a rail for balance.',p:'Ankle, left leg',u:1,a:['standCalf','seatCalf']},
+slCalf:{n:'Single-leg calf raise',c:'Hold a rail for balance.',p:'Ankle, legs',u:1,a:['standCalf','seatCalf']},
 seatCalf:{n:'Seated calf raise',c:'Pause at the bottom, squeeze at the top.',p:'Ankle',a:['standCalf','slCalf']},
-hipAbd:{n:'Hip abduction machine',c:'Lean slightly forward, push knees out, 1-second squeeze.',p:'Hips, left knee, pelvic tilt',a:['cableAbd','bandWalk']},
-cableAbd:{n:'Cable hip abduction',c:'Left leg first. Stand tall, sweep the leg out.',p:'Hips',u:1,a:['hipAbd','bandWalk']},
-bandWalk:{n:'Banded lateral walk',t:1,s:30,bw:1,c:'Band above knees, half squat, small steps.',p:'Hips, left knee',a:['hipAbd','cableAbd']},
-tibRaise:{n:'Tibialis raise (back to wall)',c:'Heels forward, lift toes to shins, slow lower.',p:'Ankle, left knee',bw:1,a:['heelWalk']},
+hipAbd:{n:'Hip abduction machine',c:'Lean slightly forward, push knees out, 1-second squeeze.',p:'Hips, knees, pelvic tilt',a:['cableAbd','bandWalk']},
+cableAbd:{n:'Cable hip abduction',c:'Stand tall, sweep the leg out.',p:'Hips',u:1,a:['hipAbd','bandWalk']},
+bandWalk:{n:'Banded lateral walk',t:1,s:30,bw:1,c:'Band above knees, half squat, small steps.',p:'Hips, knees',a:['hipAbd','cableAbd']},
+tibRaise:{n:'Tibialis raise (back to wall)',c:'Heels forward, lift toes to shins, slow lower.',p:'Ankle, knees',bw:1,a:['heelWalk']},
 heelWalk:{n:'Heel walk',t:1,s:30,bw:1,c:'Toes up, walk on your heels.',p:'Ankle',a:['tibRaise']},
 hipThrust:{n:'Barbell hip thrust',c:'Chin tucked, ribs down, tuck the pelvis at the top. No arching.',p:'Pelvic tilt, lower back',a:['machThrust','dbBridge']},
 machThrust:{n:'Hip thrust machine',c:'Posterior tilt at the top, 1-second squeeze.',p:'Pelvic tilt',a:['hipThrust','dbBridge']},
 dbBridge:{n:'DB glute bridge (floor)',c:'DB on the hips, tuck and lift, pause.',p:'Pelvic tilt',a:['hipThrust','machThrust']},
 dbRDL:{n:'DB Romanian deadlift',c:'Hips back, DBs skim the thighs, stop at a hamstring stretch. Spine long.',p:'Lower back',a:['pullThrough','slRDL','backExt45']},
 pullThrough:{n:'Cable pull-through',c:'Hinge back, then snap hips through. Lower-back friendly.',p:'Lower back',a:['dbRDL','backExt45']},
-slRDL:{n:'Single-leg RDL (hand support)',c:'Left leg first. Hold a rack, hips square.',p:'Left knee, lower back',u:1,a:['dbRDL','pullThrough']},
-stepUp:{n:'DB step-up',c:'Left leg first. Knee-height box, drive through the whole foot, slow down.',p:'Left knee (ACL)',u:1,a:['rfess','revLunge']},
-legExt:{n:'Leg extension (partial range)',c:'Work from 90° to about 30° of bend. Protects the ACL graft.',p:'Left knee (ACL)',a:['spanishSq','tke']},
-spanishSq:{n:'Spanish squat (band)',c:'Band behind the knees, sit back, shins vertical.',p:'Left knee',bw:1,a:['legExt','tke']},
-tke:{n:'Terminal knee extension (band)',c:'Left leg first. Straighten the knee against the band, squeeze the quad.',p:'Left knee (ACL)',u:1,bw:1,a:['legExt','spanishSq']},
+slRDL:{n:'Single-leg RDL (hand support)',c:'Hold a rack, hips square.',p:'Knees, lower back',u:1,a:['dbRDL','pullThrough']},
+stepUp:{n:'DB step-up',c:'Knee-height box, drive through the whole foot, slow down.',p:'Knees',u:1,a:['rfess','revLunge']},
+legExt:{n:'Leg extension (partial range)',c:'Work from 90° to about 30° of bend. Easier on the knee joint.',p:'Knees',a:['spanishSq','tke']},
+spanishSq:{n:'Spanish squat (band)',c:'Band behind the knees, sit back, shins vertical.',p:'Knees',bw:1,a:['legExt','tke']},
+tke:{n:'Terminal knee extension (band)',c:'Straighten the knee against the band, squeeze the quad.',p:'Knees',u:1,bw:1,a:['legExt','spanishSq']},
 backExt45:{n:'45° back extension (glute bias)',c:'Soft upper back, squeeze glutes, stop at neutral. Never overextend.',p:'Lower back',a:['pullThrough','dbBridge']},
-adductM:{n:'Adductor machine',c:'Controlled range, pause at the squeeze.',p:'Hips, left knee',a:['copen','cableAdd']},
+adductM:{n:'Adductor machine',c:'Controlled range, pause at the squeeze.',p:'Hips, knees',a:['copen','cableAdd']},
 copen:{n:'Copenhagen plank (short lever)',t:1,s:20,u:1,bw:1,c:'Knee on bench, lift hips, body straight.',p:'Hips',a:['adductM','cableAdd']},
-cableAdd:{n:'Cable hip adduction',c:'Left leg first. Sweep across the body with control.',u:1,a:['adductM','copen']},
-/* core — no sit-ups or loaded flexion for L4-L5 */
+cableAdd:{n:'Cable hip adduction',c:'Sweep across the body with control.',u:1,a:['adductM','copen']},
+/* core — no sit-ups or loaded spinal flexion, to protect the lower back */
 deadBug:{n:'Dead bug',c:'Low back pressed down. Exhale as you reach.',p:'Lower back, pelvic tilt',u:1,bw:1,a:['birdDog','plank']},
 birdDog:{n:'Bird dog (3-second hold)',c:'Long reach, spine locked, hips level.',p:'Lower back',u:1,bw:1,a:['deadBug','bearHold']},
-sidePlank:{n:'Side plank',t:1,s:30,u:1,bw:1,c:'Left side first. Elbow under shoulder, hips high.',p:'Lower back',a:['sidePlankK','suitcase']},
+sidePlank:{n:'Side plank',t:1,s:30,u:1,bw:1,c:'Elbow under shoulder, hips high.',p:'Lower back',a:['sidePlankK','suitcase']},
 sidePlankK:{n:'Side plank (knees)',t:1,s:30,u:1,bw:1,c:'Easier lever, same straight line.',a:['sidePlank']},
 pallof:{n:'Pallof press',c:'Cable at chest height. Press out and resist the twist.',p:'Lower back',u:1,a:['pallofHold','deadBug']},
 pallofHold:{n:'Pallof hold',t:1,s:30,u:1,c:'Arms out, stay square, breathe.',p:'Lower back',a:['pallof']},
 mcgill:{n:'McGill curl-up',c:'One knee bent, hands under low back. Lift head and shoulders slightly, no spine curl.',p:'Lower back',bw:1,a:['deadBug','plank']},
 plank:{n:'RKC plank',t:1,s:30,bw:1,c:'Squeeze glutes and quads hard, elbows pull toward toes.',p:'Pelvic tilt',a:['bearHold','deadBug']},
 bearHold:{n:'Bear hold',t:1,s:30,bw:1,c:'Knees an inch off the floor, back flat.',a:['plank','birdDog']},
-suitcase:{n:'Suitcase carry',t:1,s:30,u:1,c:'Left hand first. Walk tall, no leaning.',p:'Lower back',a:['farmer','sidePlank']},
+suitcase:{n:'Suitcase carry',t:1,s:30,u:1,c:'Walk tall, no leaning.',p:'Lower back',a:['farmer','sidePlank']},
 farmer:{n:'Farmer carry',t:1,s:40,c:'Heavy DBs, tall posture, short steps.',a:['suitcase']},
 /* mobility */
-catCamel:{n:'Cat-camel',t:1,s:45,bw:1,c:'Slow wave through the spine, stop short of end range.',p:'Lower back (L4-L5)',a:['childPose']},
+catCamel:{n:'Cat-camel',t:1,s:45,bw:1,c:'Slow wave through the spine, stop short of end range.',p:'Lower back',a:['childPose']},
 openBook:{n:'Open book (T-spine)',u:1,bw:1,c:'Knees stacked, chest turns, low back stays quiet.',p:'Back, right shoulder',a:['thread']},
 thread:{n:'Thread the needle',u:1,bw:1,c:'On all fours, reach under then open up.',p:'Upper back',a:['openBook']},
-crossBody:{n:'Cross-body shoulder stretch',t:1,s:30,u:1,bw:1,c:'Pull the arm across at chest height. Targets the back of the shoulder.',p:'Right shoulder (posterior)',a:['sleeper']},
-sleeper:{n:'Modified sleeper stretch',t:1,s:30,u:1,bw:1,c:'Lie rolled slightly back, gently press the forearm down. Mild only.',p:'Right shoulder (posterior)',a:['crossBody']},
-wallSlide:{n:'Wall slide with lift-off',bw:1,c:'Ribs down, forearms on wall, slide up, lift off an inch.',p:'Right shoulder',a:['bandPA']},
-bandPA:{n:'Band pull-apart',bw:1,c:'Ribs down, pull to a T, 1-second pause.',p:'Right shoulder, upper back',a:['wallSlide','facePull']},
-bandER:{n:'Band external rotation',u:1,bw:1,c:'Elbow at the side, rotate out slowly.',p:'Right shoulder',a:['sideER']},
-wristEcc:{n:'Wrist extensor eccentrics',u:1,bw:1,c:'Light DB, palm down. Lift with the other hand, lower slowly over 4 seconds.',p:'Tennis elbow',a:['flexbar']},
-flexbar:{n:'Flexbar reverse twist',u:1,bw:1,c:'Tyler twist, slow eccentric.',p:'Tennis elbow',a:['wristEcc']},
+crossBody:{n:'Cross-body shoulder stretch',t:1,s:30,u:1,bw:1,c:'Pull the arm across at chest height. Targets the back of the shoulder.',p:'Shoulders',a:['sleeper']},
+sleeper:{n:'Modified sleeper stretch',t:1,s:30,u:1,bw:1,c:'Lie rolled slightly back, gently press the forearm down. Mild only.',p:'Shoulders',a:['crossBody']},
+wallSlide:{n:'Wall slide with lift-off',bw:1,c:'Ribs down, forearms on wall, slide up, lift off an inch.',p:'Shoulders',a:['bandPA']},
+bandPA:{n:'Band pull-apart',bw:1,c:'Ribs down, pull to a T, 1-second pause.',p:'Shoulders, upper back',a:['wallSlide','facePull']},
+bandER:{n:'Band external rotation',u:1,bw:1,c:'Elbow at the side, rotate out slowly.',p:'Shoulders',a:['sideER']},
+wristEcc:{n:'Wrist extensor eccentrics',u:1,bw:1,c:'Light DB, palm down. Lift with the other hand, lower slowly over 4 seconds.',p:'Elbows',a:['flexbar']},
+flexbar:{n:'Flexbar reverse twist',u:1,bw:1,c:'Tyler twist, slow eccentric.',p:'Elbows',a:['wristEcc']},
 hipFlexPPT:{n:'Half-kneeling hip flexor stretch',t:1,s:40,u:1,bw:1,c:'Tuck the pelvis and squeeze the down-knee glute before leaning.',p:'Pelvic tilt, hips',a:['couch']},
 couch:{n:'Couch stretch',t:1,s:40,u:1,bw:1,c:'Glute on, ribs down, mild pull only.',p:'Pelvic tilt, hips',a:['hipFlexPPT']},
-kneeWall:{n:'Knee-to-wall ankle rocks',u:1,bw:1,c:'Heel stays down. Do an extra set on the left.',p:'Ankle, left leg',a:['slantCalf']},
+kneeWall:{n:'Knee-to-wall ankle rocks',u:1,bw:1,c:'Heel stays down.',p:'Ankle, legs',a:['slantCalf']},
 slantCalf:{n:'Slant-board calf stretch',t:1,s:40,bw:1,c:'Knees straight, then bent.',p:'Ankle',a:['kneeWall']},
-mckenzie:{n:'Prone press-up',bw:1,c:'Hips stay down. Skip it if pain travels into the leg.',p:'Lower back (L4-L5)',a:['catCamel']},
+mckenzie:{n:'Prone press-up',bw:1,c:'Hips stay down. Skip it if pain travels into the leg.',p:'Lower back',a:['catCamel']},
 hip9090:{n:'90/90 hip switches',u:1,bw:1,c:'Tall chest, rotate from the hips.',p:'Hips',a:['worldGreatest']},
 adductRock:{n:'Adductor rock-back',u:1,bw:1,c:'Hips back, keep the spine neutral.',p:'Hips',a:['hip9090']},
-tkeMob:{n:'Terminal knee extension (band)',u:1,bw:1,c:'Left leg first. Squeeze the quad to fully straighten.',p:'Left knee (ACL)',a:['slBalance']},
+tkeMob:{n:'Terminal knee extension (band)',u:1,bw:1,c:'Squeeze the quad to fully straighten.',p:'Knees',a:['slBalance']},
 bridgePPT:{n:'Glute bridge with pelvic tuck',bw:1,c:'Tuck first, then lift. No lumbar arch.',p:'Pelvic tilt, lower back',a:['deadBug']},
-slBalance:{n:'Single-leg balance',t:1,s:30,u:1,bw:1,c:'Left leg first. Soft knee, eyes forward. Close eyes to progress.',p:'Left knee (ACL), ankle',a:['tkeMob']},
+slBalance:{n:'Single-leg balance',t:1,s:30,u:1,bw:1,c:'Soft knee, eyes forward. Close eyes to progress.',p:'Knees, ankle',a:['tkeMob']},
 worldGreatest:{n:"World's greatest stretch",u:1,bw:1,c:'Lunge, elbow to instep, rotate open.',p:'Hips, back',a:['hip9090']},
-tempoSquat:{n:'Tempo squat (3 s down)',bw:1,c:'Sit between the hips, knees track the 2nd toe, 3-second lower.',p:'Left knee (ACL), hips',a:['squatChair','wallSit']},
-squatChair:{n:'Squat to chair',bw:1,c:'Tap the chair lightly and stand. Gives the knee a safe, controlled depth.',p:'Left knee (ACL), lower back',a:['tempoSquat','wallSit']},
-wallSit:{n:'Wall sit',t:1,s:40,bw:1,c:'Thighs toward parallel only as far as the knee is happy. Weight in the heels.',p:'Left knee (ACL)',a:['squatChair','tempoSquat']},
-inclinePU:{n:'Incline push-up (hands on desk or bed)',bw:1,c:'Body in one line, elbows about 45°. Higher hands are easier on the shoulder.',p:'Right shoulder',a:['pushup','kneePU']},
-kneePU:{n:'Knee push-up',bw:1,c:'Knees down, hips in line, full control.',p:'Right shoulder',a:['inclinePU','pushup']},
-closePU:{n:'Close-hand incline push-up',bw:1,c:'Hands shoulder-width, elbows brush the ribs. Triceps focus.',p:'Right shoulder',a:['inclinePU','kneePU']},
+tempoSquat:{n:'Tempo squat (3 s down)',bw:1,c:'Sit between the hips, knees track the 2nd toe, 3-second lower.',p:'Knees, hips',a:['squatChair','wallSit']},
+squatChair:{n:'Squat to chair',bw:1,c:'Tap the chair lightly and stand. Gives the knee a safe, controlled depth.',p:'Knees, lower back',a:['tempoSquat','wallSit']},
+wallSit:{n:'Wall sit',t:1,s:40,bw:1,c:'Thighs toward parallel only as far as the knee is happy. Weight in the heels.',p:'Knees',a:['squatChair','tempoSquat']},
+inclinePU:{n:'Incline push-up (hands on desk or bed)',bw:1,c:'Body in one line, elbows about 45°. Higher hands are easier on the shoulder.',p:'Shoulders',a:['pushup','kneePU']},
+kneePU:{n:'Knee push-up',bw:1,c:'Knees down, hips in line, full control.',p:'Shoulders',a:['inclinePU','pushup']},
+closePU:{n:'Close-hand incline push-up',bw:1,c:'Hands shoulder-width, elbows brush the ribs. Triceps focus.',p:'Shoulders',a:['inclinePU','kneePU']},
 doorRow:{n:'Door-frame row',bw:1,c:'Grip both sides of a sturdy door frame, lean back and row your chest to it. Feet closer = harder.',p:'Upper back, right shoulder',a:['towelRow','proneYTW']},
 towelRow:{n:'Towel door row',bw:1,c:'Towel around the handles of a closed door that opens away from you. Test it holds, lean back, row.',p:'Upper back',a:['doorRow','proneYTW']},
-proneYTW:{n:'Prone Y-T-W raise',bw:1,c:'Face down, forehead on a towel. Reps = each letter. Thumbs up, slow and light.',p:'Right shoulder, upper back',a:['doorRow','wallSlide']},
+proneYTW:{n:'Prone Y-T-W raise',bw:1,c:'Face down, forehead on a towel. Reps = each letter. Thumbs up, slow and light.',p:'Shoulders, upper back',a:['doorRow','wallSlide']},
 towelCurl:{n:'Towel isometric curl',t:1,s:20,u:1,bw:1,c:'Stand on a towel, curl the ends up hard against it and hold. Neutral grip spares the elbow.',p:'Elbow',a:['doorCurl']},
 doorCurl:{n:'Door-frame biceps curl',bw:1,u:1,c:'Hold the frame palm up, lean back, curl yourself in slowly.',a:['towelCurl']},
-bwRevLunge:{n:'Reverse lunge',bw:1,u:1,c:'Left leg first. Step back, front heel heavy, torso tall.',p:'Left knee (ACL)',a:['bwSplit','chairStep']},
-bwSplit:{n:'Split squat (3 s down)',bw:1,u:1,c:'Left leg first. Straight down and up, front heel heavy.',p:'Left knee (ACL)',a:['bwRevLunge','chairStep']},
-chairStep:{n:'Step-up onto a sturdy chair',bw:1,u:1,c:'Left leg first. Drive through the whole foot, step down slowly. Use a lower step if the chair is tall.',p:'Left knee (ACL)',a:['bwSplit','bwRevLunge']},
-skater:{n:'Skater squat to pillow',bw:1,u:1,c:'Left leg first. Back knee taps a folded pillow; fingertips on a wall for balance.',p:'Left knee (ACL), hips',a:['bwSplit','chairStep']},
-bwSLRDL:{n:'Single-leg RDL (bodyweight)',bw:1,u:1,c:'Left leg first. Fingertips on a wall, hips square, spine long.',p:'Left knee, lower back',a:['slBridge','bedThrust']},
-slBridge:{n:'Single-leg glute bridge',bw:1,u:1,c:'Left leg first. Tuck the pelvis, drive through the heel, pause.',p:'Pelvic tilt, lower back',a:['bridgeMarch','bedThrust']},
+bwRevLunge:{n:'Reverse lunge',bw:1,u:1,c:'Step back, front heel heavy, torso tall.',p:'Knees',a:['bwSplit','chairStep']},
+bwSplit:{n:'Split squat (3 s down)',bw:1,u:1,c:'Straight down and up, front heel heavy.',p:'Knees',a:['bwRevLunge','chairStep']},
+chairStep:{n:'Step-up onto a sturdy chair',bw:1,u:1,c:'Drive through the whole foot, step down slowly. Use a lower step if the chair is tall.',p:'Knees',a:['bwSplit','bwRevLunge']},
+skater:{n:'Skater squat to pillow',bw:1,u:1,c:'Back knee taps a folded pillow; fingertips on a wall for balance.',p:'Knees, hips',a:['bwSplit','chairStep']},
+bwSLRDL:{n:'Single-leg RDL (bodyweight)',bw:1,u:1,c:'Fingertips on a wall, hips square, spine long.',p:'Knees, lower back',a:['slBridge','bedThrust']},
+slBridge:{n:'Single-leg glute bridge',bw:1,u:1,c:'Tuck the pelvis, drive through the heel, pause.',p:'Pelvic tilt, lower back',a:['bridgeMarch','bedThrust']},
 bedThrust:{n:'Hip thrust, shoulders on the bed',bw:1,c:'Chin tucked, ribs down, pelvis tucked at the top. 2-second pause.',p:'Pelvic tilt, lower back',a:['slBridge','bridgeMarch']},
 bridgeMarch:{n:'Glute bridge march',bw:1,u:1,c:'Hips high and level while you lift one foot at a time.',p:'Pelvic tilt, lower back',a:['slBridge','bedThrust']},
-latLunge:{n:'Lateral lunge',bw:1,u:1,c:'Left side first. Sit back into the hip, other leg long.',p:'Hips',a:['adductRock','bwSplit']},
-lungeKnee:{n:'Reverse lunge to knee drive',bw:1,u:1,c:'Left leg first. Step back, drive the knee up and balance for a second. No jumping.',p:'Left knee (ACL), balance',a:['bwRevLunge','chairStep']},
+latLunge:{n:'Lateral lunge',bw:1,u:1,c:'Sit back into the hip, other leg long.',p:'Hips',a:['adductRock','bwSplit']},
+lungeKnee:{n:'Reverse lunge to knee drive',bw:1,u:1,c:'Step back, drive the knee up and balance for a second. No jumping.',p:'Knees, balance',a:['bwRevLunge','chairStep']},
 bearCrawl:{n:'Bear crawl',t:1,s:30,bw:1,c:'Knees an inch off the floor, small steps forward and back, back flat.',p:'Shoulder stability, core',a:['bearHold']},
-slCalfBW:{n:'Single-leg calf raise (on a step)',bw:1,u:1,c:'Left leg first. Full stretch at the bottom, hold a wall.',p:'Ankle, left leg',a:['tibRaise']},
-wristStretch:{n:'Wrist extensor stretch',t:1,s:30,u:1,bw:1,c:'Arm straight, palm down, gently bend the wrist with the other hand.',p:'Tennis elbow',a:['wristEcc']},
+slCalfBW:{n:'Single-leg calf raise (on a step)',bw:1,u:1,c:'Full stretch at the bottom, hold a wall.',p:'Ankle, legs',a:['tibRaise']},
+wristStretch:{n:'Wrist extensor stretch',t:1,s:30,u:1,bw:1,c:'Arm straight, palm down, gently bend the wrist with the other hand.',p:'Elbows',a:['wristEcc']},
 bikeWU:{n:'Easy bike or incline walk',t:1,s:180,bw:1,c:'Start easy and build to a moderate pace. Aim for a light sweat, not fatigue.',a:['marchWU']},
 marchWU:{n:'March in place with arm swings',t:1,s:90,bw:1,c:'Knees to hip height, swing the arms, breathe through the nose.',a:['bikeWU']},
-scapPU:{n:'Scap push-up',bw:1,c:'Arms locked. Let the shoulder blades sink together, then push them apart.',p:'Right shoulder',a:['wallSlide','bandPA']},
+scapPU:{n:'Scap push-up',bw:1,c:'Arms locked. Let the shoulder blades sink together, then push them apart.',p:'Shoulders',a:['wallSlide','bandPA']},
 rampUp:{n:'Ramp-up sets for your first lift',bw:1,unit:'sets',c:'Two light sets of the first strength exercise: about 50% for 8 reps, then 70% for 4 reps. Log nothing, just groove the pattern.'},
 childPose:{n:"Child's pose breathing",t:1,s:60,bw:1,c:'Breathe into the low back, arms long.',p:'Lower back',a:['catCamel']}
 };
@@ -446,11 +448,8 @@ function applyProfile(){
   Object.assign(T,P.tpls);Object.assign(MOB,P.mob);Object.assign(WU,P.wu);Object.keys(P.rot||{}).forEach(k=>{ROT[k]=P.rot[k]});
   TPL_KEYS.length=0;[...new Set(Object.keys(P.tpls))].forEach(k=>TPL_KEYS.push(k));TPL_KEYS.push('long','rest');
 }
-/* personalised cue text: other users don't share your left-side and injury history */
-function cueOf(e){let t=e.c||'';if(!S.prof)return t;const sd=(S.prof.ans||{}).side||'none';
-  if(sd==='none')t=t.replace(/\b(Left|Right) (leg|side|arm|hand) first[.,]?\s*/g,'').replace(/\s*Do an extra set on the left\./,'').replace(/;?\s*your left may differ after the ACL surgery\.?/,'.');
-  else if(sd==='right')t=t.replace(/\bLeft\b/g,'Right').replace(/\bleft\b/g,'right');
-  return t}
-function protOf(e){if(!e.p)return'';if(!S.prof)return e.p;const m=e.p.replace(/Left knee \(ACL\)|Left knee|left knee/g,'Knees').replace(/Right shoulder \(posterior\)|Right shoulder/g,'Shoulders').replace(/ \(L4-L5\)/g,'').replace(/Tennis elbow|Elbow\b/g,'Elbows').replace(/left leg|Left leg/g,'Legs');return[...new Set(m.split(/,\s*/))].join(', ')}
-function sideNote(e,always){if(!e.u)return'';const sd=S.prof?(S.prof.ans||{}).side||'none':'left';if(sd==='none')return'';return` <b>${sd==='right'?'Right':'Left'} side first${always?', always':''}.</b>`}
+/* exercise cues are written for everyone; the weaker side comes from the user's own setup answers (sideNote) */
+function cueOf(e){return e.c||''}
+function protOf(e){if(!e.p)return'';return[...new Set(e.p.split(/,\s*/))].join(', ')}
+function sideNote(e,always){if(!e.u)return'';const sd=S.prof?(S.prof.ans||{}).side||'none':'none';if(sd==='none')return'';return` <b>${sd==='right'?'Right':'Left'} side first${always?', always':''}.</b>`}
 

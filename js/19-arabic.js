@@ -61,3 +61,5 @@ AR_PART.push(
  [/^([+-]?\d+) kg since (.+)$/,'$1 كغ منذ $2'],[/^Cycle (\d+) · week (\d+)\/(\d+)$/,'الدورة $1 · الأسبوع $2/$3'],[/^(\d+) sets$/,'$1 مجموعات']);
 Object.assign(AR,{'Weekly report · new':'التقرير الأسبوعي · جديد','+20 g':'+20 غ'});
 AR_PART.push([/^sessions last week · (\d+) PRs?$/,'جلسات الأسبوع الماضي · $1 أرقام قياسية'],[/^\+(\d+) more$/,'+$1 أخرى']);
+Object.assign(AR,{'Neck':'الرقبة','Shoulder blade (scapula)':'لوح الكتف','Upper back':'أعلى الظهر','Chest or pec':'الصدر','Groin or adductor':'الفخذ الداخلي','Hamstring':'العضلة الخلفية للفخذ','Calf or Achilles':'السمانة أو وتر أخيل','Foot (plantar fasciitis)':'القدم (التهاب اللفافة الأخمصية)',
+ 'Before you train':'قبل أن تبدأ التمرين','I agree':'أوافق','Turn on backup':'فعّل النسخ الاحتياطي','Remind me later':'ذكّرني لاحقًا','Your data is only on this phone':'بياناتك موجودة على هذا الهاتف فقط'});
