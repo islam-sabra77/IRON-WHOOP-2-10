@@ -2,7 +2,7 @@
 /* ---------- SUPPLEMENT STACK QUESTIONNAIRE ----------
    A few questions about goals, issues, diet and medicines build a stack from the guide.
    Used in the setup questionnaire and from the Supplements tab (new stack or improve the current one). */
-const SQ_GOALS=[['muscle','💪 Build muscle'],['strength',''+IC.plate+' Strength and power'],['endurance','🏃 Endurance'],['fatloss','🔥 Lose fat'],['energy',''+IC.bolt+' More energy'],['focus','🧠 Focus and memory'],['sleep','🌙 Better sleep'],['stress','🧘 Less stress'],['joints','🦴 Joint health'],['heart','❤️ Heart health'],['immunity','🛡️ Immunity'],['gut','🌿 Gut health'],['skin',''+IC.spark+' Skin and hair'],['hormones','⚖️ Hormone balance'],['longevity','⏳ Healthy ageing']];
+const SQ_GOALS=[['muscle','💪 Build muscle'],['strength',''+IC.plate+' Strength and power'],['endurance','🏃 Endurance'],['fatloss','🔥 Lose fat'],['energy',''+IC.bolt+' More energy'],['focus','🧠 Focus and memory'],['sleep','🌙 Better sleep'],['stress','🧘 Less stress'],['joints','🦴 Joint health'],['heart','❤️ Heart health'],['immunity','🛡️ Immunity'],['gut','🌿 Gut health'],['skin',''+IC.spark+' Skin and hair'],['hormones','⚖️ Hormone balance'],['longevity','⏳ Healthy aging']];
 const SQ_ISSUES=[['poorsleep','Trouble sleeping'],['lowenergy','Tired or low energy'],['anxious','Stressed or anxious'],['jointpain','Joint pain or stiffness'],['soreness','Slow recovery or very sore'],['bloating','Bloating or digestion'],['colds','Catch colds often'],['lowsun','Little sun or low vitamin D'],['cramps','Muscle cramps'],['bloodsugar','High blood sugar'],['cholesterol','High cholesterol'],['bp','High blood pressure'],['migraine','Migraines'],['lowiron','Low iron or heavy periods'],['none','None of these']];
 const SQ_MEDS=[['thinners','Blood thinners'],['bpmeds','Blood pressure medicine'],['diabmeds','Diabetes medicine'],['antidep','Antidepressants'],['thyroid','Thyroid condition'],['pregnant','Pregnant or breastfeeding'],['kidney','Kidney problems'],['liver','Liver problems'],['none','None of these']];
 /* what each answer points to: [supplement id, points, reason] */
@@ -17,11 +17,11 @@ const SQ_MAP={
   stress:[['ashwagandha',3,'lowers stress and cortisol'],['magnesium',1,'calmer nervous system'],['rhodiola',1,'stress resilience'],['theanine',1,'calm without drowsiness']],
   joints:[['omega3',2,'joint comfort'],['collagen',2,'tendons and joints'],['curcumin',1,'joint inflammation'],['glucosamine',1,'cartilage support']],
   heart:[['omega3',3,'heart health'],['coq10',2,'heart muscle energy'],['fiber',1,'cholesterol'],['vitk2',1,'arterial health']],
-  immunity:[['vitd',2,'immune function'],['vitc',2,'immune support'],['zinc',2,'immune defences'],['probiotic',1,'gut immunity']],
+  immunity:[['vitd',2,'immune function'],['vitc',2,'immune support'],['zinc',2,'immune defenses'],['probiotic',1,'gut immunity']],
   gut:[['probiotic',3,'gut balance'],['fiber',2,'regularity'],['prebiotic',1,'feeds good bacteria'],['glutamine',1,'gut lining']],
   skin:[['collagen',3,'skin elasticity'],['vitc',1,'collagen production'],['biotin',1,'hair and nails'],['astaxanthin',1,'skin protection']],
   hormones:[['zinc',2,'hormone production'],['vitd',1,'hormone health'],['magnesium',1,'hormone balance'],['ashwagandha',1,'may support testosterone']],
-  longevity:[['omega3',2,'long-term health'],['vitd',1,'long-term health'],['coq10',1,'mitochondria'],['urolithin',1,'mitochondrial renewal'],['taurine',1,'healthy ageing'],['creatine',1,'muscle and brain with age']],
+  longevity:[['omega3',2,'long-term health'],['vitd',1,'long-term health'],['coq10',1,'mitochondria'],['urolithin',1,'mitochondrial renewal'],['taurine',1,'healthy aging'],['creatine',1,'muscle and brain with age']],
   poorsleep:[['magnesium',3,'falling and staying asleep'],['glycine',2,'sleep quality'],['melatonin',1,'falling asleep (short term)'],['theanine',1,'quieter mind at night']],
   lowenergy:[['vitd',1,'low vitamin D causes fatigue'],['b12',2,'tiredness'],['rhodiola',1,'fatigue'],['coq10',1,'energy'],['magnesium',1,'energy and muscles']],
   anxious:[['ashwagandha',3,'stress and anxiety'],['theanine',2,'calm'],['magnesium',2,'calmer nervous system']],
@@ -170,17 +170,17 @@ function suppSheet(id,pre){
   const info=suppInfo(x.n);
   openSheet(`<h4 class="disp">${id?'Edit supplement':'Add supplement'}</h4>
   <label class="fl2" for="sn">Name</label><input type="text" id="sn" data-in="sname" list="sdb" placeholder="Start typing, e.g. Magnesium" maxlength="40" value="${esc(x.n)}" autocomplete="off"><datalist id="sdb">${SUPP_DB.map(e=>`<option value="${esc(e.n)}">`).join('')}</datalist>
-  <div id="sinfo">${info?`<div class="sinfohead">ℹ️ Recognised: <b>${esc(info.n)}</b></div>${suppInfoHTML(info)}`:''}</div>
+  <div id="sinfo">${info?`<div class="sinfohead">ℹ️ Recognized: <b>${esc(info.n)}</b></div>${suppInfoHTML(info)}`:''}</div>
   <label class="fl2" for="sd">Your dose</label><input type="text" id="sd" placeholder="${info?esc(info.d):'e.g. 2,000 IU'}" maxlength="40" value="${esc(x.d)}">
   <label class="fl2" for="ss">When</label><select id="ss">${SLOTS.map(sl=>`<option ${sl===x.slot?'selected':''}>${sl}</option>`).join('')}</select>
   <label class="fl2" for="snote">Note (optional)</label><input type="text" id="snote" placeholder="${info?esc(info.w):'e.g. With breakfast'}" maxlength="90" value="${esc(x.note)}">
-  <span class="fl2">Colour</span><div class="swatches">${HAB_COLORS.map(c=>`<button class="sw ${c===x.c?'on':''}" style="--c:${c}" data-a="scol" data-v="${c}" aria-label="Colour"></button>`).join('')}</div>
+  <span class="fl2">Color</span><div class="swatches">${HAB_COLORS.map(c=>`<button class="sw ${c===x.c?'on':''}" style="--c:${c}" data-a="scol" data-v="${c}" aria-label="Color"></button>`).join('')}</div>
   <button class="cta" style="--c:var(--cardio)" data-a="suppsave" data-k="${id||''}">${id?'Save changes':'Add supplement'}</button>
   ${id?`<button class="dangerbtn" data-a="delsupp" data-k="${id}">Remove ${esc(x.n)}</button>`:''}`);
 }
 function suppNameInput(el){
   const info=suppInfo(el.value),box=document.getElementById('sinfo');if(!box)return;
-  box.innerHTML=info?`<div class="sinfohead">ℹ️ Recognised: <b>${esc(info.n)}</b></div>${suppInfoHTML(info)}`:'';
+  box.innerHTML=info?`<div class="sinfohead">ℹ️ Recognized: <b>${esc(info.n)}</b></div>${suppInfoHTML(info)}`:'';
   const sd=document.getElementById('sd'),ss=document.getElementById('ss'),sn=document.getElementById('snote');
   sd.placeholder=info?info.d:'e.g. 2,000 IU';sn.placeholder=info?info.w:'e.g. With breakfast';
   if(info&&UI.sdraft&&UI.sdraft.isNew&&UI.sdraft.lastInfo!==info.id){ss.value=info.s;UI.sdraft.lastInfo=info.id}
@@ -480,7 +480,7 @@ function habSheet(id){
   const x=id?S.habits.find(h=>h.id===id):{n:'',e:EMOJIS[0],c:HAB_COLORS[0]};UI.hdraft={...x};const lk=x.link||null;
   openSheet(`<h4 class="disp">${id?'Edit habit':'New habit'}</h4><input type="text" id="hn" placeholder="e.g. Read 10 pages" value="${esc(x.n)}" maxlength="40">
   <div class="emopick">${EMOJIS.map(e=>`<button class="${e===x.e?'on':''}" data-a="hemo" data-v="${e}">${e}</button>`).join('')}</div>
-  <div class="swatches">${HAB_COLORS.map(c=>`<button class="sw ${c===x.c?'on':''}" style="--c:${c}" data-a="hcol" data-v="${c}" aria-label="Colour"></button>`).join('')}</div>
+  <div class="swatches">${HAB_COLORS.map(c=>`<button class="sw ${c===x.c?'on':''}" style="--c:${c}" data-a="hcol" data-v="${c}" aria-label="Color"></button>`).join('')}</div>
   <div class="card" style="--c:${WC.rec};margin:10px 0 0"><h4 class="disp" style="margin:0 0 4px;font-size:22px">${IC.link} Auto-track with WHOOP</h4>
   <select id="hlk" data-in="hlk"><option value="">Off: I tick it myself</option>${Object.keys(LINKS).map(k=>`<option value="${k}" ${lk&&lk.k===k?'selected':''}>${LINKS[k].l}</option>`).join('')}</select>
   <div id="hlrow" class="${lk?'':'hide'}"><label class="fl2" id="hllab" for="hlt">${lk?`Done when ${LINKS[lk.k].l.toLowerCase()} ${LINKS[lk.k].op}`:''} ${lk&&LINKS[lk.k].u?'('+LINKS[lk.k].u+')':''}</label><input type="text" inputmode="decimal" id="hlt" value="${lk?lk.t:''}"></div>

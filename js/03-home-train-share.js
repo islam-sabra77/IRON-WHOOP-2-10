@@ -222,7 +222,7 @@ function cardioHTML(d,cd){
   const zi=cd.z==='int'?[1,1,1,1,1]:cd.z==='circ'?[1,1,1,0,0]:[1,1,0,0,0];
   return`<div class="cardio" style="--c:${c}"><div class="row"><div><div class="big disp num">${cd.mins}′</div><div style="font-weight:800">${esc(cd.m)}</div></div><button class="tick ${on?'on':''}" style="--c:${c};width:52px;height:52px;flex-basis:52px" data-a="cardiochk" aria-label="Cardio done">${IC.check}</button></div>
   <div class="zbar">${zi.map(z=>`<span class="${z?'on':''}"></span>`).join('')}</div>
-  <div class="muted" style="font-size:14px">${cd.z==='circ'?`${cd.mins} rounds of 40 s on and 20 s easy, rotating: ${esc(cd.moves.join(', ').toLowerCase())}. No jumping, kind to the knee and your hotel neighbours.`:cd.z==='int'?`${(ph.length-2)/2} rounds of 30 s hard and 60 s easy, with warm-up and cool-down. The timer calls every switch.`:'Zone 2: about 60–70% of max heart rate. You can speak in full sentences. On WHOOP, strain stays moderate.'}</div>
+  <div class="muted" style="font-size:14px">${cd.z==='circ'?`${cd.mins} rounds of 40 s on and 20 s easy, rotating: ${esc(cd.moves.join(', ').toLowerCase())}. No jumping, kind to the knee and your hotel neighbors.`:cd.z==='int'?`${(ph.length-2)/2} rounds of 30 s hard and 60 s easy, with warm-up and cool-down. The timer calls every switch.`:'Zone 2: about 60–70% of max heart rate. You can speak in full sentences. On WHOOP, strain stays moderate.'}</div>
   <button class="cta" data-a="cardiotimer">${IC.play} Start ${cd.mins}-minute timer</button></div>`;
 }
 
