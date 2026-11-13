@@ -702,3 +702,15 @@ body.onhome .top .icbtn{background:#23265C;border-color:#2D3170;color:#EEF0FF}
 .whyrow{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px}
 .whyrow .pill{flex:0 0 auto;margin-top:2px;white-space:nowrap}
 .whyrow p{margin:2px 0 0;font-size:14px}
+
+/* ---------- AI coach review ---------- */
+.aircard{margin-top:10px;border-left:6px solid var(--upper)}
+.airhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.airhead b{display:flex;align-items:center;gap:6px;font-weight:800}.airhead svg{width:18px;height:18px}
+.airline{font-size:16px;font-weight:700;margin:0 0 10px}
+.airsec{border-left:4px solid var(--c);padding-left:10px;margin:0 0 10px}
+.airsec span{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--c)}
+.airsec ul{margin:4px 0 0;padding-left:18px;font-size:14px}.airsec li{margin:0 0 4px}
+.airfoot{font-size:12px;margin:0}.airerr{color:var(--bad);font-size:14px;font-weight:650;margin:0 0 8px}
+.airwait{margin:0;animation:airpulse 1.4s ease-in-out infinite}
+@keyframes airpulse{50%{opacity:.45}}

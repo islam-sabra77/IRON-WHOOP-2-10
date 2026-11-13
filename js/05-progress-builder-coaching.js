@@ -350,6 +350,7 @@ function reportSheet(ws){
   ${r.w1&&r.w0?`<div class="stat"><b class="disp num">${(r.w1.v-r.w0.v>=0?'+':'')+(r.w1.v-r.w0.v).toFixed(1)} kg</b><span>Body weight change</span></div>`:''}</div>
   ${r.prs.length?`<div class="card" style="margin-top:10px"><b>${IC.trophy} Personal records</b>${r.prs.slice(0,6).map(x=>`<div class="hrow" style="grid-template-columns:1fr auto"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><b class="num">${x.e1} kg e1RM <span style="color:var(--ok)">+${x.up}</span></b></div>`).join('')}</div>`:''}
   ${pl.length?`<div class="card"><b>${IC.pause} Stalled lifts</b>${pl.slice(0,4).map(x=>`<div style="padding:6px 0;border-top:1px solid var(--ln)"><button class="wklink" data-a="lifthist" data-e="${x.ex}">${esc(E[x.ex].n)} ›</button><div class="muted" style="font-size:13px">${esc(x.fixes[0])}</div></div>`).join('')}</div>`:''}
+  ${typeof airCard==='function'?airCard(ws):''}
   <div class="note" style="--c:var(--upper)"><b>Focus for next week:</b> ${esc(nextFocus(ws))}</div>
   <div class="grid2"><button class="cta ghost" style="margin:0" data-a="report" data-v="${addD(ws,-7)}">‹ Previous week</button>${addD(ws,7)<=addD(sunOf(t),-7)?`<button class="cta ghost" style="margin:0" data-a="report" data-v="${addD(ws,7)}">Next week ›</button>`:`<button class="cta ghost" style="margin:0" data-a="report" data-v="${sunOf(t)}">This week so far</button>`}</div>
   <button class="cta ghost" data-a="close">Close</button>`);

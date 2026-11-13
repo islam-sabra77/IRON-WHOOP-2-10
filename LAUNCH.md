@@ -10,7 +10,7 @@ Netlify → Site configuration → Environment variables:
 | --- | --- | --- |
 | `WHOOP_CLIENT_ID` | WHOOP connect | From your WHOOP developer app. Set it explicitly; the code's built-in fallback is your personal test app. |
 | `WHOOP_CLIENT_SECRET` | WHOOP connect | Never commit it. |
-| `ANTHROPIC_API_KEY` | InBody reading, Arabic translations | Without it those features turn themselves off. |
+| `ANTHROPIC_API_KEY` | InBody reading, Arabic translations, AI coach review | Without it those features turn themselves off. |
 | `AI_MONTHLY_CAP` | Cost control | Max paid AI calls per month across all users (default 3000). |
 | `ERROR_LOG_KEY` | Reading error reports and feedback | Any long random string. Read with `/api/log-error?key=…` and `/api/feedback?key=…`. |
 
