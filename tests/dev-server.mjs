@@ -8,6 +8,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const port = +(process.argv[2] || process.env.PORT || 8790);
+process.env.IRON_NO_LIMITS = process.env.IRON_NO_LIMITS || '1';
+// the same security policy as production (netlify.toml), minus the https upgrade that localhost can't use
+const CSP = (fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'netlify.toml'), 'utf8').match(/Content-Security-Policy = "([^"]+)"/) || [])[1].replace(/;\s*upgrade-insecure-requests/, '');
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml' };
 
 // in-memory replacement for @netlify/blobs
@@ -43,6 +46,6 @@ http.createServer(async (req, res) => {
   let p = decodeURIComponent(url.pathname); if (p.endsWith('/')) p += 'index.html';
   const file = path.join(root, p);
   if (!file.startsWith(root) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404); res.end('not found'); return; }
-  res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
+  res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store', 'Content-Security-Policy': CSP, 'X-Frame-Options': 'DENY', 'X-Content-Type-Options': 'nosniff' });
   fs.createReadStream(file).pipe(res);
 }).listen(port, () => console.log('IRON test server on http://localhost:' + port));

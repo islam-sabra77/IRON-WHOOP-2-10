@@ -4,12 +4,14 @@
 //   GET    /api/share?id=<id>                         -> { enc, exp }
 //   DELETE /api/share?id=<id>    header x-share-del: <del>
 import { getStore } from '@netlify/blobs';
+import { rateLimit } from '../lib/guard.mjs';
 
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 const rnd = (n) => Array.from(crypto.getRandomValues(new Uint8Array(n)), (b) => b.toString(16).padStart(2, '0')).join('');
 const okId = (s) => typeof s === 'string' && /^[a-f0-9]{24}$/.test(s);
 
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'share', 30, 600); if (lim) return lim; }
   const store = getStore('share'), url = new URL(req.url), id = url.searchParams.get('id');
   if (req.method === 'GET') {
     if (!okId(id)) return json({ error: 'id' }, 400);

@@ -2,9 +2,11 @@
 //   POST /api/log-error  body { msg, src, stack, tab, v, ua, t }
 //   GET  /api/log-error?key=<ERROR_LOG_KEY>  -> latest 200 reports (set ERROR_LOG_KEY in Netlify to read them)
 import { getStore } from '@netlify/blobs';
+import { rateLimit } from '../lib/guard.mjs';
 
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 export default async (req) => {
+  { const lim = await rateLimit(getStore('limits'), req, 'log-error', 20, 300); if (lim) return lim; }
   const store = getStore('errors');
   if (req.method === 'GET') {
     const key = new URL(req.url).searchParams.get('key');

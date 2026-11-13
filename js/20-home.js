@@ -28,6 +28,7 @@ function renderHome(){
   else h+=`<div class="hg-cta2"><button class="hg-ready" data-a="rcopen"><span class="hg-rtx"><b>${L?L[0]:'How do you feel today?'}</b><span>${L?L[1]:'A 10-second readiness check sets today’s intensity'}</span></span><span class="lhgo">›</span></button><button class="hg-link" data-a="hgo" data-v="whoop">Connect WHOOP to do this automatically ›</button></div>`;
   h+=`</section>`;
   if(typeof fwCard==='function')h+=fwCard();
+  if(typeof protectCard==='function')h+=protectCard();
   // day picker
   let days='';for(let i=0;i<7;i++){const d=addD(ws,i),k=tplOf(d),tt=k&&T[k],on=d===UI.hday,dot=S.done[d]?'var(--ok)':tt?KCOLOR(tt.k):'var(--ln)';
     days+=`<button class="hg-day ${on?'on':''} ${d===t?'today':''}" data-a="hday" data-d="${d}" aria-pressed="${on}" aria-label="${nice(d)}${tt?', '+esc(tt.n):''}${S.done[d]?', done':''}"><small>${DS[i]}</small><b class="num">${pd(d).getDate()}</b><i style="background:${dot}"></i></button>`}

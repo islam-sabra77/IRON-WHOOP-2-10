@@ -24,9 +24,7 @@ for (const m of lint('"use strict";\n' + src, 'app.js', { ...globals.browser }))
   out.push(`${at ? at.f + ':' + (line - at.start + 1) : 'app.js:' + line}  ${m.message}`);
 }
 for (const f of ['sw.js']) for (const m of lint(fs.readFileSync(path.join(root, f), 'utf8'), f, { ...globals.serviceworker })) out.push(`${f}:${m.line}  ${m.message}`);
-for (const f of ['share.html']) {
-  const code = fs.readFileSync(path.join(root, f), 'utf8').match(/<script>([\s\S]*?)<\/script>/)[1];
-  for (const m of lint(code, 'share.js', { ...globals.browser })) out.push(`${f} (script):${m.line}  ${m.message}`);
-}
+for (const f of ['share.js']) for (const m of lint(fs.readFileSync(path.join(root, f), 'utf8'), f, { ...globals.browser })) out.push(`${f}:${m.line}  ${m.message}`);
+for (const f of ['index.html', 'share.html', 'privacy.html', 'terms.html']) if (/<script>|\son[a-z]+=/i.test(fs.readFileSync(path.join(root, f), 'utf8'))) out.push(`${f}: inline script or handler (blocked by the security policy)`);
 if (out.length) { console.error(out.join('\n')); console.error(`\n${out.length} problem(s)`); process.exit(1); }
-console.log(`lint ok: ${files.length} scripts, sw.js, share.html`);
+console.log(`lint ok: ${files.length} scripts, sw.js, share.js, no inline scripts`);

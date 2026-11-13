@@ -3,6 +3,7 @@ import { expect } from '@playwright/test';
 export async function openApp(page) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => { if (m.type() === 'error' && /Content Security Policy/i.test(m.text())) errors.push('CSP: ' + m.text()); });
   page.on('dialog', (d) => d.accept(d.type() === 'prompt' ? (globalThis.__promptAnswer || '') : undefined));
   await page.goto('/index.html');
   await page.click('[data-a="obskip"]');
