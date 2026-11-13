@@ -209,6 +209,7 @@ document.addEventListener('click',ev=>{
   case'pinvid':{const cur=S.vids[el.dataset.e]||'';const u=window.prompt('Paste a YouTube link for '+E[el.dataset.e].n+' (leave empty to go back to the search):',cur);if(u===null)break;if(u.trim())S.vids[el.dataset.e]=u.trim();else delete S.vids[el.dataset.e];save();rerender();break}
   case'swap':swapSheet(k,el.dataset.b);break;
   case'lifthist':liftSheet(el.dataset.e);break;
+  case'why':whySheet(d,k);break;
   case'ibupload':ibUploadPick();break;
   case'ibopen':ibSheet();break;
   case'ibsave':ibSave();break;

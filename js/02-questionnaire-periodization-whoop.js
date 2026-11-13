@@ -221,20 +221,20 @@ function extAt(d){return S.ext.find(x=>d>=x.from&&d<=x.to)||null}
 function rangeOf(r){if(typeof r==='number')return[r,r];const m=String(r).match(/(\d+)(?:-(\d+))?/);return m?[+m[1],+(m[2]||m[1])]:[8,10]}
 function rx(role,d,dose,isT){
   const ph=phaseOf(d),off=ph.off,wi=weekInt(d);
-  if(role==='tw'){let sets=ph.s==='S'?4:3;const add={F:0,H:2,S:4}[ph.s]+off;if(ph.deload)sets=2;if(readyOf(d)==='y')sets--;if(wi&&wi.lvl==='ease'&&!ph.deload)sets--;sets=Math.max(1,sets);
-    const v=isT?dose+(ph.deload?0:add*5):String(dose+(ph.deload?0:add));return{sets,reps:v,rir:ph.rir,rest:60}}
-  const sc=SCH[ph.s];let[sets,base]=sc[role];let rir=ph.rir;
+  if(role==='tw'){let sets=ph.s==='S'?4:3;const s0=sets,adj=[];const add={F:0,H:2,S:4}[ph.s]+off;if(ph.deload){sets=2;adj.push('dl')}if(readyOf(d)==='y'){sets--;adj.push('y-')}if(wi&&wi.lvl==='ease'&&!ph.deload){sets--;adj.push('wk-')}sets=Math.max(1,sets);
+    const v=isT?dose+(ph.deload?0:add*5):String(dose+(ph.deload?0:add));return{sets,reps:v,rir:ph.rir,rest:60,base:s0,rir0:ph.rir,adj}}
+  const sc=SCH[ph.s];let[sets,base]=sc[role];let rir=ph.rir;const s0=sets,adj=[];/* adj: every change from the phase's standard sets and RIR, explained in 21-why.js */
   let reps=role==='coreT'?base+off*5:(role==='pre'?base:base+off);
-  if(role==='main'&&!ph.deload)sets+=ph.mainset;
-  const ex=extAt(d);if(ex&&ex.vol>0&&role==='arm')sets+=1;if(ex&&ex.vol<0&&(role==='acc'||role==='arm'))sets-=1;
-  if(ph.vol>0&&(role==='acc'||role==='arm'))sets+=1;if(ph.vol<0&&(role==='acc'||role==='arm'))sets-=1;
-  if(wi&&!ph.deload){if(wi.lvl==='push'&&(role==='main'||role==='sec'))sets+=1;if(wi.lvl==='ease'&&(role==='sec'||role==='acc'||role==='arm'))sets-=1;if(wi.lvl==='ease'&&+rir<4)rir=String(+rir+1)}
-  if(ph.deload){sets=2;rir='4'}
-  if(readyOf(d)==='y'&&(role==='acc'||role==='arm'||role==='pre'))sets--;
-  if(readyOf(d)==='y'&&role==='main'&&!ph.deload&&+rir<2)rir='2';
+  if(role==='main'&&!ph.deload&&ph.mainset){sets+=ph.mainset;adj.push('ms')}
+  const ex=extAt(d);if(ex&&ex.vol>0&&role==='arm'){sets+=1;adj.push('ext+')}if(ex&&ex.vol<0&&(role==='acc'||role==='arm')){sets-=1;adj.push('ext-')}
+  if(ph.vol>0&&(role==='acc'||role==='arm')){sets+=1;adj.push('cyc+')}if(ph.vol<0&&(role==='acc'||role==='arm')){sets-=1;adj.push('cyc-')}
+  if(wi&&!ph.deload){if(wi.lvl==='push'&&(role==='main'||role==='sec')){sets+=1;adj.push('wk+')}if(wi.lvl==='ease'&&(role==='sec'||role==='acc'||role==='arm')){sets-=1;adj.push('wk-')}if(wi.lvl==='ease'&&+rir<4){rir=String(+rir+1);adj.push('wkr')}}
+  if(ph.deload){sets=2;rir='4';adj.length=0;adj.push('dl')}
+  if(readyOf(d)==='y'&&(role==='acc'||role==='arm'||role==='pre')){sets--;adj.push('y-')}
+  if(readyOf(d)==='y'&&role==='main'&&!ph.deload&&+rir<2){rir='2';adj.push('yr')}
   sets=Math.max(1,Math.min(5,sets));
   let rest=REST[role];if(ph.s==='S'&&role==='main')rest=150;if(S.prof&&S.prof.ans&&+S.prof.ans.len<90)rest=Math.round(rest*(+S.prof.ans.len<=45?.7:.8)/5)*5;if(ex&&ex.vol>0&&(role==='acc'||role==='arm'))rest=45;if(ex&&ex.vol>0&&role==='pre')rest=30;
-  return{sets,reps:role==='coreT'?reps:String(reps),rir,rest};
+  return{sets,reps:role==='coreT'?reps:String(reps),rir,rest,base:s0,rir0:ph.rir,adj};
 }
 
 /* ---------- WHOOP ---------- */

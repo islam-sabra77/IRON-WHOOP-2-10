@@ -117,13 +117,12 @@ function renderTrain(){
       <button class="rbtn ${r==='g'?'on':''}" data-a="ready" data-v="g">Green<small>full session</small></button>
       <button class="rbtn ${r==='y'?'on':''}" data-a="ready" data-v="y">Yellow<small>lighter day</small></button>
       <button class="rbtn ${r==='r'?'on':''}" data-a="ready" data-v="r">Red<small>recovery only</small></button></div>`;
-    {const wi=weekInt(d);if(wi&&wi.lvl!=='normal')h+=`<div class="note" style="--c:${wi.lvl==='push'?'var(--ok)':'var(--bad)'}"><b>WHOOP week: ${wi.lvl==='push'?'push':'ease off'}.</b> ${esc(wi.why)}</div>`}
-    if(r==='y')h+=`<div class="note"><b>Lighter day.</b> One set fewer on accessories and arms, main lifts stop at 2 reps in reserve, cardio stays Zone 2.</div>`;
-    if(r==='r')h+=`<div class="note" style="--c:var(--bad)"><b>Recovery day.</b> Lifting is off today. Do the mobility, core and an easy 30-minute Zone 2. Come back tomorrow fresh.</div>`;
+    h+=whyCard(d);
     if(ph.deload)h+=`<div class="note"><b>Deload week.</b> Two sets per exercise, loads about 15% lighter, leave 4 reps in the tank. This is where the gains lock in. A new cycle starts next week.</div>`;
     else h+=`<div class="note"><b>This week: ${ph.focus}.</b> ${[(ph.c>0?'The app suggests starting weights from your strength last cycle. ':'')+'Pick loads that leave '+ph.rir+' reps in reserve. They become your starting point for the cycle.','Keep last week’s weights and add one rep to every set.','Same weights again, one more rep. You should be near the top now.','Add weight (the app suggests how much). Reps drop back down.','Same weight as last week, push for one more rep. The hardest week of the cycle.'][ph.fi]}${ph.pos===0&&ph.c>0&&ph.dec?' <b>Cycle review:</b> '+esc(ph.dec.why):''}${ph.pos===0&&ph.c>0&&!ph.dec?(ph.c%2===1?' <b>New cycle:</b> lower reps, heavier loads, and accessories and arm moves rotate to new variations.':' <b>New cycle:</b> lower reps, heavier loads, and the original accessory moves return.'):''}</div>`;
   }
   if(t.k==='rest')h+=`<div class="note"><b>Rest day.</b> The 10-minute flow below is optional but great for the pelvic tilt and low back. Supplements still count today.</div>`;
+  if(!t.blocks)h+=whyCard(d);
   if(t.k==='travel')h+=`<div class="note"><b>Travel session, no equipment.</b> All you need is a sturdy chair, a door frame and a towel.${tripAt(d)&&!S.moves[d]?' Swapped in automatically because this day is inside a trip.':''}</div>`;
   if(t.k==='long')h+=`<div class="note"><b>Active recovery.</b> Keep it conversational the whole way. Nose-breathing pace is perfect.</div>`;
   // mobility
@@ -199,6 +198,7 @@ function exCard(d,it,o){
   if(shut)return hh+'</article>';
   hh+=`<div style="overflow:hidden;margin-top:8px">${thumb(it.ex,o.c)}<div class="cue" style="font-size:14px">${esc(cueOf(e))}${sideNote(e)}</div></div>`;
   if(it.ex!==it.base){const scope=S.swaps[d]&&S.swaps[d][it.slot]?'today':'in every session';hh+=`<div class="swapped"><span>Replaces ${esc(E[it.base].n)} ${scope}</span><button data-a="undoswap" data-k="${it.slot}" data-b="${it.base}">Undo</button></div>`}
+  hh+=whyLine(d,it);
   {const plt=!e.bw&&!e.t?plateauOf(it.ex,d):null;if(plt&&!phaseOf(d).deload)hh+=plateauHTML(plt,true)}
   if(sug)hh+=`<div class="sugg num tap" data-a="lifthist" data-e="${it.ex}" role="button">Last (${short(sug.lp.d)}): ${sug.lp.sets.map(s=>s.w+'×'+s.r).join(', ')}. Try <b>${sug.w} kg</b>. <span class="muted">${sug.why}.</span> <u>History ›</u></div>`;
   else if(!e.bw&&!e.t&&!isCore)hh+=`<div class="sugg">First time: pick a load you could lift ${Number(String(it.rx.rir)[0])+0||2} more reps with. The app suggests next time.</div>`;

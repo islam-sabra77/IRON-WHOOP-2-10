@@ -685,3 +685,20 @@ body.onhome .top .wm-l{display:none!important}body.onhome .top .wm-d{display:blo
 body.onhome .top .icbtn{background:#23265C;border-color:#2D3170;color:#EEF0FF}
 .obterms{font-size:12.5px;line-height:1.45;color:var(--mu);text-align:center;margin:14px auto 0;max-width:420px}.obterms a{color:inherit;text-decoration:underline}
 .protect{border:2px solid var(--upper);display:flex;flex-direction:column;gap:10px}.protect b{display:flex;align-items:center;gap:8px;font-size:16px}.protect b svg{width:20px;height:20px}.protect p{margin:4px 0 0;font-size:14px;color:var(--mu)}
+
+/* ---------- why: reasons for every adjustment ---------- */
+.whycard{border-left:6px solid var(--upper);padding-bottom:6px}
+.whyhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.whyhead h4{margin:0}.whyhead span{font-size:13px}
+.whyit{border-left:4px solid var(--c,var(--upper));padding:2px 0 2px 10px;margin:0 0 10px}
+.whyit b{font-weight:800}.whyit p{margin:2px 0 0;font-size:14px}
+.whyit .whybc{color:var(--mu);font-size:13px}.whybc i{font-style:normal;font-weight:800;color:var(--ink)}
+.whyline{display:flex;align-items:center;gap:8px;width:100%;text-align:start;border:0;font:inherit;color:inherit;font-size:13px;margin-top:8px;padding:7px 10px;border-radius:10px;background:color-mix(in srgb,var(--c) 10%,var(--sf2));cursor:pointer}
+.whyline b{flex:0 0 auto;font-weight:800;color:var(--c)}
+.whyline span{flex:1;min-width:0}.whyline em{font-style:normal;color:var(--mu)}
+.whyline u{flex:0 0 auto;text-decoration:none;font-weight:800;color:var(--c)}
+.whybox{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--sf2);border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:14px}
+.whybox.on{background:color-mix(in srgb,var(--upper) 14%,transparent)}.whybox b{font-weight:800;white-space:nowrap}
+.whyrow{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px}
+.whyrow .pill{flex:0 0 auto;margin-top:2px;white-space:nowrap}
+.whyrow p{margin:2px 0 0;font-size:14px}
