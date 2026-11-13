@@ -41,7 +41,7 @@ const TERMS_V=1;
 document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if(!el||!el.closest('#onb'))return;
   if(['obnext','obquick','obskip','obfinish','pksignin','oblink'].includes(el.dataset.a)&&!(S.terms&&S.terms.v>=TERMS_V)){S.terms={v:TERMS_V,at:todayS()};save()}});
 function termsCheck(){if(FRESH||(S.terms&&S.terms.v>=TERMS_V))return;
-  openSheet(`<h4 class="disp">Before you train</h4><p style="font-size:15px">IRON gives general fitness, recovery and supplement guidance. It is <b>not medical advice</b>. Check with a doctor before a new programme or supplement, and stop if you feel chest pain, dizziness or sharp pain.</p>
+  openSheet(`<h4 class="disp">Before you train</h4><p style="font-size:15px">IRON gives general fitness, recovery and supplement guidance. It is <b>not medical advice</b>. Check with a doctor before a new program or supplement, and stop if you feel chest pain, dizziness or sharp pain.</p>
   <p class="muted" style="font-size:14px">Please read and agree to the <a href="terms.html" target="_blank" rel="noopener">Terms of use</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a>. You must be 16 or older.</p>
   <button class="cta" style="--c:var(--upper)" data-a="termsok">I agree</button>`)}
 document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a="termsok"]');if(!el)return;S.terms={v:TERMS_V,at:todayS()};save();closeSheet()});

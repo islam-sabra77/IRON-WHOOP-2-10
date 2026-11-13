@@ -26,7 +26,7 @@ function drawMetric(){
 }
 function bodySheet(){
   const t=todayS(),f=k=>{const lv=lastVal(k,t);return lv?(+lv.v).toFixed(1):''};
-  openSheet(`<h4 class="disp">Log body composition</h4><p class="muted" style="font-size:14px;margin:0 0 8px">Fill in what you measured. Lean mass is worked out for you from weight and body fat, so leave it empty unless your scale reports it. Grey numbers are your last entries.</p>
+  openSheet(`<h4 class="disp">Log body composition</h4><p class="muted" style="font-size:14px;margin:0 0 8px">Fill in what you measured. Lean mass is worked out for you from weight and body fat, so leave it empty unless your scale reports it. Gray numbers are your last entries.</p>
   <label class="fl2" for="bdate">Date</label><input type="date" id="bdate" value="${t}" max="${t}">
   <div class="grid2"><div><label class="fl2" for="b_weight">Weight (kg)</label><input type="text" inputmode="decimal" id="b_weight" placeholder="${f('weight')}"></div><div><label class="fl2" for="b_fat">Body fat (%)</label><input type="text" inputmode="decimal" id="b_fat" placeholder="${f('fat')}"></div></div>
   <label class="fl2" for="b_lean">Lean body mass (kg), optional</label><input type="text" inputmode="decimal" id="b_lean" placeholder="${f('lean')||'calculated'}">
@@ -334,7 +334,7 @@ function weekData(ws){
 }
 function nextFocus(ws){const nd=addD(ws,8),ph=phaseOf(nd),wi=weekInt(nd);const pl=plateaus();
   if(ph.deload)return'Deload week: lighter loads, 2 sets each, sleep well. The next cycle starts stronger.';
-  if(wi&&wi.lvl==='ease')return'Recovery is behind. Keep sessions shorter, prioritise sleep, and hold your weights.';
+  if(wi&&wi.lvl==='ease')return'Recovery is behind. Keep sessions shorter, prioritize sleep, and hold your weights.';
   if(pl.length)return`Break the stall on ${E[pl[0].ex].n}: ${pl[0].fixes[0].toLowerCase()}.`;
   if(wi&&wi.lvl==='push')return'You’re recovering well. Push the main lifts: the plan adds a set this week.';
   return`${ph.focus}. Hit every planned session.`}
