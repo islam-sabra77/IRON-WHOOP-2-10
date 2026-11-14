@@ -216,7 +216,7 @@ a{color:inherit}
 .phases span.now{outline:2.5px solid var(--ink);outline-offset:1px}
 .srow{display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--ln)}
 .srow:first-of-type{border-top:0}
-select,input[type=date],input[type=text],textarea{width:100%;height:44px;border-radius:12px;border:1.5px solid var(--ln);background:var(--sf2);padding:0 10px;font-weight:650;font-size:15px}
+select,input[type=date],input[type=text],input[type=search],textarea{width:100%;height:44px;border-radius:12px;border:1.5px solid var(--ln);background:var(--sf2);padding:0 10px;font-weight:650;font-size:15px}
 textarea{height:110px;padding:10px;font-size:12px;font-family:ui-monospace,monospace}
 
 /* supplements & habits */
@@ -685,3 +685,15 @@ body.onhome .top .wm-l{display:none!important}body.onhome .top .wm-d{display:blo
 body.onhome .top .icbtn{background:#23265C;border-color:#2D3170;color:#EEF0FF}
 .obterms{font-size:12.5px;line-height:1.45;color:var(--mu);text-align:center;margin:14px auto 0;max-width:420px}.obterms a{color:inherit;text-decoration:underline}
 .protect{border:2px solid var(--upper);display:flex;flex-direction:column;gap:10px}.protect b{display:flex;align-items:center;gap:8px;font-size:16px}.protect b svg{width:20px;height:20px}.protect p{margin:4px 0 0;font-size:14px;color:var(--mu)}
+/* activities and cardio choices */
+.actgrid{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px}
+.actchip{border:1px solid var(--ln);background:var(--sf);color:var(--ink);border-radius:99px;padding:9px 14px;font:inherit;font-size:14px;font-weight:650;min-height:42px;cursor:pointer}
+.actchip.on{background:var(--travel);border-color:var(--travel);color:#fff}
+.actcard{background:var(--sf);border:1px solid var(--ln);border-left:5px solid var(--travel);border-radius:18px;padding:12px 14px;margin:0 0 10px;display:flex;flex-direction:column;gap:8px}
+.actcard.done{border-left-color:var(--ok)}
+.acthead{display:flex;align-items:center;gap:12px}.acthead>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.acthead b{font-size:17px}.acthead .muted{font-size:13px}
+.actcard .row2{display:flex;gap:8px;flex-wrap:wrap}
+.actwarn{margin:0;font-size:13px;color:var(--warn);font-weight:650}
+.actadd{margin:4px 0 14px}
+.hg-act{background:rgba(255,255,255,.28)!important;display:inline-flex;align-items:center;gap:4px}.hg-act svg{width:13px;height:13px}
+#actq{width:100%;margin-bottom:4px}
