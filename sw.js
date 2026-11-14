@@ -1,7 +1,7 @@
 // IRON service worker: the app opens and works without a connection.
 // App files are network-first (always fresh when online) with the cache as the offline fallback.
 // API calls are never cached. Exercise thumbnails and fonts are cached as you view them.
-const VERSION = 'iron-2026-11-14-2';
+const VERSION = 'iron-2026-11-14-3';
 const SHELL = [
   './', 'index.html', 'css/app.css',
   'js/00-intro.js', 'js/01-data-exercises-plan-generator.js', 'js/02-questionnaire-periodization-whoop.js', 'js/03-home-train-share.js',
@@ -30,7 +30,8 @@ self.addEventListener('fetch', (e) => {
   }
   if (EXTERNAL.includes(url.hostname)) {
     e.respondWith(caches.open('iron-ext').then((c) => c.match(req).then((hit) => {
-      const net = fetch(req).then((res) => { if (res.ok || res.type === 'opaque') c.put(req, res.clone()); return res; }).catch(() => hit);
+      // never hand the page an empty answer: a missing font or thumbnail is a normal network error
+      const net = fetch(req).then((res) => { if (res.ok || res.type === 'opaque') c.put(req, res.clone()); return res; }).catch(() => hit || Response.error());
       return hit || net;
     })));
   }
