@@ -37,3 +37,16 @@ test('scripts share one scope without duplicate top-level names', () => {
     }
   }
 });
+
+test('the app version shown in Settings matches the offline cache version', () => {
+  const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8').match(/const VERSION = 'iron-([^']+)'/)[1];
+  const app = fs.readFileSync(path.join(root, 'js/09-errors.js'), 'utf8').match(/const SW_VERSION='([^']+)'/)[1];
+  assert.equal(app, sw, 'bump SW_VERSION in js/09-errors.js together with VERSION in sw.js');
+});
+
+test('the security policy lets the offline cache fetch every outside host it caches', () => {
+  const ext = JSON.parse(fs.readFileSync(path.join(root, 'sw.js'), 'utf8').match(/const EXTERNAL = (\[[^\]]*\])/)[1].replace(/'/g, '"'));
+  const csp = fs.readFileSync(path.join(root, 'netlify.toml'), 'utf8').match(/Content-Security-Policy = "([^"]+)"/)[1];
+  const connect = (csp.match(/connect-src ([^;]+)/) || [])[1] || '';
+  for (const h of ext) assert.ok(connect.includes('https://' + h), 'connect-src must allow ' + h + ' (the service worker fetches it)');
+});

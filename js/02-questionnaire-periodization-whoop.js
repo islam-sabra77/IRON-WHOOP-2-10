@@ -325,13 +325,15 @@ function resetSchedule(){const dates=Object.keys(S.moves);if(!dates.length&&JSON
   snapSched('Reset schedule to the original plan',dates,dates,true);dates.forEach(d=>delete S.swaps[d]);S.moves={};S.map=defaults().map;save();return true}
 function exAt(d,slot,base){const p=S.swaps[d]&&S.swaps[d][slot];if(p)return p;const x=S.swapsAll[base]||base;return typeof injSwap==='function'?injSwap(d,x):x}
 function blocksFor(d){
-  const k=tplOf(d);if(!k)return[];const t=T[k];if(!t.blocks)return[];
+  const k=tplOf(d);if(!k)return[];const t=T[k];
   if(readyOf(d)==='r')return[];
   const ex=extAt(d);
-  let out=t.blocks.map((b,bi)=>({...b,key:'s'+bi})).filter(b=>!(ex&&(ex.trim||ex.extra)&&b.opt));
+  let out=(t.blocks||[]).map((b,bi)=>({...b,key:'s'+bi})).filter(b=>!(ex&&(ex.trim||ex.extra)&&b.opt));
   if(ex&&ex.extra&&EXTRA[t.k])out.push({...EXTRA[t.k],key:'sx'});
+  /* moves you added to this day or to every session of this kind */
+  const add=typeof addedMoves==='function'?addedMoves(d):[];if(add.length)out.push({i:add.map(id=>[id,E[id].t?'coreT':'acc',E[id].t?(E[id].s||30):12]),key:'sa',added:1});
   return out.map((b,idx)=>({...b,label:String.fromCharCode(65+idx),items:b.i.map((it,ii)=>{
-    const slot=b.key+'-'+ii,b0=rotated(it[0],it[1],d),ex2=exAt(d,slot,b0);return{slot,base:b0,orig:it[0],ex:ex2,role:it[1],rx:rx(it[1],d,E[ex2].t===E[b0].t?it[2]:(E[ex2].t?(E[ex2].s||30):10),!!E[ex2].t)}})}));
+    const slot=b.key+'-'+ii,b0=b.added?it[0]:rotated(it[0],it[1],d),ex2=exAt(d,slot,b0);return{slot,base:b0,orig:it[0],ex:ex2,role:it[1],rx:rx(it[1],d,E[ex2].t===E[b0].t?it[2]:(E[ex2].t?(E[ex2].s||30):10),!!E[ex2].t)}})}));
 }
 function coreFor(d){const t=T[tplOf(d)];if(!t||!t.core)return[];return t.core.map((c,i)=>{const slot='c'+i;return{slot,base:c[0],ex:exAt(d,slot,c[0]),role:c[1],rx:rx(c[1],d)}})}
 function listFor(d,kind){const t=T[tplOf(d)];if(!t)return[];const src=kind==='wu'?(t.wu&&readyOf(d)!=='r'?WU[t.wu]:null):(mobListAt(d,t.k)||MOB[t.mob]);if(!src)return[];const pre=kind==='wu'?'w':'m';return src.map((m,i)=>{const slot=pre+i;const ex=exAt(d,slot,m[0]);let dose=m[1];if(ex!==m[0]){const b=E[m[0]],a=E[ex];if(a.t&&!b.t)dose=a.s||30;else if(!a.t&&b.t)dose=8}return{slot,base:m[0],ex,dose,kind}})}
@@ -347,7 +349,7 @@ function blockSecs(b){const rounds=Math.max(...b.items.map(x=>x.rx.sets));const 
 function strSecs(d){return blocksFor(d).reduce((a,b)=>a+blockSecs(b),0)}
 function coreSecs(d){const c=coreFor(d);if(!c.length)return 0;return blockSecs({items:c})}
 /* the plan's cardio, then any change you made (activity, style, minutes) */
-function cardioFor(d){const c=cardioBase(d);return c&&typeof cardioOv==='function'?cardioOv(d,c):c}
+function cardioFor(d){const c=cardioBase(d);return typeof cardioOv==='function'?cardioOv(d,c):c}
 function cardioBase(d){
   const k=tplOf(d);if(!k)return null;const t=T[k],ph=phaseOf(d);
   if(t.k==='long'){const base=[40,45,50,55,55,35][ph.pos]+5*Math.min(ph.c,1);return{mins:Math.min(60,base),m:'Your choice: incline walk, outdoor walk, bike, swim or elliptical',z:'z2',long:1}}

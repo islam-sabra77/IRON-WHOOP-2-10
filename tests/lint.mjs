@@ -16,7 +16,7 @@ for (const f of files) {
   src += text + '\n';
   map.push({ f, start, end: src.split('\n').length });
 }
-const rules = { 'no-undef': 'error', 'no-dupe-keys': 'error', 'no-unreachable': 'error', 'no-self-assign': 'error', 'no-dupe-else-if': 'error', 'no-duplicate-case': 'error', 'use-isnan': 'error', 'valid-typeof': 'error', 'no-const-assign': 'error', 'no-func-assign': 'error' };
+const rules = { 'no-undef': 'error', 'no-redeclare': 'error', 'no-dupe-keys': 'error', 'no-unreachable': 'error', 'no-self-assign': 'error', 'no-dupe-else-if': 'error', 'no-duplicate-case': 'error', 'use-isnan': 'error', 'valid-typeof': 'error', 'no-const-assign': 'error', 'no-func-assign': 'error' };
 const lint = (code, file, g) => new Linter().verify(code, { languageOptions: { ecmaVersion: 2024, sourceType: 'script', globals: g } , rules }, { filename: file });
 const out = [];
 for (const m of lint('"use strict";\n' + src, 'app.js', { ...globals.browser })) {

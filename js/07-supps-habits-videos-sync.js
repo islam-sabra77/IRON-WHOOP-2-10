@@ -474,7 +474,8 @@ function settingsSheet(){
   <button class="card setlink" style="margin-top:12px" data-a="syncopen"><h4 class="disp" style="font-size:22px;margin:0">${IC.cloud} Cloud backup ›</h4><span class="muted" style="font-size:14px">${syncOn()?'On'+(S.sync.at?' · last backup '+new Date(S.sync.at).toLocaleString([],{weekday:'short',hour:'2-digit',minute:'2-digit'}):''):'Off. Turn it on so you never lose your logs.'}</span></button>
   <button class="cta ghost" data-a="privacy">Privacy and your data</button><button class="cta ghost" data-a="feedback">Send feedback</button>
   <button class="cta ghost" data-a="errlog">${IC.alert} Error log${(typeof errList==='function'&&errList().length)?' ('+errList().length+')':''}</button>
-  <button class="cta ghost" style="color:var(--bad)" data-a="reset">Reset everything</button>`);
+  <button class="cta ghost" style="color:var(--bad)" data-a="reset">Reset everything</button>
+  <p class="muted" style="font-size:12.5px;text-align:center;margin:10px 0 0">IRON version ${typeof SW_VERSION!=='undefined'?SW_VERSION:''}</p>`);
 }
 function habSheet(id){
   const x=id?S.habits.find(h=>h.id===id):{n:'',e:EMOJIS[0],c:HAB_COLORS[0]};UI.hdraft={...x};const lk=x.link||null;

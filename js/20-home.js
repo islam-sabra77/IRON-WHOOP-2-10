@@ -45,6 +45,7 @@ function renderHome(){
      ${typeof actsFor==='function'&&actsFor(d).length?`<div class="hg-chips">${actsFor(d).map(x=>`<span class="hg-act">${x.done?IC.check:'+'} ${esc(actName(x.a))} · ${x.mins} min</span>`).join('')}</div>`:''}
      ${moves.length?`<div class="hg-chips">${moves.slice(0,6).map(m=>`<span>${esc(m)}</span>`).join('')}${moves.length>6?`<span>+${moves.length-6} more</span>`:''}</div>`:''}
      ${isT&&tp.k!=='rest'?`<button class="hg-go" data-a="hgo" data-v="train" data-d="${d}">${done?'See today’s session':pct>0?'Continue · '+Math.round(pct*100)+'% done':`${IC.play} Start ${esc(tp.n)}`}</button>`:`<button class="hg-go ghost" data-a="hgo" data-v="train" data-d="${d}">${done?'See this session':d<t?'Log it now':'Preview this day'}</button>`}
+     <button class="hg-link light" data-a="hgo" data-v="train" data-d="${d}">${IC.plus} Customize this day: moves, cardio, activities</button>
      ${(done||pct>0)&&tp.k!=='rest'?`<button class="hg-link light" data-a="wshare" data-d="${d}">${IC.share} Share this workout</button>`:''}</section>`}}
   // today's checks
   {const sl2=S.suppLog[t]||{},sp=S.supps||[],taken=sp.filter(s=>sl2[s.id]).length,hb=S.habits||[],hd=hb.filter(q=>habDone(q.id,t)).length,n=nutDay(t),tg=nutTargets(t),pf=Math.min(1,n.p/(tg.prot||1));
