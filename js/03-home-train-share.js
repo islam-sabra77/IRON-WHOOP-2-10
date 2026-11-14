@@ -154,6 +154,7 @@ function renderTrain(){
     h+=secHead(cd.long?'L':'Z',cd.long?'Long cardio':'Cardio',cd.long?COLORS.long:COLORS.cardio,u.cardio,mins(cd.mins),'','cardio');
     h+=isCol('cardio')?csum([{l:'Z',n:cd.mins+' min, '+cd.m,a:isChk(d,'cardio')?1:0,b:1}],cd.long?COLORS.long:COLORS.cardio,'cardio'):cardioHTML(d,cd);
   }
+  if(typeof actCards==='function')h+=actCards(d);
   if(t.k!=='rest')h+=`<div class="finish"><button class="cta" style="--c:${S.done[d]?'var(--ok)':c}" data-a="finish">${S.done[d]?IC.check+' Session complete':'Finish session'}</button></div>`;
   v.innerHTML=h;
 }
@@ -219,10 +220,10 @@ function exCard(d,it,o){
 }
 function cardioHTML(d,cd){
   const on=isChk(d,'cardio'),c=cd.long?COLORS.long:COLORS.cardio,ph=cardioPhases(cd);
-  const zi=cd.z==='int'?[1,1,1,1,1]:cd.z==='circ'?[1,1,1,0,0]:[1,1,0,0,0];
+  const zi=cd.z==='int'?[1,1,1,1,1]:cd.z==='circ'||cd.z==='free'?[1,1,1,0,0]:[1,1,0,0,0];
   return`<div class="cardio" style="--c:${c}"><div class="row"><div><div class="big disp num">${cd.mins}′</div><div style="font-weight:800">${esc(cd.m)}</div></div><button class="tick ${on?'on':''}" style="--c:${c};width:52px;height:52px;flex-basis:52px" data-a="cardiochk" aria-label="Cardio done">${IC.check}</button></div>
   <div class="zbar">${zi.map(z=>`<span class="${z?'on':''}"></span>`).join('')}</div>
-  <div class="muted" style="font-size:14px">${cd.z==='circ'?`${cd.mins} rounds of 40 s on and 20 s easy, rotating: ${esc(cd.moves.join(', ').toLowerCase())}. No jumping, kind to the knee and your hotel neighbors.`:cd.z==='int'?`${(ph.length-2)/2} rounds of 30 s hard and 60 s easy, with warm-up and cool-down. The timer calls every switch.`:'Zone 2: about 60–70% of max heart rate. You can speak in full sentences. On WHOOP, strain stays moderate.'}</div>
-  <button class="cta" data-a="cardiotimer">${IC.play} Start ${cd.mins}-minute timer</button></div>`;
+  <div class="muted" style="font-size:14px">${cd.z==='circ'?`${cd.mins} rounds of 40 s on and 20 s easy, rotating: ${esc(cd.moves.join(', ').toLowerCase())}. No jumping, kind to the knee and your hotel neighbors.`:cd.z==='int'?`${(ph.length-2)/2} rounds of 30 s hard and 60 s easy, with warm-up and cool-down. The timer calls every switch.`:cd.z==='free'?'Go at the pace the activity asks for. Keep it controlled if recovery is low.':'Zone 2: about 60–70% of max heart rate. You can speak in full sentences. On WHOOP, strain stays moderate.'}</div>
+  <div class="grid2"><button class="cta" style="margin:0" data-a="cardiotimer">${IC.play} Start ${cd.mins}-minute timer</button><button class="cta ghost" style="margin:0" data-a="cdopen">${IC.swap} Change cardio</button></div>${cd.ov?'<p class="muted" style="font-size:13px;margin:8px 0 0">You changed this cardio. Tap Change cardio to edit or go back to the plan.</p>':''}</div>`;
 }
 

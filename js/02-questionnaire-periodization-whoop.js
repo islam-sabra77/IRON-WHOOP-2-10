@@ -346,7 +346,9 @@ function itemWork(it){const e=E[it.ex],u=e.u?2:1;if(e.t)return secsOf(it)*u+10;r
 function blockSecs(b){const rounds=Math.max(...b.items.map(x=>x.rx.sets));const work=b.items.reduce((a,x)=>a+itemWork(x),0)+(b.items.length>1?10:0);const rest=Math.max(...b.items.map(x=>x.rx.rest));return rounds*(work+rest)+(b.items.some(x=>x.role==='main')?45:0)+60}
 function strSecs(d){return blocksFor(d).reduce((a,b)=>a+blockSecs(b),0)}
 function coreSecs(d){const c=coreFor(d);if(!c.length)return 0;return blockSecs({items:c})}
-function cardioFor(d){
+/* the plan's cardio, then any change you made (activity, style, minutes) */
+function cardioFor(d){const c=cardioBase(d);return c&&typeof cardioOv==='function'?cardioOv(d,c):c}
+function cardioBase(d){
   const k=tplOf(d);if(!k)return null;const t=T[k],ph=phaseOf(d);
   if(t.k==='long'){const base=[40,45,50,55,55,35][ph.pos]+5*Math.min(ph.c,1);return{mins:Math.min(60,base),m:'Your choice: incline walk, outdoor walk, bike, swim or elliptical',z:'z2',long:1}}
   if(t.k==='rest')return null;
@@ -360,7 +362,7 @@ function cardioFor(d){
 function cardioPhases(c){
   if(c.z==='int'){const rounds=Math.max(4,Math.floor((c.mins*60-300)/90));const p=[{l:'Warm-up, easy spin',s:120}];for(let i=1;i<=rounds;i++){p.push({l:'Hard '+i+'/'+rounds,s:30});p.push({l:'Easy '+i+'/'+rounds,s:60})}p.push({l:'Cool-down',s:Math.max(60,c.mins*60-120-rounds*90)});return p}
   if(c.z==='circ'){const p=[];const n=c.mins;for(let i=0;i<n;i++){p.push({l:c.moves[i%c.moves.length]+' ('+(i+1)+'/'+n+')',s:40});if(i<n-1)p.push({l:'Easy breathing',s:20})}return p}
-  return[{l:'Zone 2',s:c.mins*60}];
+  return[{l:c.z==='free'?(c.m||'Cardio'):'Zone 2',s:c.mins*60}];
 }
 function estimate(d){const m=mobSecs(d)/60,w=warmSecs(d)/60,s=strSecs(d)/60,c=coreSecs(d)/60,cd=cardioFor(d);return{m,w,s,c,cd:cd?cd.mins:0,total:m+w+s+c+(cd?cd.mins:0)}}
 

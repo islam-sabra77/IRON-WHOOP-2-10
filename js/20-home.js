@@ -42,6 +42,7 @@ function renderHome(){
      const meta=tp.k==='rest'?'Walk, stretch and sleep well':tp.k==='long'?esc(tp.f):`${moves.length} moves · about ${mins(est.total)}${isT&&r==='y'?' · trimmed for recovery':isT&&r==='r'?' · mobility and easy cardio only':''}`;
      h+=`<section class="hg-sess" style="--c:${c}" aria-label="${esc(tp.n)}"><div class="hg-srow"><span class="hg-when">${when}</span><span class="hg-pill">${pill}</span></div>
      <h3 class="disp">${esc(tp.n)}</h3><p>${esc(tp.f)}${tp.k!=='rest'&&tp.k!=='long'?'':''}</p><p class="hg-meta">${meta}</p>
+     ${typeof actsFor==='function'&&actsFor(d).length?`<div class="hg-chips">${actsFor(d).map(x=>`<span class="hg-act">${x.done?IC.check:'+'} ${esc(actName(x.a))} · ${x.mins} min</span>`).join('')}</div>`:''}
      ${moves.length?`<div class="hg-chips">${moves.slice(0,6).map(m=>`<span>${esc(m)}</span>`).join('')}${moves.length>6?`<span>+${moves.length-6} more</span>`:''}</div>`:''}
      ${isT&&tp.k!=='rest'?`<button class="hg-go" data-a="hgo" data-v="train" data-d="${d}">${done?'See today’s session':pct>0?'Continue · '+Math.round(pct*100)+'% done':`${IC.play} Start ${esc(tp.n)}`}</button>`:`<button class="hg-go ghost" data-a="hgo" data-v="train" data-d="${d}">${done?'See this session':d<t?'Log it now':'Preview this day'}</button>`}
      ${(done||pct>0)&&tp.k!=='rest'?`<button class="hg-link light" data-a="wshare" data-d="${d}">${IC.share} Share this workout</button>`:''}</section>`}}
