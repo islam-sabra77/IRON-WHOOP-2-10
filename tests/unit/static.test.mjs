@@ -37,3 +37,9 @@ test('scripts share one scope without duplicate top-level names', () => {
     }
   }
 });
+
+test('the app version shown in Settings matches the offline cache version', () => {
+  const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8').match(/const VERSION = 'iron-([^']+)'/)[1];
+  const app = fs.readFileSync(path.join(root, 'js/09-errors.js'), 'utf8').match(/const SW_VERSION='([^']+)'/)[1];
+  assert.equal(app, sw, 'bump SW_VERSION in js/09-errors.js together with VERSION in sw.js');
+});

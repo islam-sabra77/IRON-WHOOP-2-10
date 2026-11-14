@@ -55,22 +55,23 @@ function actName(a){return(ACTS[a]&&ACTS[a].n)||String(a||'Activity')}
 function cardioSet(){return S.cardioSet||(S.cardioSet={day:{},all:{}})}
 function cardioOv(d,c){
   const cs=S.cardioSet;if(!cs)return c;const k=tplOf(d),ov=(cs.day||{})[d]||(cs.all||{})[k];if(!ov)return c;
-  const r=Object.assign({},c,{ov:1});
+  // cardio added to a day that has none (rest days, or a session without cardio)
+  const r=Object.assign({mins:30,m:'Cardio',z:'z2',added:!c},c||{},{ov:1});
   if(ov.mins)r.mins=ov.mins;
-  if(ov.z&&c.z!=='circ')r.z=ov.z;
+  if(ov.z&&r.z!=='circ')r.z=ov.z;
   // low recovery still wins over hard intervals
   if(r.z==='int'&&(readyOf(d)==='y'||readyOf(d)==='r'))r.z='z2';
   if(ov.a)r.m=actName(ov.a)+(r.z==='int'?', intervals':r.z==='z2'?', Zone 2':'');
   r.a=ov.a||null;return r}
 function cardioSheet(){
-  const d=UI.date,k=tplOf(d),cd=cardioFor(d);if(!cd)return;const cs=cardioSet(),cur=(cs.day||{})[d]||(cs.all||{})[k]||{};
-  UI.cdraft=UI.cdraft&&UI.cdraft.d===d?UI.cdraft:{d,a:cur.a||'',z:cur.z||(cd.z==='circ'?'free':cd.z),mins:cur.mins||cd.mins,scope:(cs.day||{})[d]?'day':'all'};const q=UI.cdraft;
-  openSheet(`<h4 class="disp">Change cardio</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${esc(T[k].n)} · ${nice(d)}. Pick what you'd rather do; IRON keeps the time and effort sensible.</p>
+  const d=UI.date,k=tplOf(d);if(!k)return;const cd=cardioFor(d)||{mins:30,z:'z2'},none=!cardioBase(d),cs=cardioSet(),cur=(cs.day||{})[d]||(cs.all||{})[k]||{};
+  UI.cdraft=UI.cdraft&&UI.cdraft.d===d?UI.cdraft:{d,a:cur.a||(none?'incline':''),z:cur.z||(cd.z==='circ'?'free':cd.z),mins:cur.mins||cd.mins,scope:(cs.day||{})[d]||none?'day':'all'};const q=UI.cdraft;
+  openSheet(`<h4 class="disp">${none?'Add cardio':'Change cardio'}</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${esc(T[k].n)} · ${nice(d)}. Pick what you'd rather do; IRON keeps the time and effort sensible.</p>
   <label class="fl2">Activity</label><div class="actgrid">${CARDIO_ACTS.map(a=>`<button class="actchip ${q.a===a?'on':''}" data-a="cdset" data-f="a" data-v="${a}" aria-pressed="${q.a===a}">${esc(ACTS[a].n)}</button>`).join('')}</div>
   <label class="fl2">Style</label><div class="obrow">${Object.keys(CARDIO_Z).map(z=>`<button class="obopt ${q.z===z?'on':''}" data-a="cdset" data-f="z" data-v="${z}"><b>${CARDIO_Z[z]}</b></button>`).join('')}</div>
   <label class="fl2">Minutes</label><div class="pcrow"><button class="mini big" data-a="cdmin" data-v="-5" aria-label="5 minutes less">−</button><b class="disp num" style="font-size:34px;min-width:90px;text-align:center">${q.mins}′</b><button class="mini big" data-a="cdmin" data-v="5" aria-label="5 minutes more">＋</button></div>
   <label class="fl2">Apply to</label><div class="obrow"><button class="obopt ${q.scope==='day'?'on':''}" data-a="cdset" data-f="scope" data-v="day"><b>This day only</b></button><button class="obopt ${q.scope==='all'?'on':''}" data-a="cdset" data-f="scope" data-v="all"><b>Every ${esc(T[k].n)}</b></button></div>
-  <button class="cta" style="--c:var(--cardio)" data-a="cdsave">Save cardio</button>${cur.a||cur.z||cur.mins?'<button class="cta ghost" data-a="cdreset">Back to the plan’s cardio</button>':''}<button class="cta ghost" data-a="close">Cancel</button>`)}
+  <button class="cta" style="--c:var(--cardio)" data-a="cdsave">Save cardio</button>${cur.a||cur.z||cur.mins?(none?'<button class="cta ghost" data-a="cdreset">Remove this cardio</button>':'<button class="cta ghost" data-a="cdreset">Back to the plan’s cardio</button>'):''}<button class="cta ghost" data-a="close">Cancel</button>`)}
 
 /* ---------- activities ---------- */
 function actsFor(d){
@@ -132,3 +133,47 @@ document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if
   if(a==='actskip'){S.actSkip=S.actSkip||{};(S.actSkip[d]=S.actSkip[d]||{})[k]=1;save();rerender();toast('Skipped this week',()=>{delete S.actSkip[d][k]})}
   if(a==='actstop'){const r=(S.actRep||[]).find(x=>x.id===k);if(r){r.to=addD(d,-1);if(r.to<r.from)S.actRep=S.actRep.filter(x=>x!==r);save();rerender();toast(actName(r.a)+' no longer repeats')}}
 });
+
+/* ---------- ADD MOVES: any exercise, to any day or every session of that kind ---------- */
+const MV_GROUPS=[['chest','Chest',['hpush','fly']],['back','Back',['hpull','vpull','rear','shrug']],['shoulders','Shoulders',['vpush','lat','cuff']],['arms','Arms',['tri','bi']],['legs','Legs',['squat','lunge','quad','hinge','ham','glute','calf','tib','abd','add']],['core','Core and carries',['coreAE','coreFlex','coreAR','coreLat','carry']],['cardio','Cardio and power',['cardio','power']],['mob','Mobility and stretches',[]]];
+function mvGroup(id){const m=META[id];if(!m)return'mob';const g=MV_GROUPS.find(x=>x[2].includes(m.pat));return g?g[0]:'mob'}
+function addSet(){return S.addMoves||(S.addMoves={day:{},all:{},skip:{}})}
+function addedMoves(d){const a=S.addMoves;if(!a)return[];const k=tplOf(d),sk=(a.skip||{})[d]||[];
+  return[...new Set([...((a.all||{})[k]||[]),...((a.day||{})[d]||[])])].filter(id=>E[id]&&!sk.includes(id))}
+function addMoveSheet(){
+  const d=UI.date,k=tplOf(d);if(!k)return;UI.mvd=UI.mvd&&UI.mvd.d===d?UI.mvd:{d,q:'',g:'',pick:'',scope:'day'};const q=UI.mvd,set=injOn(d),have=new Set(blocksFor(d).flatMap(b=>b.items.map(it=>it.ex)));
+  const words=q.q.toLowerCase().split(/\s+/).filter(Boolean);
+  let ids=Object.keys(E).filter(id=>id!=='rampUp'&&(!q.g||mvGroup(id)===q.g)&&words.every(w=>(E[id].n+' '+mvGroup(id)).toLowerCase().includes(w)));
+  ids.sort((a,b)=>(YT[b]?1:0)-(YT[a]?1:0)||E[a].n.localeCompare(E[b].n));const more=ids.length>60;ids=ids.slice(0,60);
+  openSheet(`<h4 class="disp">Add a move</h4><p class="muted" style="font-size:14px;margin:0 0 8px">${esc(T[k].n)} · ${nice(d)}. Added moves get sets and reps that follow your cycle, and log like any other.</p>
+  <input type="search" id="mvq" data-in="mvq" placeholder="Search ${Object.keys(E).length} exercises, e.g. curl" value="${esc(q.q)}" autocomplete="off" aria-label="Search exercises">
+  <div class="actgrid">${[['','All']].concat(MV_GROUPS.map(g=>[g[0],g[1]])).map(([g,l])=>`<button class="actchip ${q.g===g?'on':''}" data-a="mvgrp" data-v="${g}">${l}</button>`).join('')}</div>
+  <div class="mvlist">${ids.map(id=>{const j=injHit(id,set),m=typeof musclesOf==='function'&&musclesOf(id);return`<button class="mvrow ${q.pick===id?'on':''}" data-a="mvpick" data-v="${id}" aria-pressed="${q.pick===id}"><span><b>${esc(E[id].n)}</b><small>${m?m.p.map(x=>MUSC_NAME[x]).join(', '):esc(MV_GROUPS.find(g=>g[0]===mvGroup(id))[1])}${have.has(id)?' · already in this day':''}${j?' · loads your '+INJ_SHORT[j]:''}</small></span><i>${q.pick===id?IC.check:'+'}</i></button>`}).join('')||'<p class="muted">No match. Try a shorter word.</p>'}${more?'<p class="muted" style="font-size:13px">Showing 60. Search to narrow down.</p>':''}</div>
+  <label class="fl2">Add to</label><div class="obrow"><button class="obopt ${q.scope==='day'?'on':''}" data-a="mvscope" data-v="day"><b>This day only</b></button><button class="obopt ${q.scope==='all'?'on':''}" data-a="mvscope" data-v="all"><b>Every ${esc(T[k].n)}</b></button></div>
+  <button class="cta" style="--c:var(--upper)" data-a="mvadd" ${q.pick?'':'disabled'}>${q.pick?'Add '+esc(E[q.pick].n):'Pick a move'}</button><button class="cta ghost" data-a="close">Cancel</button>`)}
+function moveRemove(d,id){const a=addSet(),k=tplOf(d),inDay=((a.day[d]||[]).includes(id)),inAll=((a.all[k]||[]).includes(id));
+  if(inDay&&!inAll){a.day[d]=a.day[d].filter(x=>x!==id);save();rerender();toast('Removed '+E[id].n);return}
+  openSheet(`<h4 class="disp">Remove ${esc(E[id].n)}?</h4><p class="muted" style="font-size:14px">You added it to every ${esc(T[k].n)}.</p><button class="cta ghost" data-a="mvdel1" data-v="${id}">Remove today only</button><button class="cta" style="--c:var(--bad)" data-a="mvdelall" data-v="${id}">Remove from every ${esc(T[k].n)}</button><button class="cta ghost" data-a="close">Keep it</button>`)}
+/* the bar at the top of every day: add a move, change or add cardio, add an activity */
+function dayTools(d){const has=!!cardioFor(d);return`<div class="daytools" aria-label="Customize this day"><span>Customize this day</span><div><button class="dtbtn" data-a="mvopen">${IC.plus} Add a move</button><button class="dtbtn" data-a="cdopen">${has?IC.swap+' Change cardio':IC.plus+' Add cardio'}</button><button class="dtbtn" data-a="actnew">${IC.plus} Add an activity</button></div></div>`}
+document.addEventListener('input',ev=>{const el=ev.target;if(el.dataset&&el.dataset.in==='mvq'&&UI.mvd){UI.mvd.q=el.value;const pos=el.selectionStart;addMoveSheet();const i=document.getElementById('mvq');if(i){i.focus();try{i.setSelectionRange(pos,pos)}catch(e){}}}});
+document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if(!el)return;const a=el.dataset.a,d=UI.date;
+  if(a==='mvopen'){UI.mvd=null;addMoveSheet()}
+  if(a==='mvgrp'&&UI.mvd){UI.mvd.g=el.dataset.v;addMoveSheet()}
+  if(a==='mvpick'&&UI.mvd){UI.mvd.pick=UI.mvd.pick===el.dataset.v?'':el.dataset.v;addMoveSheet()}
+  if(a==='mvscope'&&UI.mvd){UI.mvd.scope=el.dataset.v;addMoveSheet()}
+  if(a==='mvadd'&&UI.mvd&&UI.mvd.pick){const q=UI.mvd,s=addSet(),k=tplOf(q.d),id=q.pick;
+    if(q.scope==='all'){(s.all[k]=s.all[k]||[]).includes(id)||s.all[k].push(id)}else{(s.day[q.d]=s.day[q.d]||[]).includes(id)||s.day[q.d].push(id)}
+    if(s.skip[q.d])s.skip[q.d]=s.skip[q.d].filter(x=>x!==id);
+    UI.mvd=null;save();closeSheet();rerender();toast(E[id].n+' added'+(q.scope==='all'?' to every '+T[k].n:''));
+    setTimeout(()=>{const c=document.querySelector('[data-k^="sa-"]');c&&c.scrollIntoView({behavior:'smooth',block:'center'})},80)}
+  if(a==='mvdel')moveRemove(d,el.dataset.v);
+  if(a==='mvdel1'){const s=addSet();s.day[d]=(s.day[d]||[]).filter(x=>x!==el.dataset.v);(s.skip[d]=s.skip[d]||[]).push(el.dataset.v);save();closeSheet();rerender();toast('Removed for today')}
+  if(a==='mvdelall'){const s=addSet(),k=tplOf(d);s.all[k]=(s.all[k]||[]).filter(x=>x!==el.dataset.v);s.day[d]=(s.day[d]||[]).filter(x=>x!==el.dataset.v);save();closeSheet();rerender();toast('Removed from every '+T[k].n)}
+});
+
+/* ---------- UPDATES: a Home Screen app can stay open for days, so pick up new versions on return ---------- */
+(function(){if(!('serviceWorker' in navigator))return;const had=!!navigator.serviceWorker.controller;let pending=false;
+  const reload=()=>{if(typeof TM!=='undefined'&&TM){pending=true;return}const sh=document.getElementById('sheet');if(sh&&!sh.classList.contains('hide')){pending=true;return}location.reload()};
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had)reload()});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')return;if(pending){pending=false;reload();return}navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{})})})();
