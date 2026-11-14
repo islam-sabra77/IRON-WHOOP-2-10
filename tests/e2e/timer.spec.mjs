@@ -27,6 +27,13 @@ test('rest timer schedules a background alert, reschedules on +15 and cancels on
   await openApp(page);
   await page.evaluate(() => { PUSH_SUB = { endpoint: 'https://push.example/x', keys: { p256dh: 'a', auth: 'b' } }; });
   await page.evaluate(() => startTimer('Rest', [{ l: 'Set 2 is next', s: 90, c: '#2F5BFF' }]));
+  // a browser without Web Push (e.g. iPhone Safari outside the Home Screen) sends nothing and says how to get alerts
+  if (!(await page.evaluate(() => pushSupported()))) {
+    await page.waitForTimeout(800);
+    expect(calls.length).toBe(0);
+    expect(await page.evaluate(() => pushStatus())).toMatch(/Home Screen|can’t receive alerts/);
+    noErrors(page); return;
+  }
   await expect.poll(() => calls.filter((c) => c.step === 'schedule').length).toBe(1);
   const first = calls.find((c) => c.step === 'schedule').body.items[0];
   expect(first.title).toBe('Rest is over');
@@ -45,6 +52,12 @@ test('daily reminders are sent to the server with the right times', async ({ pag
   await openApp(page);
   await page.evaluate(() => { PUSH_SUB = { endpoint: 'https://push.example/x', keys: { p256dh: 'a', auth: 'b' } }; settingsSheet(); });
   await page.click('#remcard [data-a="remtog"][data-f="bed"]');
+  if (!(await page.evaluate(() => pushSupported()))) {
+    await page.waitForTimeout(1800);
+    expect(calls.length).toBe(0);
+    await expect(page.locator('#toast')).toContainText(/Home Screen|can’t receive alerts/);
+    noErrors(page); return;
+  }
   await expect.poll(() => calls.length).toBeGreaterThan(0);
   const body = calls.at(-1);
   expect(body.device).toMatch(/^d/);
