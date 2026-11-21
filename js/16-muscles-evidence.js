@@ -4,15 +4,15 @@ const PAT_MUSC={hpush:[['chest','delts','triceps'],[]],fly:[['chest'],['delts']]
   rear:[['reardelts'],['upperback','traps']],cuff:[['reardelts'],['upperback']],tri:[['triceps'],[]],bi:[['biceps'],['forearms']],squat:[['quads','glutes'],['adductors','lowerback','abs']],lunge:[['quads','glutes'],['hams','adductors']],quad:[['quads'],[]],
   hinge:[['hams','glutes','lowerback'],['upperback','forearms','traps']],ham:[['hams'],['glutes','calves']],glute:[['glutes'],['hams']],calf:[['calves'],[]],tib:[['shins'],[]],abd:[['glutes'],[]],add:[['adductors'],[]],shrug:[['traps'],['forearms']],
   carry:[['forearms','traps'],['abs','obliques','glutes']],coreAE:[['abs'],['obliques']],coreFlex:[['abs'],['obliques']],coreAR:[['obliques','abs'],['lowerback']],coreLat:[['obliques'],['abs','glutes']],cardio:[['quads','glutes','calves'],['hams','abs']],power:[['glutes','quads','hams'],['calves','abs','delts']]};
-const MUSC_NAME={chest:'Chest',delts:'Shoulders',triceps:'Triceps',biceps:'Biceps',forearms:'Forearms',abs:'Abs',obliques:'Obliques',quads:'Quads',adductors:'Inner thighs',shins:'Shins',traps:'Traps',reardelts:'Rear shoulders',upperback:'Upper back',lats:'Lats',lowerback:'Lower back',glutes:'Glutes',hams:'Hamstrings',calves:'Calves'};
-function musclesOf(ex){const m=META[ex];if(!m||!PAT_MUSC[m.pat])return null;const[p,s]=PAT_MUSC[m.pat];return{p,s}}
+const MUSC_NAME={chest:'Chest',delts:'Shoulders',triceps:'Triceps',biceps:'Biceps',forearms:'Forearms',abs:'Abs',obliques:'Obliques',quads:'Quads',adductors:'Inner thighs',shins:'Shins',traps:'Traps',reardelts:'Rear shoulders',upperback:'Upper back',lats:'Lats',lowerback:'Lower back',glutes:'Glutes',hams:'Hamstrings',calves:'Calves',hipflex:'Hip flexors',neck:'Neck'};
+function musclesOf(ex){const m=META[ex];if((!m||!PAT_MUSC[m.pat])&&typeof XM==='object'&&XM[ex])return{p:XM[ex].p,s:XM[ex].s};if(!m||!PAT_MUSC[m.pat])return null;const[p,s]=PAT_MUSC[m.pat];return{p,s}}
 function muscleMap(ex,c){
   const M=musclesOf(ex);if(!M)return'';c=c||'var(--upper)';
   const f=k=>M.p.includes(k)?`fill="${c}"`:M.s.includes(k)?`fill="${c}" fill-opacity=".38"`:'fill="var(--sf2)"';
   const pair=(k,x1,x2,y,rx,ry)=>`<ellipse ${f(k)} cx="${x1}" cy="${y}" rx="${rx}" ry="${ry}"/><ellipse ${f(k)} cx="${x2}" cy="${y}" rx="${rx}" ry="${ry}"/>`;
-  const base=ox=>`<g transform="translate(${ox} 0)" stroke="var(--ln)" stroke-width="1"><circle cx="50" cy="15" r="10" fill="var(--sf2)"/><rect x="45" y="24" width="10" height="8" fill="var(--sf2)"/>`;
+  const base=ox=>`<g transform="translate(${ox} 0)" stroke="var(--ln)" stroke-width="1"><circle cx="50" cy="15" r="10" fill="var(--sf2)"/><rect ${f('neck')} x="45" y="24" width="10" height="8"/>`;
   const front=base(0)+pair('delts',31,69,43,8,7)+`<rect ${f('chest')} x="36" y="36" width="13.5" height="20" rx="5"/><rect ${f('chest')} x="50.5" y="36" width="13.5" height="20" rx="5"/>`+pair('biceps',25,75,62,5,11)+pair('forearms',21,79,88,4.5,12)
-    +`<rect ${f('abs')} x="43" y="58" width="14" height="34" rx="5"/>`+pair('obliques',37.5,62.5,76,4.5,13)+pair('quads',41,59,121,8.5,21)+pair('adductors',47.5,52.5,112,2.6,11)+pair('shins',41,59,162,5,15)+'</g>';
+    +`<rect ${f('abs')} x="43" y="58" width="14" height="34" rx="5"/>`+pair('obliques',37.5,62.5,76,4.5,13)+pair('quads',41,59,121,8.5,21)+pair('hipflex',43.5,56.5,96,4.2,5)+pair('adductors',47.5,52.5,112,2.6,11)+pair('shins',41,59,162,5,15)+'</g>';
   const back=base(110)+`<path ${f('traps')} d="M38 34 L62 34 L68 44 L50 54 L32 44 Z"/>`+pair('reardelts',30,70,45,7,7)+`<rect ${f('upperback')} x="39" y="45" width="22" height="16" rx="5"/>`+pair('lats',36,64,67,6,13)+pair('triceps',25,75,62,5,11)+pair('forearms',21,79,88,4.5,12)
     +`<rect ${f('lowerback')} x="44" y="74" width="12" height="18" rx="4"/>`+pair('glutes',43,57,101,8,9)+pair('hams',41,59,128,7.5,17)+pair('calves',41,59,162,6,14)+'</g>';
   const lab=[...M.p.map(k=>`<b>${MUSC_NAME[k]}</b>`),...M.s.map(k=>MUSC_NAME[k])].join(', ');

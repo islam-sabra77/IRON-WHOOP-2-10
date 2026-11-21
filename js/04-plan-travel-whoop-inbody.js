@@ -47,7 +47,7 @@ function renderTravel(){
   }
   h+=`</div>`;
   TRAVEL.forEach(k=>{
-    const tp=T[k];const info=withTpl(pdate,k,()=>({est:estimate(pdate),blocks:blocksFor(pdate),core:coreFor(pdate),mob:mobFor(pdate),wu:warmFor(pdate),cd:cardioFor(pdate)}));
+    const tp=T[k];const info=withTpl(pdate,k,()=>({est:estimate(pdate),blocks:blocksFor(pdate),core:coreFor(pdate),mob:mobFor(pdate),wu:warmFor(pdate),st:typeof stretchFor==='function'?stretchFor(pdate):[],cd:cardioFor(pdate)}));
     const key='tvo-'+k,open=isCol(key);
     h+=`<div class="tvcard"><div class="tvtop"><div class="focus" style="position:relative">${tp.f}</div><h3 class="disp" style="position:relative">${tp.n}</h3><div class="tags"><span class="tag">About ${mins(info.est.total)}</span><span class="tag">${info.blocks.length} supersets</span><span class="tag">Full body</span></div></div><div class="tvbody">
       <div class="grid2"><button class="cta" style="--c:var(--travel);margin:0" data-a="dotravel" data-v="${k}">Do it today</button><button class="cta ghost" style="margin:0" data-a="col" data-v="${key}">${open?'Hide exercises':'Show exercises'}</button></div>`;
@@ -57,6 +57,7 @@ function renderTravel(){
       h+=`<div class="grp">Strength, ${mins(info.est.s)}</div><div class="csum" style="--c:${COLORS.travel}">${info.blocks.flatMap(b=>b.items.map((it,i)=>`<div class="crow"><span class="l2">${b.label}${i+1}</span><span>${esc(E[it.ex].n)}</span><b>${it.rx.sets}×${repTxt(it).replace(' / side','/side')}</b></div>`)).join('')}</div>`;
       h+=`<div class="grp">Core, ${mins(info.est.c)}</div><div class="csum" style="--c:${COLORS.core}">${info.core.map((it,i)=>`<div class="crow"><span class="l2">C${i+1}</span><span>${esc(E[it.ex].n)}</span><b>${it.rx.sets}×${repTxt(it).replace(' / side','/side')}</b></div>`).join('')}</div>`;
       h+=`<div class="grp">Cardio, ${info.cd.mins} min</div><div class="csum" style="--c:${COLORS.cardio}"><div class="crow"><span class="l2">Z</span><span>40 s on / 20 s easy: ${esc(tp.cardio.moves.join(', ').toLowerCase())}</span><b></b></div></div>`;
+      if(info.st.length)h+=`<div class="grp">Stretch, ${mins(info.est.st||0)}</div><div class="csum" style="--c:${COLORS.st}">${info.st.map((m,i)=>`<div class="crow"><span class="l2">X${i+1}</span><span>${esc(E[m.ex].n)}</span><b>${E[m.ex].t?m.dose+' s':m.dose}${E[m.ex].u?'/side':''}</b></div>`).join('')}</div>`;
     }
     h+=`</div></div>`;
   });

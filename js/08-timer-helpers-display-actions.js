@@ -199,7 +199,7 @@ document.addEventListener('click',ev=>{
   case'wdisconnect':(async()=>{try{await fetch('/api/whoop-logout',{method:'POST',headers:{'x-iron-key':S.whoop.key||''}})}catch(e){}S.whoop.connected=false;save();closeSheet();rerender();toast('WHOOP disconnected')})();break;
   case'wauto':S.whoop.auto=!S.whoop.auto;save();rerender();settingsSheet();break;
   case'mob':{const on=!isChk(d,k);setChk(d,k,on);markStart(d);save();delete UI.exo[k];if(!checkComplete(d))rerender();break}
-  case'mtimer':{const m=mobFor(d).concat(warmFor(d)).find(x=>x.slot===k);const e=E[m.ex];const mc=m.kind==='wu'?COLORS.warm:COLORS.mob;const ph=e.u?[{l:'Left side',s:m.dose,c:mc},{l:'Right side',s:m.dose,c:mc}]:[{l:e.n,s:m.dose,c:mc}];startTimer(e.n,ph,()=>{setChk(d,k,1);save();if(!checkComplete(d))rerender()});break}
+  case'mtimer':{const m=mobFor(d).concat(warmFor(d),typeof stretchFor==='function'?stretchFor(d):[]).find(x=>x.slot===k);const e=E[m.ex];const mc=m.kind==='wu'?COLORS.warm:m.kind==='st'?COLORS.st:COLORS.mob;const ph=e.u?[{l:'Left side',s:m.dose,c:mc},{l:'Right side',s:m.dose,c:mc}]:[{l:e.n,s:m.dose,c:mc}];startTimer(e.n,ph,()=>{setChk(d,k,1);save();if(!checkComplete(d))rerender()});break}
   case'set':toggleSet(d,k);break;
   case'tset':{const[slot,i]=k.split('|');const f=findItem(d,slot);const e=E[f.it.ex],sec=secsOf(f.it);const col=slot[0]==='c'?COLORS.core:COLORS.upper;const ph=e.u?[{l:'Left side',s:sec,c:col},{l:'Right side',s:sec,c:col}]:[{l:'Hold',s:sec,c:col}];startTimer(e.n+', set '+(+i+1),ph,()=>{const o=slotLog(d,slot,f.it.ex,f.it.rx.sets);if(!o.sets[+i].d)toggleSet(d,k,true)});break}
   case'cardiochk':setChk(d,'cardio',!isChk(d,'cardio'));markStart(d);save();if(!checkComplete(d))rerender();break;

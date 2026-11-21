@@ -336,7 +336,7 @@ function blocksFor(d){
     const slot=b.key+'-'+ii,b0=b.added?it[0]:rotated(it[0],it[1],d),ex2=exAt(d,slot,b0);return{slot,base:b0,orig:it[0],ex:ex2,role:it[1],rx:rx(it[1],d,E[ex2].t===E[b0].t?it[2]:(E[ex2].t?(E[ex2].s||30):10),!!E[ex2].t)}})}));
 }
 function coreFor(d){const t=T[tplOf(d)];if(!t||!t.core)return[];return t.core.map((c,i)=>{const slot='c'+i;return{slot,base:c[0],ex:exAt(d,slot,c[0]),role:c[1],rx:rx(c[1],d)}})}
-function listFor(d,kind){const t=T[tplOf(d)];if(!t)return[];const src=kind==='wu'?(t.wu&&readyOf(d)!=='r'?WU[t.wu]:null):(mobListAt(d,t.k)||MOB[t.mob]);if(!src)return[];const pre=kind==='wu'?'w':'m';return src.map((m,i)=>{const slot=pre+i;const ex=exAt(d,slot,m[0]);let dose=m[1];if(ex!==m[0]){const b=E[m[0]],a=E[ex];if(a.t&&!b.t)dose=a.s||30;else if(!a.t&&b.t)dose=8}return{slot,base:m[0],ex,dose,kind}})}
+function listFor(d,kind){const t=T[tplOf(d)];if(!t)return[];if(typeof xmList==='function'){if(kind==='wu')return xmList(d,'w');const p=typeof mobPlanAt==='function'?mobPlanAt(d):null;if(!(p&&!p.auto&&(p.areas||[]).length))return xmList(d,'m')}const src=kind==='wu'?(t.wu&&readyOf(d)!=='r'?WU[t.wu]:null):(mobListAt(d,t.k)||MOB[t.mob]);if(!src)return[];const pre=kind==='wu'?'w':'m';return src.map((m,i)=>{const slot=pre+i;const ex=exAt(d,slot,m[0]);let dose=m[1];if(ex!==m[0]){const b=E[m[0]],a=E[ex];if(a.t&&!b.t)dose=a.s||30;else if(!a.t&&b.t)dose=8}return{slot,base:m[0],ex,dose,kind}})}
 const mobFor=d=>listFor(d,'mob'),warmFor=d=>listFor(d,'wu');
 function secsOf(it){const e=E[it.ex];if(!e.t)return 0;return typeof it.rx.reps==='number'?it.rx.reps:(e.s||30)}
 function repTxt(it){const e=E[it.ex];if(e.t)return secsOf(it)+' s'+(e.u?' / side':'');return it.rx.reps+(e.u?' / side':'')}
@@ -356,7 +356,7 @@ function cardioBase(d){
   if(t.k==='rest')return null;
   if(t.k==='travel')return{mins:readyOf(d)==='r'?20:t.cardio.mins,m:readyOf(d)==='r'?'Easy walk outside or in the hotel':'Low-impact bodyweight circuit',z:readyOf(d)==='r'?'z2':'circ',moves:t.cardio.moves};
   if(readyOf(d)==='r')return{mins:30,m:'Easy walk or bike',z:'z2'};
-  const used=(mobSecs(d)+warmSecs(d)+strSecs(d)+coreSecs(d))/60;
+  const used=(mobSecs(d)+warmSecs(d)+strSecs(d)+coreSecs(d)+(typeof stretchSecs==='function'?stretchSecs(d):0))/60;
   const PP=(S.custom&&S.custom.target)?S.custom:(S.prof&&S.prof.plan),tgt=PP?PP.target:84,rgc=PP?PP.cardioRange:[10,20];const mins=Math.max(rgc[0],Math.min(rgc[1],Math.round(tgt-used)));
   const wi=weekInt(d);if(t.cardio.z==='int'&&((wi&&wi.lvl==='ease')||readyOf(d)==='y'))return{mins,m:'Zone 2 instead of intervals (recovery is low)',z:'z2'};
   return{mins,m:t.cardio.m,z:t.cardio.z};
@@ -366,7 +366,7 @@ function cardioPhases(c){
   if(c.z==='circ'){const p=[];const n=c.mins;for(let i=0;i<n;i++){p.push({l:c.moves[i%c.moves.length]+' ('+(i+1)+'/'+n+')',s:40});if(i<n-1)p.push({l:'Easy breathing',s:20})}return p}
   return[{l:c.z==='free'?(c.m||'Cardio'):'Zone 2',s:c.mins*60}];
 }
-function estimate(d){const m=mobSecs(d)/60,w=warmSecs(d)/60,s=strSecs(d)/60,c=coreSecs(d)/60,cd=cardioFor(d);return{m,w,s,c,cd:cd?cd.mins:0,total:m+w+s+c+(cd?cd.mins:0)}}
+function estimate(d){const m=mobSecs(d)/60,w=warmSecs(d)/60,s=strSecs(d)/60,c=coreSecs(d)/60,st=typeof stretchSecs==='function'?stretchSecs(d)/60:0,cd=cardioFor(d);return{m,w,s,c,st,cd:cd?cd.mins:0,total:m+w+s+c+st+(cd?cd.mins:0)}}
 
 /* ---------- logs ---------- */
 function L(d){return S.logs[d]||(S.logs[d]={})}
@@ -374,15 +374,16 @@ function slotLog(d,slot,ex,n){const l=L(d);let o=l[slot];if(!o||o.ex!==ex){o=l[s
 function isChk(d,k){return!!(S.logs[d]&&S.logs[d]._x&&S.logs[d]._x[k])}
 function setChk(d,k,v){const l=L(d);l._x=l._x||{};if(v)l._x[k]=1;else delete l._x[k]}
 function units(d){
-  const k=tplOf(d);const r={mob:[0,0],wu:[0,0],str:[0,0],core:[0,0],cardio:[0,0]};if(!k)return r;
+  const k=tplOf(d);const r={mob:[0,0],wu:[0,0],str:[0,0],core:[0,0],cardio:[0,0],st:[0,0]};if(!k)return r;
   mobFor(d).forEach(m=>{r.mob[1]++;if(isChk(d,m.slot))r.mob[0]++});
   warmFor(d).forEach(m=>{r.wu[1]++;if(isChk(d,m.slot))r.wu[0]++});
   blocksFor(d).forEach(b=>b.items.forEach(it=>{const l=S.logs[d]&&S.logs[d][it.slot];const n=it.rx.sets;r.str[1]+=n;if(l&&l.ex===it.ex)r.str[0]+=l.sets.slice(0,n).filter(s=>s.d).length}));
   coreFor(d).forEach(it=>{const l=S.logs[d]&&S.logs[d][it.slot];const n=it.rx.sets;r.core[1]+=n;if(l&&l.ex===it.ex)r.core[0]+=l.sets.slice(0,n).filter(s=>s.d).length});
   if(cardioFor(d)){r.cardio[1]=1;if(isChk(d,'cardio'))r.cardio[0]=1}
+  if(typeof stretchFor==='function')stretchFor(d).forEach(m=>{r.st[1]++;if(isChk(d,m.slot))r.st[0]++});
   return r;
 }
-function pctOf(u){const ks=['mob','wu','str','core','cardio'];const a=ks.reduce((x,k)=>x+u[k][0],0),b=ks.reduce((x,k)=>x+u[k][1],0);return b?a/b:0}
+function pctOf(u){const ks=['mob','wu','str','core','cardio','st'].filter(k=>u[k]);const a=ks.reduce((x,k)=>x+u[k][0],0),b=ks.reduce((x,k)=>x+u[k][1],0);return b?a/b:0}
 const isTraining=k=>k&&T[k]&&(T[k].k==='hiit'||T[k].k==='upper'||T[k].k==='lower'||T[k].k==='full'||T[k].k==='long'||T[k].k==='travel');
 
 /* ---------- progression engine ---------- */

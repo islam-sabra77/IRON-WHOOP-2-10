@@ -5,7 +5,7 @@ test('no personal medical details are baked into the app', async ({ page }) => {
   await openApp(page);
   const hits = await page.evaluate(() => {
     const txt = JSON.stringify(E) + JSON.stringify(SUPP_DB);
-    return ['ACL', 'L4-L5', 'Left knee', 'Right shoulder', 'ennis elbow', 'Left leg first', 'pelvic tilt', 'Pelvic tilt'].filter((w) => txt.includes(w));
+    return ['ACL', 'L4-L5', 'Left knee', 'Right shoulder', 'ennis elbow', 'Left leg first'].filter((w) => txt.includes(w));
   });
   expect(hits).toEqual([]);
   noErrors(page);

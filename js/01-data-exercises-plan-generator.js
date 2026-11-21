@@ -4,7 +4,7 @@ const KEY='stronghold-plan-v1';
 /* the sample plan runs 12 weeks from the Monday of the week you first open IRON */
 const PLAN_START=(()=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})(),
   PLAN_END=(()=>{const d=new Date(PLAN_START+'T12:00:00');d.setDate(d.getDate()+12*7-1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})();
-const COLORS={upper:'#2F5BFF',lower:'#FF6A13',mob:'#00B39A',core:'#E8A900',cardio:'#FF2D78',long:'#7B4DFF',rest:'#8E97BF',travel:'#00A3FF',warm:'#43A512',full:'#E11D74',hiit:'#F04438'};
+const COLORS={upper:'#2F5BFF',lower:'#FF6A13',mob:'#00B39A',core:'#E8A900',cardio:'#FF2D78',long:'#7B4DFF',rest:'#8E97BF',travel:'#00A3FF',warm:'#43A512',st:'#8A5CF6',full:'#E11D74',hiit:'#F04438'};
 const HAB_COLORS=['#2F5BFF','#FF6A13','#00B39A','#FF2D78','#7B4DFF','#E8A900','#12B76A','#00A3FF'];
 const EMOJIS=['💧','👟','🌙','📖','🧘','🥗','☀️','🚭','🧊','📵','🙏','✍️','🦷','💤','🍎','🏃'];
 function defaults(){return{
@@ -360,7 +360,7 @@ medBallSlam:'power|gym|1|lb|',jumpSquat:'power|bw|2|kn,an|',broadJump:'power|bw|
 const META={};Object.keys(META_RAW).forEach(id=>{const[p,eq,l,av,f]=META_RAW[id].split('|');META[id]={pat:p,eq,lvl:+l,av:av?av.split(','):[],main:f==='M'}});
 // auto-alternatives for exercises without a hand-picked list
 Object.keys(META).forEach(id=>{if(E[id]&&!E[id].a){E[id].a=Object.keys(META).filter(x=>x!==id&&META[x].pat===META[id].pat&&E[x]).slice(0,4)}});
-const EXDB_COUNT=Object.keys(META).length+21; // strength/core/cardio moves + mobility & warm-up drills
+let EXDB_COUNT=Object.keys(META).length+21; // strength/core/cardio moves + mobility & warm-up drills
 
 /* =====================================================================
    PLAN GENERATOR
