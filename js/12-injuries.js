@@ -3,11 +3,11 @@
    Each injury has a start date and, once healed, an end date. On days an injury is active,
    moves that load that joint are swapped for safe ones and its mobility is added.
    Healing it brings the normal moves back from that day on; past days stay as they were logged. */
-const INJ_SHORT={nk:'neck',sh:'shoulder',sc:'shoulder blade',ub:'upper back',pc:'chest',el:'elbow',wr:'wrist',lb:'lower back',hp:'hip',gr:'groin',hm:'hamstring',kn:'knee',ac:'calf or Achilles',an:'ankle',ft:'foot'};
+const INJ_SHORT={apt:'pelvis',nk:'neck',sh:'shoulder',sc:'shoulder blade',ub:'upper back',pc:'chest',el:'elbow',wr:'wrist',lb:'lower back',hp:'hip',gr:'groin',hm:'hamstring',kn:'knee',ac:'calf or Achilles',an:'ankle',ft:'foot'};
 /* the full list of injury areas, top of the body to the bottom */
-(function(){const names={nk:'Neck',sh:'Shoulder',sc:'Shoulder blade (scapula)',ub:'Upper back',pc:'Chest or pec',el:'Elbow',wr:'Wrist',lb:'Lower back',hp:'Hip',gr:'Groin or adductor',hm:'Hamstring',kn:'Knee',ac:'Calf or Achilles',an:'Ankle',ft:'Foot (plantar fasciitis)'};
+(function(){const names={nk:'Neck',sh:'Shoulder',sc:'Shoulder blade (scapula)',ub:'Upper back',pc:'Chest or pec',el:'Elbow',wr:'Wrist',lb:'Lower back',apt:'Anterior pelvic tilt',hp:'Hip',gr:'Groin or adductor',hm:'Hamstring',kn:'Knee',ac:'Calf or Achilles',an:'Ankle',ft:'Foot (plantar fasciitis)'};
   Object.keys(INJ).forEach(k=>delete INJ[k]);Object.assign(INJ,names);
-  Object.assign(INJ_AREA,{nk:'tspine',sc:'shoulders',ub:'tspine',pc:'shoulders',gr:'hips',hm:'hams',ac:'ankles',ft:'ankles'})})();
+  Object.assign(INJ_AREA,{apt:'hips',nk:'tspine',sc:'shoulders',ub:'tspine',pc:'shoulders',gr:'hips',hm:'hams',ac:'ankles',ft:'ankles'})})();
 /* which moves load the newer areas: by movement pattern, then by name for impact and overhead work */
 const INJ_PAT={nk:['shrug','vpush','carry','coreFlex'],sc:['vpush','lat','vpull','shrug','fly'],ub:['hinge','shrug','carry','hpull'],pc:['hpush','fly'],gr:['add','lunge'],hm:['ham','hinge'],ac:['calf'],ft:[]};
 (function injAugment(){

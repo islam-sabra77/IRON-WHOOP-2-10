@@ -288,7 +288,7 @@ const PAT_NEAR={hpush:['fly','vpush','tri'],fly:['hpush'],vpush:['lat','hpush'],
 const WU_DRILLS=['bikeWU','marchWU','scapPU','bandPA','bandER','catCamel','worldGreatest','openBook','hip9090','wallSlide'];
 function altsFor(slot,base,cur){
   const MIN=5,MAX=8,out=[];const add=x=>{if(x&&E[x]&&x!==cur&&x!=='rampUp'&&!out.includes(x))out.push(x)};
-  add(base);(E[base].a||[]).forEach(add);
+  add(base);if(!(typeof XM==='object'&&XM[base]&&!META[base]))(E[base].a||[]).forEach(add);
   const mb=META[base];
   if(mb){
     const a=S.prof&&S.prof.ans,eqs=a?eqList(a.equip):null,inj=injOn(UI.date||todayS());
@@ -296,6 +296,7 @@ function altsFor(slot,base,cur){
     const rank=pats=>Object.keys(META).filter(id=>E[id]&&pats.includes(META[id].pat)).sort((x,y)=>score(x)-score(y));
     for(const id of rank([mb.pat])){if(out.length>=MAX)break;add(id)}
     if(out.length<MIN)for(const id of rank(PAT_NEAR[mb.pat]||[])){if(out.length>=MIN)break;add(id)}
+  }else if(typeof XM==='object'&&(XM[base]||XM[cur])){xmAlts(slot,base,cur).forEach(add);
   }else{
     const groups=Object.values(MOBPOOL).filter(g=>g.includes(base)).flat();
     const all=[...new Set(Object.values(MOBPOOL).flat())];
@@ -307,9 +308,9 @@ function altsFor(slot,base,cur){
 }
 function swapSheet(slot,base){
   const d=UI.date,cur=exAt(d,slot,base);const alts=altsFor(slot,base,cur);
-  const c=slot[0]==='m'?COLORS.mob:slot[0]==='c'?COLORS.core:KCOLOR(T[tplOf(d)].k);
+  const c=slot[0]==='m'?COLORS.mob:slot[0]==='z'?COLORS.st:slot[0]==='w'?COLORS.warm:slot[0]==='c'?COLORS.core:KCOLOR(T[tplOf(d)].k);
   openSheet(`<h4 class="disp">Replace ${esc(E[cur].n)}</h4><p class="muted" style="font-size:14px;margin:0 0 6px">Pick one of these ${alts.length} alternatives that suits your joints and equipment. Choose whether it applies today only or every time this exercise appears. You can undo either.</p>
-  ${alts.map(a=>`<div class="opt" style="--c:${c}"><b>${esc(E[a].n)}${a===base?' <span class="pill" style="--c:'+c+'">original</span>':''}</b><span>${esc(cueOf(E[a]))}</span>${E[a].p?`<div><span class="chipinj" style="--c:${c}">${esc(protOf(E[a]))}</span></div>`:''}<div class="row2"><button class="mini demo" style="flex:0 0 auto;--c:${c}" data-a="demo" data-e="${a}">${IC.play}</button><button data-a="doswap" data-k="${slot}" data-b="${base}" data-e="${a}" data-s="day">Today only</button><button class="p" data-a="doswap" data-k="${slot}" data-b="${base}" data-e="${a}" data-s="all">Every session</button></div></div>`).join('')}
+  ${alts.map(a=>`<div class="opt" style="--c:${c}"><b>${esc(E[a].n)}${a===base?' <span class="pill" style="--c:'+c+'">original</span>':''}</b><span>${esc(cueOf(E[a]))}</span>${typeof xmTarget==='function'&&xmTarget(a)?`<span class="xmt">${IC.target||'◎'} ${esc(xmTarget(a))}</span>`:''}${E[a].p?`<div><span class="chipinj" style="--c:${c}">${esc(protOf(E[a]))}</span></div>`:''}<div class="row2"><button class="mini demo" style="flex:0 0 auto;--c:${c}" data-a="demo" data-e="${a}">${IC.play}</button><button data-a="doswap" data-k="${slot}" data-b="${base}" data-e="${a}" data-s="day">Today only</button><button class="p" data-a="doswap" data-k="${slot}" data-b="${base}" data-e="${a}" data-s="all">Every session</button></div></div>`).join('')}
   <button class="cta ghost" data-a="close">Cancel</button>`);
 }
 function moveSheet(){

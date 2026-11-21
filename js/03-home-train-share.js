@@ -98,7 +98,7 @@ function renderTrain(){
   const t=T[k],c=KCOLOR(t.k),u=units(d),pct=pctOf(u),est=estimate(d),ph=phaseOf(d),moved=!!S.moves[d];
   let h='';
   // hero
-  const segs=[['Mob',est.m,u.mob],['Warm',est.w,u.wu],['Strength',est.s,u.str],['Core',est.c,u.core],['Cardio',est.cd,u.cardio]].filter(s=>s[1]>0.5&&s[2][1]>0);
+  const segs=[['Mob',est.m,u.mob],['Warm',est.w,u.wu],['Strength',est.s,u.str],['Core',est.c,u.core],['Cardio',est.cd,u.cardio],['Stretch',est.st||0,u.st||[0,0]]].filter(s=>s[1]>0.5&&s[2][1]>0);
   h+=`<section class="hero" style="--c:${c}">
     <div class="big-pct disp num">${Math.round(pct*100)}%<small>done</small></div>
     <div class="when">${nice(d)}</div>
@@ -155,11 +155,17 @@ function renderTrain(){
     h+=secHead(cd.long?'L':'Z',cd.long?'Long cardio':'Cardio',cd.long?COLORS.long:COLORS.cardio,u.cardio,mins(cd.mins),'','cardio');
     h+=isCol('cardio')?csum([{l:'Z',n:cd.mins+' min, '+cd.m,a:isChk(d,'cardio')?1:0,b:1}],cd.long?COLORS.long:COLORS.cardio,'cardio'):cardioHTML(d,cd);
   }
+  // cool-down stretches for the muscles this session used
+  const st=typeof stretchFor==='function'?stretchFor(d):[];
+  if(st.length){
+    h+=secHead('X','Stretch',COLORS.st,u.st,mins(est.st),'Cool-down','st');
+    h+=isCol('st')?csum(st.map((m,i)=>({l:'X'+(i+1),n:E[m.ex].n,a:isChk(d,m.slot)?1:0,b:1})),COLORS.st,'st'):`<div class="mlist" style="--c:${COLORS.st}">${st.map(m=>mobRow(d,m,COLORS.st)).join('')}</div>`;
+  }
   if(typeof actCards==='function')h+=actCards(d);
   if(t.k!=='rest')h+=`<div class="finish"><button class="cta" style="--c:${S.done[d]?'var(--ok)':c}" data-a="finish">${S.done[d]?IC.check+' Session complete':'Finish session'}</button></div>`;
   v.innerHTML=h;
 }
-const SECS=['mob','wu','str','core','cardio'];
+const SECS=['mob','wu','str','core','cardio','st'];
 const CHEV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
 const isCol=k=>!!(S.col&&S.col[k]);
 function secHead(letter,name,c,u,time,extra,key){return`<div class="sec ${isCol(key)?'closed':''}"><button class="sechead" style="--c:${c}" data-a="col" data-v="${key}" aria-expanded="${!isCol(key)}"><span class="sq">${letter}</span><h3 class="disp">${name}</h3><span class="cnt num">${u[0]}/${u[1]}${extra?' · '+extra:''}<br>${time}</span><span class="chev">${CHEV}</span></button></div>`}
@@ -172,11 +178,11 @@ function mobRow(d,m,c){
   const e=E[m.ex],on=isChk(d,m.slot),sw=m.ex!==m.base,shut=isShut(m.slot,on,true);
   let h=`<div class="mv ${on?'done':''} ${shut?'shut':''}" style="--c:${c}">
     <div class="mvh"><button class="tick ${on?'on':''}" data-a="mob" data-k="${m.slot}" aria-label="Mark ${esc(e.n)} done">${IC.check}</button>
-    <div class="mi" data-a="excol" data-k="${m.slot}" data-s="${shut?1:0}" role="button" aria-expanded="${!shut}"><b>${esc(e.n)}</b><span>${doseTxt(m)}${sw?', swapped':''}</span></div>
+    <div class="mi" data-a="excol" data-k="${m.slot}" data-s="${shut?1:0}" role="button" aria-expanded="${!shut}"><b>${esc(e.n)}</b><span>${doseTxt(m)}${sw?', swapped':''}</span>${typeof xmTarget==='function'&&xmTarget(m.ex)?`<span class="xmt">${IC.target||'◎'} ${esc(xmTarget(m.ex))}</span>`:''}${(()=>{const wy=typeof xmWhy==='function'?xmWhy(d,m):'';return wy?`<span class="xmwhy">${esc(wy)}</span>`:''})()}</div>
     ${e.t?`<button class="mini play" data-a="mtimer" data-k="${m.slot}" aria-label="Start ${m.dose} second timer">${IC.play}${m.dose>=60?fmtT(m.dose):m.dose+'s'}</button>`:''}
     <button class="chevbtn" data-a="excol" data-k="${m.slot}" data-s="${shut?1:0}" aria-label="${shut?'Expand':'Collapse'}">${CHEV}</button></div>`;
   if(!shut){
-    h+=`<div class="mvb">${thumb(m.ex,c)}<div class="cue">${esc(cueOf(e))}${sideNote(e)}</div>${e.p?`<span class="chipinj" style="--c:${c}">${esc(protOf(e))}</span>`:''}${injNote(UI.date,m)}
+    h+=`<div class="mvb">${thumb(m.ex,c)}<div class="cue">${esc(cueOf(e))}${sideNote(e)}</div>${typeof muscleMap==='function'&&typeof XM==='object'&&XM[m.ex]?muscleMap(m.ex,c):''}${e.p?`<span class="chipinj" style="--c:${c}">${esc(protOf(e))}</span>`:''}${injNote(UI.date,m)}
     <div class="tools" style="clear:both"><button class="mini demo" data-a="demo" data-e="${m.ex}">${IC.play} Demo</button>${m.base!=='rampUp'?`<button class="mini" data-a="swap" data-k="${m.slot}" data-b="${m.base}">${IC.swap} Replace</button>`:''}${sw?`<button class="mini" data-a="undoswap" data-k="${m.slot}" data-b="${m.base}">Undo swap</button>`:''}</div></div>`;
   }
   return h+'</div>';

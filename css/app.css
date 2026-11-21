@@ -709,3 +709,9 @@ body.onhome .top .icbtn{background:#23265C;border-color:#2D3170;color:#EEF0FF}
 .mvrow i{flex:0 0 28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--sf2);font-style:normal;font-weight:800;color:var(--upper)}.mvrow i svg{width:16px;height:16px}
 .mvrow.on{background:color-mix(in srgb,var(--upper) 10%,var(--sf))}.mvrow.on i{background:var(--upper);color:#fff}
 #mvq{width:100%;margin-bottom:6px}
+
+/* warm-up, mobility and stretch targets */
+.mi .xmt{display:block;font-size:12px;font-weight:650;color:var(--c,var(--mob));margin-top:2px;line-height:1.3}
+.opt .xmt{display:block;font-size:12.5px;font-weight:650;color:var(--c,var(--mob));margin:2px 0}
+.mi .xmwhy{display:inline-block;margin-top:3px;font-size:11.5px;font-weight:750;padding:1px 8px;border-radius:99px;background:color-mix(in srgb,var(--c,var(--mob)) 14%,transparent);color:var(--c,var(--mob))}
+.mvb .mmap{clear:both;margin-top:8px}
