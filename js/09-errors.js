@@ -24,5 +24,5 @@ document.addEventListener('click',ev=>{const el=ev.target.closest('[data-a]');if
 function netBadge(){let b=document.getElementById('netbadge');if(navigator.onLine){b&&b.remove();return}if(!b){b=document.createElement('div');b.id='netbadge';b.className='netbadge';b.setAttribute('role','status');b.textContent='Offline · saving on this phone';document.body.appendChild(b)}}
 window.addEventListener('offline',netBadge);window.addEventListener('online',()=>{netBadge();toast(syncOn()?'Back online. Backing up your changes.':'Back online')});netBadge();
 /* service worker for offline use */
-const SW_VERSION='2026-11-22-2'; /* must match VERSION in sw.js (a unit test checks) */
+const SW_VERSION='2026-11-22-3'; /* must match VERSION in sw.js (a unit test checks) */
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>logError('Service worker: '+e.message,'sw')));

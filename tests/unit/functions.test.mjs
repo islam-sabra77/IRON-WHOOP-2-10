@@ -114,3 +114,54 @@ test('rate limits stop a flood from one device but not other devices, and the AI
   assert.equal(await aiBudget(st), true); assert.equal(await aiBudget(st), true); assert.equal(await aiBudget(st), false);
   delete process.env.AI_MONTHLY_CAP;
 });
+
+test('food search and barcode lookup normalise Open Food Facts answers', async () => {
+  const food = await load('food.mjs');
+  const realFetch = globalThis.fetch; const calls = [];
+  globalThis.fetch = async (u) => { calls.push(String(u));
+    if (String(u).includes('/api/v2/product/5000159407236')) return new Response(JSON.stringify({ status: 1, product: { code: '5000159407236', product_name: 'Oat bar', brands: 'Brand, Other', serving_quantity: 40, serving_size: '1 bar (40 g)', nutriments: { 'energy-kcal_100g': 420, proteins_100g: 8.04, carbohydrates_100g: 60, fat_100g: 15 } } }), { status: 200 });
+    if (String(u).includes('/api/v2/product/')) return new Response('{}', { status: 404 });
+    return new Response(JSON.stringify({ products: [{ code: '1', product_name: 'Greek yogurt', nutriments: { energy_100g: 418.4, proteins_100g: 10 } }, { code: '2', product_name: '', nutriments: {} }] }), { status: 200 }); };
+  try {
+    const one = await (await food(new Request('http://x/api/food?code=5000159407236'))).json();
+    assert.equal(one.item.name, 'Oat bar'); assert.equal(one.item.brand, 'Brand'); assert.deepEqual(one.item.per100, { kcal: 420, p: 8, c: 60, f: 15 }); assert.equal(one.item.serving.g, 40);
+    // the second lookup is served from the cache
+    await food(new Request('http://x/api/food?code=5000159407236')); assert.equal(calls.filter((c) => c.includes('5000159407236')).length, 1);
+    assert.equal((await food(new Request('http://x/api/food?code=12345678'))).status, 404);
+    const s = await (await food(new Request('http://x/api/food?q=greek%20yogurt'))).json();
+    assert.equal(s.items.length, 1); assert.equal(s.items[0].per100.kcal, 100);
+    assert.equal((await food(new Request('http://x/api/food?q=a'))).status, 400);
+  } finally { globalThis.fetch = realFetch; }
+});
+
+test('meal photo needs the API key, a device key and an image', async () => {
+  const meal = await load('meal-photo.mjs');
+  const prev = process.env.ANTHROPIC_API_KEY; delete process.env.ANTHROPIC_API_KEY;
+  const mk = (body, k = key) => new Request('http://x/api/meal-photo', { method: 'POST', headers: { 'x-iron-key': k, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  try {
+    assert.equal((await meal(mk({ data: 'x', media_type: 'image/jpeg' }))).status, 501);
+    process.env.ANTHROPIC_API_KEY = 'test';
+    assert.equal((await meal(mk({ data: 'x', media_type: 'image/jpeg' }, 'short'))).status, 401);
+    assert.equal((await meal(mk({ data: 'x', media_type: 'application/pdf' }))).status, 415);
+    assert.equal((await meal(mk({}))).status, 400);
+  } finally { if (prev === undefined) delete process.env.ANTHROPIC_API_KEY; else process.env.ANTHROPIC_API_KEY = prev; }
+});
+
+test('Oura data is merged into one recovery record per day and the connection can be removed', async () => {
+  const oura = await load('oura-data.mjs');
+  const k = 'b'.repeat(64), h = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(k)))).map((b) => b.toString(16).padStart(2, '0')).join('');
+  await globalThis.__ironStore('oura').setJSON('tok:' + h, { at: 'tok', rt: 'r', exp: Date.now() + 864e5 });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (u, o) => { assert.equal(o.headers.Authorization, 'Bearer tok'); const p = new URL(String(u)).pathname;
+    if (p.endsWith('/daily_readiness')) return new Response(JSON.stringify({ data: [{ day: '2026-11-20', score: 81 }, { day: '2026-11-21', score: 55 }] }));
+    if (p.endsWith('/daily_sleep')) return new Response(JSON.stringify({ data: [{ day: '2026-11-21', score: 70 }] }));
+    return new Response(JSON.stringify({ data: [{ day: '2026-11-21', total_sleep_duration: 1800, average_hrv: 30, lowest_heart_rate: 60 }, { day: '2026-11-21', total_sleep_duration: 26100, average_hrv: 48, lowest_heart_rate: 52 }] })); };
+  try {
+    const r = await (await oura(new Request('http://x/api/oura-data', { headers: { 'x-iron-key': k } }))).json();
+    assert.equal(r.connected, true);
+    assert.deepEqual(r.records.find((x) => x.d === '2026-11-21'), { d: '2026-11-21', rec: 55, perf: 70, hrv: 48, rhr: 52, dur: 7.25, bed: null, wake: null });
+    assert.equal(r.records.find((x) => x.d === '2026-11-20').rec, 81);
+  } finally { globalThis.fetch = realFetch; }
+  assert.equal((await oura(new Request('http://x/api/oura-data', { method: 'DELETE', headers: { 'x-iron-key': k } }))).status, 200);
+  assert.equal((await oura(new Request('http://x/api/oura-data', { headers: { 'x-iron-key': k } }))).status, 401);
+});
