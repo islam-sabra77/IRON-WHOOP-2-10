@@ -83,3 +83,17 @@ test('stretches and mobility drills can be replaced with ones for the same muscl
   expect(await page.evaluate((z) => stretchFor(UI.date).find((m) => m.slot === z.slot).ex, z)).toBe(pick);
   noErrors(page);
 });
+
+test('every exercise, warm-up, mobility drill and stretch has a demo video', async ({ page }) => {
+  await openApp(page);
+  const r = await page.evaluate(() => {
+    const ids = Object.keys(E).filter((id) => id !== 'rampUp');
+    return { n: ids.length, missing: ids.filter((id) => !/^[A-Za-z0-9_-]{11}$/.test(YT[id] || '')).map((id) => id + ' (' + E[id].n + ')') };
+  });
+  expect(r.n).toBeGreaterThan(300);
+  expect(r.missing).toEqual([]);
+  // the player embeds it
+  await page.evaluate(() => openPlayer('pigeon'));
+  await expect(page.locator('.sheet iframe[src*="youtube-nocookie.com/embed/"]')).toHaveCount(1);
+  noErrors(page);
+});
