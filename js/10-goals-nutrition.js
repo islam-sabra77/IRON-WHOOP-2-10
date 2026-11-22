@@ -66,7 +66,7 @@ function nutTargets(d){
   return{kcal,prot,burn,bmr:Math.round(bmr),src,goal,training,why:`${goal==='fat'?'20% under':goal==='muscle'?'8% over':goal==='strength'?'5% over':'about'} the ${Math.round(burn)} kcal you burn on a ${training?'training':'rest'} day${wd&&wd.kcal&&d<todayS()?' (from WHOOP)':''}, with BMR from ${src}.`};
 }
 function nutDay(d){const l=(S.food||{})[d]||[];return{p:l.reduce((a,x)=>a+(+x.p||0),0),c:l.reduce((a,x)=>a+(+x.c||0),0),list:l}}
-function renderFood(){
+function renderFood(){if(typeof renderNutrition==='function'){renderNutrition();return}
   const d=UI.fday||todayS(),n=nutDay(d),tg=nutTargets(d),t=todayS();
   let bars='';for(let i=6;i>=0;i--){const dd=addD(d,-i),x=nutDay(dd),tt=nutTargets(dd);const hp=Math.min(1,x.p/tt.prot);bars+=`<button class="fbar ${dd===d?'on':''}" data-a="fday" data-v="${dd}"><i style="height:${Math.max(4,hp*60)}px;background:${hp>=.9?'var(--ok)':'color-mix(in srgb,#12B76A 45%,var(--sf2))'}"></i><span>${DS[dow(dd)][0]}</span></button>`}
   let h=`<div class="phead"><h2 class="pagetitle disp">Nutrition</h2><button class="addbtn" style="--c:#12B76A" data-a="foodadd">${IC.plus}Add</button></div><p class="sub">${d===t?'Today':nice(d)} · ${tg.training?'training day':'rest day'}</p>

@@ -252,7 +252,7 @@ function whoopDay(d){
   if(drop&&lvl!=='r')lvl=lvl==='g'?'y':'r';
   return{...x,lvl,hb,rb,hrvD,rhrD,drop,why}
 }
-function readyOf(d){if(S.ready[d])return S.ready[d];if(S.whoop&&S.whoop.connected&&S.whoop.auto){const w=whoopDay(d);if(w)return w.lvl}return''}
+function readyOf(d){if(S.ready[d])return S.ready[d];if((S.whoop&&S.whoop.connected&&S.whoop.auto)||(S.oura&&S.oura.connected&&S.oura.auto!==false)){const w=whoopDay(d);if(w)return w.lvl}return''}
 function lowStreak(d){let n=0;for(let i=0;i<3;i++){const w=whoopDay(addD(d,-i));if(w&&w.lvl!=='g')n++;else break}return n}
 function isoToLocal(iso){return ds(new Date(iso))}
 async function whoopSync(force){

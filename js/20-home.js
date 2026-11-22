@@ -15,17 +15,18 @@ function renderHome(){
   if(!UI.hday||UI.hday<ws||UI.hday>addD(ws,6))UI.hday=t;
   const anim=!UI.hAnimDone;UI.hAnimDone=true;
   const name=(S.prof&&S.prof.ans&&S.prof.ans.name)||'',hr=new Date().getHours();
-  const ld=latestDay(),x=(S.whoop.connected?W(ld):null)||{},wd=S.whoop.connected?whoopDay(ld):null,lvl=readyOf(t)||(wd&&wd.lvl)||'';
+  const HLIVE=(typeof recLive==='function'?recLive():S.whoop.connected)||!!((S.wdata||{})[t]&&S.wdata[t].src==='checkin');
+  const ld=latestDay(),x=(HLIVE?W(ld):null)||{},wd=HLIVE?whoopDay(ld):null,lvl=readyOf(t)||(wd&&wd.lvl)||'';
   const L=H_LVL[lvl],col=L?L[2]:'#8E97BF';
   // header
   let h=`<section class="hg-hero" aria-label="Readiness"><p class="hg-date">${nice(t)}</p><h2 class="hg-hi disp">${hr<12?'Good morning':hr<18?'Good afternoon':'Good evening'}${name?', '+esc(name):''}</h2>`;
-  if(S.whoop.connected&&x.rec!=null){
+  if(HLIVE&&x.rec!=null){
     h+=`<button class="hg-ready" data-a="hwhy" aria-expanded="${!!UI.hwhy}">${hGauge(x.rec,col,anim)}<span class="hg-rtx"><b>${L?L[0]:'Recovery'}</b><span>${L?L[1]:''}. ${UI.hwhy?'Tap to hide':'Tap to see why'}</span></span></button>`;
     if(UI.hwhy){const sl=x.sleep,hrvT=wd&&wd.hrvD!=null?(wd.hrvD>=0?'+':'')+Math.round(wd.hrvD*100)+'% vs avg':'30-day avg pending',rhrT=wd&&wd.rhrD!=null?(wd.rhrD>0?'+':'')+Math.round(wd.rhrD)+' vs avg':'';
       h+=`<div class="hg-why"><div><b>${sl?hm(sl.dur):'–'}</b><span>Sleep${sl&&sl.perf!=null?', '+Math.round(sl.perf)+'% of need':''}</span></div><div><b>${x.hrv!=null?Math.round(x.hrv)+' ms':'–'}</b><span>HRV, ${hrvT}</span></div><div><b>${x.rhr!=null?Math.round(x.rhr)+' bpm':'–'}</b><span>Resting HR${rhrT?', '+rhrT:''}</span></div></div>
       ${wd&&wd.why?`<p class="hg-note">${esc(wd.why.join(' · '))}${ld!==t?' · from '+short(ld):''}</p>`:''}<button class="hg-link" data-a="hgo" data-v="whoop">Open Body ›</button>`}
-  }else if(S.whoop.connected){h+=`<button class="hg-ready" data-a="rcopen">${hGauge(null,col,false)}<span class="hg-rtx"><b>${L?L[0]:'No recovery yet'}</b><span>${L?L[1]:'WHOOP hasn’t scored today. Tap for a quick readiness check'}</span></span></button>`}
-  else h+=`<div class="hg-cta2"><button class="hg-ready" data-a="rcopen"><span class="hg-rtx"><b>${L?L[0]:'How do you feel today?'}</b><span>${L?L[1]:'A 10-second readiness check sets today’s intensity'}</span></span><span class="lhgo">›</span></button><button class="hg-link" data-a="hgo" data-v="whoop">Connect WHOOP to do this automatically ›</button></div>`;
+  }else if(HLIVE){h+=`<button class="hg-ready" data-a="rcopen">${hGauge(null,col,false)}<span class="hg-rtx"><b>${L?L[0]:'No recovery yet'}</b><span>${L?L[1]:'WHOOP hasn’t scored today. Tap for a quick readiness check'}</span></span></button>`}
+  else h+=`<div class="hg-cta2"><button class="hg-ready" data-a="rcopen"><span class="hg-rtx"><b>${L?L[0]:'How do you feel today?'}</b><span>${L?L[1]:'A 20-second morning check-in gives your recovery score'}</span></span><span class="lhgo">›</span></button><button class="hg-link" data-a="recsrc">Connect WHOOP or Oura to do this automatically ›</button></div>`;
   h+=`</section>`;
   if(typeof fwCard==='function')h+=fwCard();
   if(typeof protectCard==='function')h+=protectCard();
@@ -63,7 +64,8 @@ function renderHome(){
      h+=`<section class="card hg-lift" aria-label="Lift progress"><div class="hg-seg" role="tablist">${top.map((e,j)=>`<button role="tab" aria-selected="${j===i}" class="${j===i?'on':''}" data-a="hlift" data-v="${j}">${esc(nameOf(e))}</button>`).join('')}</div>
      <button class="hg-lrow" data-a="lifthist" data-e="${ex}"><span><small>Estimated 1-rep max</small><b class="disp num">${Math.round(now)} kg</b><em style="color:${dl>=0?'var(--ok)':'var(--bad)'}">${dl>=0?'+':''}${Math.round(dl)} kg since ${short(ago.d)}</em></span>${hSpark(ser.slice(-10).map(q=>q.v),'var(--upper)')}</button>`;
      const sch=[...Array(7)].map((_,j)=>addD(ws,j)).filter(d=>isTraining(tplOf(d))),dn=sch.filter(d=>S.done[d]).length,need=Math.max(0,4-dn),wk=weekStreak();
-     h+=`<p class="hg-streak">${IC.trophy||''}<span><b>${wk}-week streak.</b> ${need?`${need} more session${need>1?'s':''} this week keeps it going.`:'This week already counts.'}</span></p></section>`}}
+     if(typeof weekCard!=='function')h+=`<p class="hg-streak">${IC.trophy||''}<span><b>${wk}-week streak.</b> ${need?`${need} more session${need>1?'s':''} this week keeps it going.`:'This week already counts.'}</span></p></section>`}}
+  if(typeof weekCard==='function'){h+=recapBanner();h+=weekCard()}
   // at a glance
   {const ph=phaseOf(inPlan(t)?t:S.start),tw=weekVol(ws),lw2=addD(ws,-7),wdd=weekData(lw2),g=goalList()[0],ibl=ibLatest(),bw=lastVal('weight',t),trip=(S.trips||[]).filter(q=>q.to>=t).sort((a,b)=>a.from<b.from?-1:1)[0];
    const tile=(a,lab,val,sub,c,extra)=>`<button class="hg-mini" style="--c:${c}" ${a}><span>${lab}</span><b>${val}</b><small>${sub}</small>${extra||''}</button>`;

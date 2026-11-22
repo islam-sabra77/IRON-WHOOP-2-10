@@ -35,7 +35,9 @@ test('nutrition targets and quick add', async ({ page }) => {
   const tg = await page.evaluate(() => nutTargets(todayS()));
   expect(tg.prot).toBeGreaterThan(100);
   expect(tg.kcal).toBeGreaterThan(1500);
-  await page.click('[data-a="foodq"][data-v="0"]');
+  // quick-add presets now live in the add-food sheet under Recent
+  await page.click('[data-a="nadd"]'); await page.click('[data-a="ntab"][data-v="recent"]');
+  await page.click('[data-a="foodq2"][data-v="0"]');
   expect(await page.evaluate(() => nutDay(todayS()).p)).toBe(25);
   await page.click('[data-a="fooddel"][data-v="0"]');
   expect(await page.evaluate(() => nutDay(todayS()).p)).toBe(0);
